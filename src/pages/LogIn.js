@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, TextInput, Text, View } from 'react-native';
 import React from 'react';
-import ButtonGradient from './ButtonGradient';
+import ButtonGradient from '../components/ButtonGradient';
 
-export default function App() {
+export default function () {
   return (
     <View style={styles.container}>
             <Text style={styles.title }>Bienvenido </Text>
