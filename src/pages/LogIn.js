@@ -9,7 +9,7 @@ export default function () {
             <Text style={styles.title }>Bienvenido </Text>
       <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
       <TextInput style={styles.TextInput} placeholder="Correo eléctronico"/>
-      <TextInput style={styles.TextInput} placeholder='Contraseña '/>
+      <TextInput secureTextEntry style={styles.TextInput} placeholder='Contraseña '/>
       <ButtonGradient></ButtonGradient>
       <StatusBar style="auto" />
     </View>
@@ -47,4 +47,6 @@ const styles = StyleSheet.create({
 
   }
 }); 
+ 
+
  

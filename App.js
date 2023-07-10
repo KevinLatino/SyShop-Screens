@@ -1,79 +1,50 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {View, ScrollView, Text, Button, StyleSheet} from 'react-native';
-import {Bubble, GiftedChat, Send} from 'react-native-gifted-chat';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, TextInput, Text, View } from 'react-native';
+import React from 'react';
+import ButtonGradient from './ButtonGradient';
 
-const ChatScreen = () => {
-  const [messages, setMessages] = useState([]);
-
-
-
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages),
-    );
-  }, []);
-
-  const renderSend = (props) => {
-    return (
-      <Send {...props}>
-        <View>
-          <MaterialCommunityIcons
-            name="send-circle"
-            style={{marginBottom: 5, marginRight: 5}}
-            size={32}
-            color="#e00000"
-          />
-        </View>
-      </Send>
-    );
-  };
-
-  const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: '#e00000',
-          },
-        }}
-        textStyle={{
-          right: {
-            color: '#fff',
-          },
-        }}
-      />
-    );
-  };
-
-  const scrollToBottomComponent = () => {
-    return(
-      <FontAwesome name='angle-double-down' size={22} color='#333' />
-    );
-  }
-
+export default function App() {
   return (
-    <GiftedChat
-      messages={messages}
-      placeholder='Mensaje...'
-      onSend={(messages) => onSend(messages)}
-      user={{
-        _id: 1,
-      }}
-      renderBubble={renderBubble}
-      alwaysShowSend
-      renderSend={renderSend}
-      scrollToBottom
-      scrollToBottomComponent={scrollToBottomComponent}
-    />
+    <View style={styles.container}>
+            <Text style={styles.title }>Bienvenido </Text>
+      <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
+      <TextInput style={styles.TextInput} placeholder="Correo eléctronico"/>
+      <TextInput secureTextEntry style={styles.TextInput} placeholder='Contraseña '/>
+      <ButtonGradient></ButtonGradient>
+      <StatusBar style="auto" />
+    </View>
   );
-};
-
-export default ChatScreen;
+}
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f1f1f1 ',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 50,
+    color: "#344340",
+    fontWeight: "bold"
+  },
+  subtitle: {
+    fontSize: 20,
+    color: "gray",
+  }, 
+  TextInput: {
+    borderWidth: 1, 
+    paddingStart: 30,
+    borderColor: "gray",
+    padding: 10,
+    width: "80%",
+    height: 50,
+    marginTop: 20,
+    borderRadius: 30,
+    backgroundColor: "#fff"
+  },
+  button:{
 
-  
-});
+  }
+}); 
+ 
