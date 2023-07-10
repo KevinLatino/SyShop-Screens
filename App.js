@@ -1,18 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, TextInput, Text, View } from 'react-native';
 import React from 'react';
-import ButtonCreateAccount from './Button2';
+import ButtonGradient from './ButtonGradient';
 
 export default function App() {
   return (
     <View style={styles.container}>
-            <Text style={styles.title }>Crea una cuenta</Text>
-      <Text style={styles.subtitle}>Rellena tus datos personales</Text>
-      <TextInput style={styles.TextInput} placeholder="Nombre"/>
-      <TextInput style={styles.TextInput} placeholder='Primer apellido '/>
-      <TextInput style={styles.TextInput} placeholder='Segundo apellido '/>
-      <TextInput style={styles.TextInput} placeholder='Número telefónico'/>
-      <ButtonCreateAccount></ButtonCreateAccount>
+            <Text style={styles.title }>Bienvenido </Text>
+      <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
+      <TextInput style={styles.TextInput} placeholder="Correo eléctronico"/>
+      <TextInput secureTextEntry style={styles.TextInput} placeholder='Contraseña '/>
+      <ButtonGradient></ButtonGradient>
       <StatusBar style="auto" />
     </View>
   );
@@ -26,8 +24,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize:40 ,
-    color: "#ff4040",
+    fontSize: 50,
+    color: "#344340",
     fontWeight: "bold"
   },
   subtitle: {
@@ -37,13 +35,16 @@ const styles = StyleSheet.create({
   TextInput: {
     borderWidth: 1, 
     paddingStart: 30,
-    borderColor: "grey",
+    borderColor: "gray",
     padding: 10,
-    color: "#344340",
     width: "80%",
     height: 50,
     marginTop: 20,
     borderRadius: 30,
     backgroundColor: "#fff"
+  },
+  button:{
+
   }
 }); 
+ 
