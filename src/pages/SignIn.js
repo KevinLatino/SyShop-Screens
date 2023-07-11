@@ -86,6 +86,7 @@ export default () => {
       <TextInput
         text={password}
         onChangeText={setPassword}
+        secureTextEntry
         style={styles.TextInput}
         placeholder='Contraseña'
       />
