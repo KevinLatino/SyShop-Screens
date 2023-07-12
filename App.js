@@ -1,13 +1,16 @@
 import { PaperProvider } from 'react-native-paper'
-import SignIn from './src/pages/SignIn.js'
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import GoogleSignInButton from './src/components/GoogleSignInButton'
 
-GoogleSignin.configure();
+const App = () => {
+  return (
+    <GoogleSignInButton setUserInformation={(u) => console.log(u)} />
+  )
+}
 
 export default () => {
   return (
     <PaperProvider>
-      <SignIn />
+      <App />
     </PaperProvider>
   );
 }
