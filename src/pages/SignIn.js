@@ -2,9 +2,9 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import { StyleSheet, TextInput, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
-import { Button } from 'react-native-paper'
+import { Button, Divider } from 'react-native-paper'
 import formatApiUrl from '../utilities/format-api-url.js'
-import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin'
+import GoogleSignInButton from '../components/GoogleSignInButton.js'
 
 const styles = StyleSheet.create({
   container: {
@@ -52,7 +52,6 @@ const signInWithPlainAccount = async (email, password) => {
 export default () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [isGoogleSignInInProgress, setIsGoogleSignInInProgress] = useState(false)
 
   const handleSignIn = (_) => {
     try {
@@ -62,17 +61,9 @@ export default () => {
     }
   }
 
-  const handleGoogleSignIn = async (_) => {
-    GoogleSignin.signIn()
-      .then((userInformation) => console.log(userInformation))
-      .catch((error) => console.log(error))
-
-    setIsGoogleSignInInProgress(true);
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title }>Bienvenido</Text>
+      <Text style={styles.title}>Bienvenido</Text>
 
       <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
 
@@ -98,11 +89,8 @@ export default () => {
         Iniciar sesión
       </Button>
 
-      <GoogleSigninButton
-        size={GoogleSigninButton.Size.Wide}
-        color={GoogleSigninButton.Color.Light}
-        onPress={handleGoogleSignIn}
-        disabled={isGoogleSignInInProgress}
+      <GoogleSignInButton
+        setUserInformation={(userInformation) => console.log(userInformation)}
       />
 
       <StatusBar style="auto" />
