@@ -4,6 +4,9 @@ import * as Google from 'expo-auth-session/providers/google'
 import axios from 'axios'
 import { maybeCompleteAuthSession } from "expo-web-browser"
 import configuration from "../configuration"
+  
+const googleLogoUri
+    = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/2008px-Google_%22G%22_Logo.svg.png"
 
 maybeCompleteAuthSession()
 
@@ -45,20 +48,20 @@ const getUserInformation = async (accessToken) => {
   return data
 }
 
-export default ({ setUserInformation }) => {
+export default ({ text, onSignIn }) => {
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: configuration.GOOGLE_WEB_CLIENT_ID,
-    androidClientId: configuration.GOOGLE_ANDROID_CLIENT_ID
+    androidClientId: configuration.GOOGLE_ANDROID_CLIENT_ID,
+    expoClientId: configuration.GOOGLE_EXPO_CLIENT_ID
     // iosClientId: ""
   })
-  const googleLogoUri = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/2008px-Google_%22G%22_Logo.svg.png"
 
   useEffect(() => {
     if ((response !== null) && (response.type === "success")) {
       const accessToken = response.authentication.accessToken
 
       getUserInformation(accessToken)
-        .then((userInformation) => setUserInformation(userInformation))
+        .then((userInformation) => onSignIn(userInformation))
     }
   }, [response])
 
@@ -71,7 +74,7 @@ export default ({ setUserInformation }) => {
         <Image source={{uri: googleLogoUri, width: 25, height: 25}} />
 
         <Text style={styles.buttonText}>
-          Sign in with Google
+          {text}
         </Text>
       </View>
     </TouchableOpacity>

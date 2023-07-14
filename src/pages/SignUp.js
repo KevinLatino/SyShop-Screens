@@ -1,35 +1,28 @@
+import axios from 'axios'
+import validator from 'validator'
+import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
+import { signOnWithGoogleAccount } from '../utilities/api-calls'
+import formatApiUrl from '../utilities/format-api-url'
+import { useForm } from '../utilities/forms'
+import TextField from '../components/TextField'
+import PageTitle from '../components/PageTitle'
+import PageSubtitle from './PageSubtitle'
+import PageDivider from '../components/PageDivider'
+import GoogleSignInButton from '../components/GoogleSignInButton'
+import { View, StyleSheet } from 'react-native'
+import { Text, Button } from 'react-native-paper'
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, TextInput, Text, View } from 'react-native'
-import { Button } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: "1rem",
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  title: {
-    fontSize: 40,
-    color: "#ff4040",
-    fontWeight: "bold"
-  },
-  subtitle: {
-    fontSize: 20,
-    color: "gray",
-  },
-  TextInput: {
-    borderWidth: 1,
-    paddingStart: 30,
-    borderColor: "grey",
-    padding: 10,
-    color: "#344340",
-    width: "80%",
-    height: 50,
-    marginTop: 20,
-    borderRadius: 30,
-    backgroundColor: "#fff"
+    paddingTop: "1rem",
+    paddingBottom: "1rem"
   }
-});
+})
 
 const signUpWithPlainAccount = async (userInformation) => {
   const apiUrl = formatApiUrl("/users_service/sign_up_customer_with_plain_account")
@@ -45,20 +38,51 @@ const signUpWithPlainAccount = async (userInformation) => {
   localStorage.setItem("sessionToken", sessionToken)
 }
 
-export default () => {
-  const [userInformation, setUserInformation] = useState({
-    name: "",
-    first_surname: "",
-    second_surname: "",
-    phone_number: "",
-    picture: "",
-    email: "",
-    password: ""
-  })
+const checkPhoneNumber = (phoneNumber) => {
+  if (!validator.isMobilePhone(phoneNumber, "es-CR")) {
+    return "Número telefónico inválido"
+  }
 
-  const handleSignUp = (_) => {
+  return null
+}
+
+export default () => {
+  const {
+    getField,
+    setField,
+    getError
+  } = useForm(
+    {
+      name: "",
+      first_surname: "",
+      second_surname: "",
+      phone_number: "",
+      picture: null,
+      email: "",
+      password: ""
+    },
+    {
+      name: makeNotEmptyChecker("Nombre vacío"),
+      first_surname: makeNotEmptyChecker("Primer apellido vacío"),
+      second_surname: makeNotEmptyChecker("Segundo apellido vació"),
+      phone_number: checkPhoneNumber,
+      picture: null,
+      email: checkEmail,
+      password: makeNotEmptyChecker("Contraseña vacía")
+    }
+  )
+
+  const handleSignUpWithPlainAccount = async (_) => {
     try {
-      signUpWithPlainAccount(userInformation)
+      await signUpWithPlainAccount(userInformation)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSignUpWithGoogleAccount = async (userInformation) => {
+    try {
+      await signOnWithGoogleAccount(userInformation)
     } catch (error) {
       console.log(error)
     }
@@ -66,61 +90,72 @@ export default () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Crea una cuenta</Text>
+      <PageTitle text="Registrate" />
 
-      <Text style={styles.subtitle}>Rellena tus datos personales</Text>
+      <PageDivider />
 
-      <TextInput
-        onChangeText={(text) => setUserInformation({...userInformation, name: text})}
-        text={userInformation.name}
-        style={styles.TextInput}
-        placeholder="Nombre"
+      <PageSubtitle text="Ingresa tus datos personales" />
+
+      <TextField
+        text={getField("name")}
+        onChangeText={setField("name")}
+        error={getError("name")}
+        label="Nombre"
       />
 
-      <TextInput
-        onChangeText={(text) => setUserInformation({...userInformation, first_surname: text})}
-        text={userInformation.first_surname}
-        style={styles.TextInput}
-        placeholder='Primer apellido'
+      <TextField
+        text={getField("first_surname")}
+        onChangeText={setField("first_surname")}
+        error={getError("first_surname")}
+        label="Primer apellido"
       />
 
-      <TextInput
-        onChangeText={(text) => setUserInformation({...userInformation, second_surname: text})}
-        text={userInformation.second_surname}
-        style={styles.TextInput}
-        placeholder='Segundo apellido'
+      <TextField
+        text={getField("second_surname")}
+        onChangeText={setField("second_surname")}
+        error={getError("second_surname")}
+        label="Segundo apellido"
       />
 
-      <TextInput
-        onChangeText={(text) => setUserInformation({...userInformation, email: text})}
-        text={userInformation.email}
-        style={styles.TextInput}
-        placeholder='Correo eléctronico'
+      <TextField
+        text={getField("phone_number")}
+        onChangeText={setField("phone_number")}
+        error={getError("phone_number")}
+        label="Número telefónico"
       />
 
-      <TextInput
-        onChangeText={(text) => setUserInformation({...userInformation, phone_number: text})}
-        text={userInformation.phone_number}
-        style={styles.TextInput}
-        placeholder='Número telefónico'
+      <TextField
+        text={getField("email")}
+        onChangeText={setField("email")}
+        error={getError("email")}
+        label="Correo electrónico"
       />
 
-      <TextInput
-        onChangeText={(text) => setUserInformation({...userInformation, password: text})}
-        text={userInformation.password}
-        style={styles.TextInput}
+      <TextField
+        text={getField("password")}
+        onChangeText={setField("password")}
+        error={getError("password")}
+        label="Contraseña"
         secureTextEntry
-        placeholder='Contraseña'
       />
 
       <Button
         mode="contained"
-        onPress={handleSignUp}
+        onPress={handleSignUpWithPlainAccount}
       >
-        Crear cuenta
+        Registrarse
       </Button>
+
+      <PageDivider />
+
+      <PageSubtitle text="Registrate con tu cuenta de Google" />
+
+      <GoogleSignInButton
+        text="Registrarse"
+        onSignIn={handleSignUpWithGoogleAccount}
+      />
 
       <StatusBar style="auto" />
     </View>
-  );
+  )
 }

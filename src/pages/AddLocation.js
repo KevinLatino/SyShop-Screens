@@ -1,3 +1,5 @@
+import PageTitle from '../components/PageTitle'
+import PageDivider from '../components/PageDivider'
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, TextInput, Text, View } from 'react-native'
 import { Button } from 'react-native-paper'
@@ -34,9 +36,9 @@ const styles = StyleSheet.create({
 export default () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Añade un nuevo domicilio</Text>
+      <PageTitle text="Añade un nuevo domicilio" />
 
-      <Text style={styles.subtitle}>Ingresa los datos</Text>
+      <PageDivider />
 
       <TextInput style={styles.TextInput} placeholder="Código postal" />
 
@@ -48,11 +50,10 @@ export default () => {
 
       <TextInput style={styles.TextInput} placeholder='Barrio, residencial, condominio, apartamento, etc...' />
 
-
       <Button
         mode="contained"
       >
-        Continuar
+        Añadir
       </Button>
 
       <StatusBar style="auto" />

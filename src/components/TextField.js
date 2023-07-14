@@ -1,4 +1,5 @@
-import { View, TextInput, HelperText } from 'react-native-paper'
+import { View } from 'react-native'
+import { TextInput, HelperText } from 'react-native-paper'
 
 export default ({error, ...textInputProps}) => {
   return (
@@ -9,7 +10,7 @@ export default ({error, ...textInputProps}) => {
         error={(error !== null) && (error !== undefined)}
       />
 
-      <HelperText type="error" visibler={isErrorVisible}>
+      <HelperText type="error" visibler={(error !== null) && (error !== undefined)}>
         {error}
       </HelperText>
     </View>

@@ -1,38 +1,26 @@
 import axios from 'axios'
-import React, { useState } from 'react'
-import { StyleSheet, TextInput, Text, View } from 'react-native'
+import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
+import { signOnWithGoogleAccount } from '../utilities/api-calls'
+import formatApiUrl from '../utilities/format-api-url'
+import { useForm } from '../utilities/forms'
+import TextField from '../components/TextField'
+import PageTitle from '../components/PageTitle'
+import PageSubtitle from './PageSubtitle'
+import PageDivider from '../components/PageDivider'
+import GoogleSignInButton from '../components/GoogleSignInButton'
+import { View, StyleSheet } from 'react-native'
+import { Text, Button } from 'react-native-paper'
 import { StatusBar } from 'expo-status-bar'
-import { Button, Divider } from 'react-native-paper'
-import formatApiUrl from '../utilities/format-api-url.js'
-import GoogleSignInButton from '../components/GoogleSignInButton.js'
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f1f1 ',
+    gap: "1.5rem",
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: "1rem",
+    paddingBottom: "1rem"
   },
-  title: {
-    fontSize: 50,
-    color: "#344340",
-    fontWeight: "bold"
-  },
-  subtitle: {
-    fontSize: 20,
-    color: "gray",
-  }, 
-  TextInput: {
-    borderWidth: 1, 
-    paddingStart: 30,
-    borderColor: "gray",
-    padding: 10,
-    width: "80%",
-    height: 50,
-    marginTop: 20,
-    borderRadius: 30,
-    backgroundColor: "#fff"
-  }
 })
 
 const signInWithPlainAccount = async (email, password) => {
@@ -50,12 +38,36 @@ const signInWithPlainAccount = async (email, password) => {
 }
 
 export default () => {
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const {
+    setField,
+    getField,
+    getError,
+    hasErrors
+  } = useForm(
+    {
+      email: "",
+      password: ""
+    },
+    {
+      email: checkEmail,
+      password: makeNotEmptyChecker("Contraseña vacía")
+    }
+  )
 
-  const handleSignIn = (_) => {
+  const handleSignInWithPlainAccount = async (_) => {
     try {
-      signInWithPlainAccount(email, password)
+      await signInWithPlainAccount(
+        getField("email"),
+        getField("password")
+      )
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSignInWithGoogleAccount = async (userInformation) => {
+    try {
+      await signOnWithGoogleAccount(userInformation)
     } catch (error) {
       console.log(error)
     }
@@ -63,37 +75,45 @@ export default () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenido</Text>
+      <PageTitle text="Inicia sesión" />
 
-      <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
+      <PageDivider />
 
-      <TextInput
-        text={email}
-        onChangeText={setEmail}
-        style={styles.TextInput}
-        placeholder="Correo eléctronico"
+      <PageSubtitle text="Ingresa tu correo electrónico y contraseña" />
+
+      <TextField
+        text={getField("email")}
+        onChangeText={setField("email")}
+        error={getError("email")}
+        label="Correo electrónico"
       />
 
-      <TextInput
-        text={password}
-        onChangeText={setPassword}
+      <TextField
+        text={getField("password")}
+        onChangeText={setField("password")}
+        error={getError("password")}
+        label="Contraseña"
         secureTextEntry
-        style={styles.TextInput}
-        placeholder='Contraseña'
       />
 
       <Button
         mode="contained"
-        onPress={handleSignIn}
+        onPress={handleSignInWithPlainAccount}
+        disabled={hasErrors()}
       >
         Iniciar sesión
       </Button>
 
+      <PageDivider />
+
+      <PageSubtitle text="Inicia sesión con tu cuenta de Google" />
+
       <GoogleSignInButton
-        setUserInformation={(userInformation) => console.log(userInformation)}
+        text="Iniciar sesión"
+        onSignIn={handleSignInWithGoogleAccount}
       />
 
       <StatusBar style="auto" />
     </View>
-  );
+  )
 }
