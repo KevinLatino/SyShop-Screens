@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const useForm = (initialValues, errorHandlers) => {
+export default (initialValues, errorHandlers) => {
   const [fieldsState, setFieldsState] = React.useState(initialValues)
   const [errorsState, setErrorsState] = React.useState({})
 
@@ -26,14 +26,21 @@ export const useForm = (initialValues, errorHandlers) => {
     return setter
   }
 
-  const fields = fieldsState
+  const getError = (name) => {
+    return errorsState[name]
+  }
 
-  const errors = errorsState
+  const hasErrors = () => {
+    return Object.values(errorsState).some((v) => v !== null)
+  }
+
+  const fields = fieldsState
 
   return {
     getField,
     setField,
-    fields,
-    errors
+    getError,
+    hasErrors,
+    fields
   }
 }
