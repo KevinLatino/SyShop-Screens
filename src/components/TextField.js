@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { TextInput, HelperText } from 'react-native-paper'
 
-export default ({error, ...textInputProps}) => {
+export default ({ error, ...textInputProps }) => {
   return (
     <View>
       <TextInput

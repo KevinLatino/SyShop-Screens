@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const useForm = (initialValues, errorHandlers) => {
+export default (initialValues, errorHandlers) => {
   const [fieldsState, setFieldsState] = React.useState(initialValues)
   const [errorsState, setErrorsState] = React.useState({})
 
