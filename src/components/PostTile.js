@@ -1,4 +1,5 @@
-import { Card, Divider, Chip, Button, Text } from 'react-native-paper'
+import { useState } from 'react'
+import { Card, Divider, Chip, IconButton, Text } from 'react-native-paper'
 
 const styles = {
   extraInformationView: {
@@ -23,7 +24,22 @@ const formatPostSubtitle = (post) => {
   return subtitle
 }
 
+const likePost = (post_id, customer_id) => {
+  // Esto es temporal hasta que guarden las sesiones en el localStorage
+  console.log(`Customer (id=${customer_id}) liked post (id=${post_id})`)
+}
+
 export default ({ post }) => {
+  const [doesCustomerLikePost, setDoesCustomerLikePost] = useState(
+    post.does_customer_like_post
+  )
+
+  const handleLikePress = () => {
+    likePost(post.post_id, "")
+
+    setDoesCustomerLikePost(!doesCustomerLikePost)
+  }
+
   const categoriesChips = post
       .categories
       .map((category) => {
@@ -45,6 +61,10 @@ export default ({ post }) => {
       />
       
       <Card.Content>
+        <Text variant="bodySmall">
+          {post.description}
+        </Text>
+
         <Text variant="bodyMedium">
           {post.description}
         </Text>
@@ -63,7 +83,11 @@ export default ({ post }) => {
       </Card.Content>
 
       <Card.Actions>
-        <Button mode="contained" icon="heart-outline"></Button>
+        <IconButton
+          mode="contained"
+          icon={doesCustomerLikePost ? "heart" : "heart-outline"}
+          onPress={handleLikePress}
+        />
       </Card.Actions>
     </Card>
   )

@@ -8,10 +8,15 @@ export default ({ callback }) => {
     callback()
       .then((callbackResult) => setResult(callbackResult))
       .catch((callbackError) => setError(callbackError))
+
+    setResult(null)
+    setError(null)
   }
 
   useEffect(() => {
-    run()
+    callback()
+      .then((callbackResult) => setResult(callbackResult))
+      .catch((callbackError) => setError(callbackError))
   }, [])
 
   return [run, result, error]
