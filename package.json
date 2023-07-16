@@ -19,6 +19,7 @@
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
     "expo-web-browser": "~12.1.1",
+    "jotai": "^2.2.2",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "react-native-gifted-chat": "^2.4.0",

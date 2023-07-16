@@ -1,12 +1,14 @@
 import axios from 'axios'
 import configuration from '../configuration'
+import formatApiUrl from '../utilities/format-api-url'
 import useAsync from '../hooks/useAsync'
 import { useState } from 'react'
-import { View, StyleSheet } from 'react-native'
+import { FlatList, View, StyleSheet } from 'react-native'
 import {
   TouchableRipple,
   List,
   FAB,
+  Button,
   Searchbar,
   Portal,
   Modal
@@ -41,6 +43,40 @@ const getAddressAutocompleteResults = async (searchedText) => {
   const searchResults = await axios.get(url)
 
   return searchResults
+}
+
+const storeLocation = async (geoapifyLocation) => {
+  const location = {
+    place_name: geoapifyLocation.name,
+    street_address: geoapifyLocation.address_line1,
+    city: geoapifyLocation.city,
+    state: geoapifyLocation.state,
+    zip_code: geoapifyLocation.postcode,
+  }
+  const url = formatApiUrl("/locations_service/add_customer_location")
+
+  const { statusText } = await axios.post(url, {
+    customer_id: null, // Temporal
+    ...location,
+  })
+
+  if (statusText !== "OK") {
+    throw Error("Could not store customer's new location")
+  }
+}
+
+const getLocations = async () => {
+  const url = formatApiUrl("/locations_service/get_customer_locations")
+
+  const { data, statusText } = await axios.post(url, {
+    customer_id: null // Temporal
+  })
+
+  if (statusText !== "OK") {
+    throw Error("Could not get customer locations")
+  }
+
+  return data
 }
 
 const LocationTile = ({ location }) => {
@@ -108,11 +144,59 @@ const AddressAutocompleteInput = ({ onSelect }) => {
   )
 }
 
-const AddLocationModel = ({ visible, onDismiss }) => {
+const AddLocationModal = ({ visible, hideModal }) => {
+  const [selectedLocation, setSelectedLocation] = useState(null)
+
+  const handlePress = async () => {
+    try {
+      await storeLocation(selectedLocation)
+    } catch (error) {
+      console.log(error)
+    }
+
+    hideModal()
+  }
+
   return (
     <Portal>
-      <Modal visible={visible} onDismiss={onDismiss}>
+      <Modal visible={visible} onDismiss={hideModal}>
+        <AddressAutocompleteInput onSelect={setSelectedLocation} />
+
+        <Button
+          onPress={handlePress}
+        >
+          Añadir domicilio
+        </Button>
       </Modal>
     </Portal>
+  )
+}
+
+export default () => {
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [
+    runGetLocations,
+    locations,
+    getLocationsError
+  ] = useAsync(() => getLocations())
+
+  return (
+    <View>
+      <FlatList
+        data={locations}
+        keyExtractor={(location) => location.location_id}
+        renderItem={(location) => <LocationTile location={location} />}
+        onStartReached={runGetLocations}
+      />
+
+      <AddLocationModal
+        visible={isModalVisible}
+        hideModal={() => setIsModalVisible(false)}
+      />
+
+      <AddLocationFloatingActionButton
+        onPress={() => setIsModalVisible(true)}
+      />
+    </View>
   )
 }
