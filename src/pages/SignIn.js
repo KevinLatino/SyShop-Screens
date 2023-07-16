@@ -3,6 +3,8 @@ import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
 import { signOnWithGoogleAccount } from '../utilities/api-calls'
 import formatApiUrl from '../utilities/format-api-url'
 import useForm from '../hooks/useForm'
+import { useAtom } from 'jotai'
+import { sessionAtom } from '../context'
 import TextField from '../components/TextField'
 import PageTitle from '../components/PageTitle'
 import PageSubtitle from './PageSubtitle'
@@ -11,6 +13,7 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import { View, StyleSheet } from 'react-native'
 import { Button } from 'react-native-paper'
 import { StatusBar } from 'expo-status-bar'
+import NetworkError from '../utilities/NetworkError'
 
 const styles = StyleSheet.create({
   container: {
@@ -23,22 +26,26 @@ const styles = StyleSheet.create({
   },
 })
 
-const signInWithPlainAccount = async (email, password) => {
+const signInWithPlainAccount = async (credentials, setSession) => {
   const apiUrl = formatApiUrl("/users_service/sign_in_user_with_plain_account")
 
-  const { data, statusText } = await axios.post(apiUrl, { email, password })
+  const { data, statusText } = await axios.post(apiUrl, credentials)
 
   if (statusText !== "OK") {
-    throw Error("Could not sign in with a plain account")
+    throw NetworkError("Could not sign in with a plain account")
   }
 
-  const sessionToken = data.token
+  const session = {
+    token: data.token,
+    customerId: data.user_id
+  }
 
-  localStorage.setItem("sessionToken", sessionToken)
+  setSession(session)
 }
 
 export default () => {
   const {
+    fields,
     setField,
     getField,
     getError,
@@ -53,13 +60,11 @@ export default () => {
       password: makeNotEmptyChecker("Contraseña vacía")
     }
   )
+  const [_, setSession] = useAtom(sessionAtom)
 
   const handleSignInWithPlainAccount = async (_) => {
     try {
-      await signInWithPlainAccount(
-        getField("email"),
-        getField("password")
-      )
+      await signInWithPlainAccount(fields, setSession)
     } catch (error) {
       console.log(error)
     }
@@ -67,7 +72,7 @@ export default () => {
 
   const handleSignInWithGoogleAccount = async (userInformation) => {
     try {
-      await signOnWithGoogleAccount(userInformation)
+      await signOnWithGoogleAccount(userInformation, setSession)
     } catch (error) {
       console.log(error)
     }
@@ -82,14 +87,14 @@ export default () => {
       <PageSubtitle text="Ingresa tu correo electrónico y contraseña" />
 
       <TextField
-        text={getField("email")}
+        value={getField("email")}
         onChangeText={setField("email")}
         error={getError("email")}
         label="Correo electrónico"
       />
 
       <TextField
-        text={getField("password")}
+        value={getField("password")}
         onChangeText={setField("password")}
         error={getError("password")}
         label="Contraseña"

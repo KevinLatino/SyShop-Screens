@@ -3,6 +3,8 @@ import configuration from '../configuration'
 import formatApiUrl from '../utilities/format-api-url'
 import useAsync from '../hooks/useAsync'
 import { useState } from 'react'
+import { useAtom } from 'jotai'
+import { sessionAtom } from '../context'
 import { FlatList, View, StyleSheet } from 'react-native'
 import {
   TouchableRipple,
@@ -11,14 +13,22 @@ import {
   Button,
   Searchbar,
   Portal,
-  Modal
+  Modal,
+  Surface
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
+  container: {
+    height: "100vh",
+    width: "100hh"
+  },
   fab: {
     position: 'absolute',
-    bottom: 10,
-    left: 5
+    right: 10,
+    bottom: 10
+  },
+  disabledAddressAutocompleteResultTile: {
+    backgroundColor: "darkgray"
   }
 })
 
@@ -30,6 +40,10 @@ const formatLocationSubtitle = (location) => {
 }
 
 const getAddressAutocompleteResults = async (searchedText) => {
+  if (searchedText === "") {
+    return null
+  }
+
   const baseUrl = "https://api.geoapify.com/v1/geocode/autocomplete?"
   const queryParameters = new URLSearchParams()
 
@@ -40,23 +54,24 @@ const getAddressAutocompleteResults = async (searchedText) => {
   queryParameters.append("format", "json")
 
   const url = baseUrl + queryParameters.toString()
-  const searchResults = await axios.get(url)
+  const { data } = await axios.get(url)
+  const searchResults = data.results
 
   return searchResults
 }
 
-const storeLocation = async (geoapifyLocation) => {
+const storeLocation = async (geoapifyLocation, session) => {
   const location = {
     place_name: geoapifyLocation.name,
     street_address: geoapifyLocation.address_line1,
     city: geoapifyLocation.city,
-    state: geoapifyLocation.state,
+    state: geoapifyLocation.state ?? geoapifyLocation.province,
     zip_code: geoapifyLocation.postcode,
   }
   const url = formatApiUrl("/locations_service/add_customer_location")
 
   const { statusText } = await axios.post(url, {
-    customer_id: null, // Temporal
+    customer_id: session.customerId,
     ...location,
   })
 
@@ -65,11 +80,11 @@ const storeLocation = async (geoapifyLocation) => {
   }
 }
 
-const getLocations = async () => {
+const getLocations = async (session) => {
   const url = formatApiUrl("/locations_service/get_customer_locations")
 
   const { data, statusText } = await axios.post(url, {
-    customer_id: null // Temporal
+    customer_id: session.customerId
   })
 
   if (statusText !== "OK") {
@@ -85,7 +100,25 @@ const LocationTile = ({ location }) => {
       <List.Item
         title={location.place_name}
         description={formatLocationSubtitle(location)}
-        left={(props) => <List.Icon {...props} icon="location" />}
+        left={(props) => <List.Icon {...props} icon="map-marker" />}
+      />
+    </TouchableRipple>
+  )
+}
+
+const AddressAutocompleteResultTile = ({ result, onSelect }) => {
+  const isDisabled = result.name === undefined
+
+  return (
+    <TouchableRipple
+      onPress={() => onSelect(result)}
+      disabled={isDisabled}
+      style={isDisabled ? styles.disabledAddressAutocompleteResultTile : {}}
+    >
+      <List.Item
+        key={result.place_id}
+        title={result.formatted}
+        left={(props) => <List.Icon {...props} icon="map-marker" />}
       />
     </TouchableRipple>
   )
@@ -109,18 +142,19 @@ const AddressAutocompleteInput = ({ onSelect }) => {
     getAddressAutocompleteResultsError
   ] = useAsync(() => getAddressAutocompleteResults(searchedText))
 
-  const resultTiles = addressAutocompleteResults.map((result) => {
-    return (
-      <TouchableRipple
-        onPress={() => onSelect(result)}
-      >
-        <List.Item
-          title={result.formatted}
-          left={(props) => <List.Icon {...props} icon="location-pin" />}
-        />
-      </TouchableRipple>
+  const resultTiles = (addressAutocompleteResults !== null)
+    ? addressAutocompleteResults.map(
+      (result) => {
+        return (
+          <AddressAutocompleteResultTile
+            key={result.place_id}
+            result={result}
+            onSelect={onSelect}
+          />
+        )
+      }
     )
-  })
+    : null
 
   const handleSearch = (newSearchedText) => {
     runGetAddressAutocompleteResults()
@@ -132,7 +166,7 @@ const AddressAutocompleteInput = ({ onSelect }) => {
       <Searchbar
         value={searchedText}
         onChangeText={handleSearch}
-        placeholder="Escribe la ubicación de tu nuevo domicilio"
+        placeholder="Ubicación"
       />
 
       <View>
@@ -146,10 +180,12 @@ const AddressAutocompleteInput = ({ onSelect }) => {
 
 const AddLocationModal = ({ visible, hideModal }) => {
   const [selectedLocation, setSelectedLocation] = useState(null)
+  const [session, _] = useAtom(sessionAtom)
+  console.log(selectedLocation)
 
   const handlePress = async () => {
     try {
-      await storeLocation(selectedLocation)
+      await storeLocation(selectedLocation, session)
     } catch (error) {
       console.log(error)
     }
@@ -160,13 +196,17 @@ const AddLocationModal = ({ visible, hideModal }) => {
   return (
     <Portal>
       <Modal visible={visible} onDismiss={hideModal}>
-        <AddressAutocompleteInput onSelect={setSelectedLocation} />
+        <Surface elevation={5}>
+          <AddressAutocompleteInput onSelect={setSelectedLocation} />
 
-        <Button
-          onPress={handlePress}
-        >
-          Añadir domicilio
-        </Button>
+          <Button
+            mode="contained"
+            onPress={handlePress}
+            disabled={selectedLocation === null}
+          >
+            Añadir domicilio
+          </Button>
+        </Surface>
       </Modal>
     </Portal>
   )
@@ -174,14 +214,15 @@ const AddLocationModal = ({ visible, hideModal }) => {
 
 export default () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [session, _] = useAtom(sessionAtom)
   const [
     runGetLocations,
     locations,
     getLocationsError
-  ] = useAsync(() => getLocations())
+  ] = useAsync(() => getLocations(session))
 
   return (
-    <View>
+    <View style={styles.container}>
       <FlatList
         data={locations}
         keyExtractor={(location) => location.location_id}
