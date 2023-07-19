@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default ({ callback }) => {
+export default (callback) => {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
 
