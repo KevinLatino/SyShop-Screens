@@ -1,12 +1,10 @@
 import { PaperProvider } from 'react-native-paper'
-import SignUp from './src/pages/SignUp'
-import SignIn from './src/pages/SignIn'
-import ChooseLocation from './src/pages/ChooseLocation'
+import SearchBar from './src/components/SearchBar'
 
 export default () => {
   return (
     <PaperProvider>
-      <ChooseLocation />
+      <SearchBar />
     </PaperProvider>
   )
 }
