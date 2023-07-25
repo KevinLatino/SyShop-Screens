@@ -1,19 +1,17 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {View, ScrollView, Text, Button, StyleSheet} from 'react-native';
-import {Bubble, GiftedChat, Send} from 'react-native-gifted-chat';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useState, useCallback } from 'react'
+import { View } from 'react-native'
+import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
-const ChatScreen = () => {
+export default () => {
   const [messages, setMessages] = useState([]);
-
-
 
   const onSend = useCallback((messages = []) => {
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, messages),
-    );
-  }, []);
+    )
+  }, [])
 
   const renderSend = (props) => {
     return (
@@ -27,8 +25,8 @@ const ChatScreen = () => {
           />
         </View>
       </Send>
-    );
-  };
+    )
+  }
 
   const renderBubble = (props) => {
     return (
@@ -45,19 +43,19 @@ const ChatScreen = () => {
           },
         }}
       />
-    );
-  };
+    )
+  }
 
   const scrollToBottomComponent = () => {
     return(
       <FontAwesome name='angle-double-down' size={22} color='#333' />
-    );
+    )
   }
 
   return (
     <GiftedChat
       messages={messages}
-      placeholder='Mensaje...'
+      placeholder='Escribe un mensaje'
       onSend={(messages) => onSend(messages)}
       user={{
         _id: 1,
@@ -68,12 +66,5 @@ const ChatScreen = () => {
       scrollToBottom
       scrollToBottomComponent={scrollToBottomComponent}
     />
-  );
-};
-
-export default ChatScreen;
-
-const styles = StyleSheet.create({
-
-  
-});
+  )
+}
