@@ -1,12 +1,12 @@
 import { PaperProvider } from 'react-native-paper'
-import SearchBar from './src/components/SearchBar'
-import TextField from './src/components/TextField'
-import SignIn from './src/pages/SignIn'
+import AppSnackBar from './src/components/AppSnackBar'
 
-export default () => {
+const App = () => {
   return (
     <PaperProvider>
-	  <SignIn />
+      <AppSnackBar />
     </PaperProvider>
   )
 }
+
+export default App
