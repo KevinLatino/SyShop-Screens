@@ -21,6 +21,11 @@ const App = () => {
             name="Chat"
             component={<Chat />}
           />
+
+          <Stack.Screen
+            name="SearchResults"
+            component={<SearchResults />}
+          />
         </Stack.Navigator>
 
         <BottomTab.Navigator>
