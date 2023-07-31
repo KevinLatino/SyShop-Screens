@@ -7,7 +7,7 @@ import DeliveryTile from '../components/DeliveryTile'
 
 const fetchActiveDeliveries = async (customerId) => {
   const payload = {
-    customerId
+    customer_id: customerId
   }
   const activeDeliveries = await requestServer(
     "/deliveries_service/get_customer_active_deliveries",

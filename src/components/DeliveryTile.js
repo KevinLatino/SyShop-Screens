@@ -28,13 +28,13 @@ const TrackLocationIcon = ({ delivery, ...props }) => {
 export default ({ delivery }) =>  {
   const title = delivery.post.title
   const amount = delivery.sale.amount
-  const uber_state = delivery.uber_state
-  const place_name = delivery.location.place_name
+  const uberState = delivery.uber_state
+  const placeName = delivery.location.place_name
 
   return (
     <List.Item
       title={`${title} x${amount}`}
-      description={`${place_name}: ${uber_state}`}
+      description={`${placeName}: ${uberState}`}
       left={(props) => <TrackLocationIcon {...props} delivery={delivery} />}
     />
   )

@@ -2,5 +2,5 @@
 
 - [ ] Actualizar los imports
 - [ ] Pulir el código
-- [ ] Unir todo el código mediante navegación
+- [ ] Terminar los screens que faltan
 - [ ] Hacer lo de Stripe
