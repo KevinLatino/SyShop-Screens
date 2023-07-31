@@ -13,17 +13,43 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import { View, StyleSheet } from 'react-native'
 import { Button } from 'react-native-paper'
 import { StatusBar } from 'expo-status-bar'
+import { Text } from 'react-native-paper'
 // import NetworkError from '../utilities/NetworkError'
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     gap: "1.5rem",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center', // Center items horizontally
+    justifyContent: 'center', // Center items vertically
     paddingTop: "1rem",
     paddingBottom: "1rem"
   },
+  title: {
+    fontSize: 50,
+    color: "#344340",
+    fontWeight: "bold",
+    display: "flex",
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  subtitle: {
+    fontSize: 20,
+    color: "gray",
+    display: "flex",
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center"
+  }, 
+  Button:{
+    display: "flex",
+    width: 225,
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#c20000"
+  }
 })
 
 const signInWithPlainAccount = async (credentials, setSession) => {
@@ -81,11 +107,8 @@ export default () => {
 
   return (
     <View style={styles.container}>
-      <PageTitle text="Inicia sesión" />
-
-      <PageDivider />
-
-      <PageSubtitle text="Ingresa tu correo electrónico y contraseña" />
+    <Text style={styles.title }>Bienvenido </Text>
+      <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
 
       <TextField
         value={getField("email")}
@@ -103,6 +126,7 @@ export default () => {
       />
 
       <Button
+      style={styles.Button}
         mode="contained"
         onPress={handleSignInWithPlainAccount}
         disabled={hasErrors()}
@@ -112,10 +136,10 @@ export default () => {
 
       <PageDivider />
 
-      <PageSubtitle text="Inicia sesión con tu cuenta de Google" />
+      <PageSubtitle text="O también" />
 
       <GoogleSignInButton
-        text="Iniciar sesión"
+        text="Iniciar sesión con google"
         onSignIn={handleSignInWithGoogleAccount}
       />
 

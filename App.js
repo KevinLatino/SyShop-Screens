@@ -8,46 +8,51 @@ import DeliveryList from './src/screens/DeliveryList'
 import ChatList from './src/screens/ChatList'
 import Chat from './src/screens/Chat'
 import AppSnackBar from './src/components/AppSnackBar'
+import SignIn from './src/screens/SignIn'
 
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
 
 const App = () => {
-  return (
-    <PaperProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Chat"
-            component={<Chat />}
-          />
-        </Stack.Navigator>
+  // return (
+  //   <PaperProvider>
+  //     <NavigationContainer>
+  //       <Stack.Navigator>
+  //         <Stack.Screen
+  //           name="Chat"
+  //           component={<Chat />}
+  //         />
+  //       </Stack.Navigator>
 
-        <BottomTab.Navigator>
-          <BottomTab.Screen
-            name="Home"
-            component={<Home />}
-          />
+  //       <BottomTab.Navigator>
+  //         <BottomTab.Screen
+  //           name="Home"
+  //           component={<Home />}
+  //         />
       
-          <BottomTab.Screen
-            name="Deliveries"
-            component={<DeliveryList />}
-          />
+  //         <BottomTab.Screen
+  //           name="Deliveries"
+  //           component={<DeliveryList />}
+  //         />
 
-          <BottomTab.Screen
-            name="Chats"
-            component={<ChatList />}
-          />
+  //         <BottomTab.Screen
+  //           name="Chats"
+  //           component={<ChatList />}
+  //         />
 
-          <BottomTab.Screen
-            name="MyProfile"
-          />
-        </BottomTab.Navigator>
-      </NavigationContainer>
+  //         <BottomTab.Screen
+  //           name="MyProfile"
+  //         />
+  //       </BottomTab.Navigator>
+  //     </NavigationContainer>
 
-      <AppSnackBar />
-    </PaperProvider>
+  //     <AppSnackBar />
+  //   </PaperProvider>
+  // )
+
+  return (
+    <SignIn />
   )
 }
 
-export default App
+export default App;
