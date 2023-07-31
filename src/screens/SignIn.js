@@ -1,7 +1,7 @@
-import axios from 'axios'
+// import axios from 'axios'
 import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
 import { signOnWithGoogleAccount } from '../utilities/api-calls'
-import formatApiUrl from '../utilities/format-api-url'
+// import formatApiUrl from '../utilities/format-api-url'
 import useForm from '../hooks/useForm'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
@@ -13,7 +13,7 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import { View, StyleSheet } from 'react-native'
 import { Button } from 'react-native-paper'
 import { StatusBar } from 'expo-status-bar'
-import NetworkError from '../utilities/NetworkError'
+// import NetworkError from '../utilities/NetworkError'
 
 const styles = StyleSheet.create({
   container: {
@@ -27,20 +27,21 @@ const styles = StyleSheet.create({
 })
 
 const signInWithPlainAccount = async (credentials, setSession) => {
-  const apiUrl = formatApiUrl("/users_service/sign_in_user_with_plain_account")
+  // const apiUrl = formatApiUrl("/users_service/sign_in_user_with_plain_account")
 
-  const { data, statusText } = await axios.post(apiUrl, credentials)
+  // const { data, statusText } = await axios.post(apiUrl, credentials)
 
-  if (statusText !== "OK") {
-    throw NetworkError("Could not sign in with a plain account")
-  }
+  // if (statusText !== "OK") {
+  //   throw NetworkError("Could not sign in with a plain account")
+  // }
 
-  const session = {
-    token: data.token,
-    customerId: data.user_id
-  }
+  // const session = {
+  //   token: data.token,
+  //   customerId: data.user_id
+  // }
 
-  setSession(session)
+  // setSession(session)
+  console.log("Siuuu")
 }
 
 export default () => {
@@ -90,14 +91,14 @@ export default () => {
         value={getField("email")}
         onChangeText={setField("email")}
         error={getError("email")}
-        label="Correo electrónico"
+        placeholder="Correo electrónico"
       />
 
       <TextField
         value={getField("password")}
         onChangeText={setField("password")}
         error={getError("password")}
-        label="Contraseña"
+        placeholder="Contraseña"
         secureTextEntry
       />
 
