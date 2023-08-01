@@ -12,11 +12,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 16,
+    //paddingTop: 16,
     backgroundColor: '#ffffff',
   },
   menu: {
-    marginTop:15,
+    // marginTop:15,
     marginLeft:-16,
     width:414,
     height:65,
