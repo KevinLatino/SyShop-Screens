@@ -14,21 +14,26 @@ const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
 
 const App = () => {
-  // return (
-  //   <PaperProvider>
-  //     <NavigationContainer>
-  //       <Stack.Navigator>
-  //         <Stack.Screen
-  //           name="Chat"
-  //           component={<Chat />}
-  //         />
-  //       </Stack.Navigator>
+  return (
+    <PaperProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Chat"
+            component={<Chat />}
+          />
 
-  //       <BottomTab.Navigator>
-  //         <BottomTab.Screen
-  //           name="Home"
-  //           component={<Home />}
-  //         />
+          <Stack.Screen
+            name="SearchResults"
+            component={<SearchResults />}
+          />
+        </Stack.Navigator>
+
+        <BottomTab.Navigator>
+          <BottomTab.Screen
+            name="Home"
+            component={<Home />}
+          />
       
   //         <BottomTab.Screen
   //           name="Deliveries"
