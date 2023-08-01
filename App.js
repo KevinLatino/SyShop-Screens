@@ -6,8 +6,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Home from './src/screens/Home'
 import DeliveryList from './src/screens/DeliveryList'
 import ChatList from './src/screens/ChatList'
-import EditPost from './src/screens/EditPost'
+import Welcome from './src/screens/Welcome'
 import AppSnackBar from './src/components/AppSnackBar'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 
 const Stack = createStackNavigator()
@@ -51,7 +52,9 @@ const App = () => {
   // )
 
   return (
-    <EditPost />
+    <SafeAreaProvider>
+      <Welcome/>
+    </SafeAreaProvider>
   )
 }
 
