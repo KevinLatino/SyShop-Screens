@@ -6,8 +6,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Home from './src/screens/Home'
 import DeliveryList from './src/screens/DeliveryList'
 import ChatList from './src/screens/ChatList'
-import Chat from './src/screens/Chat'
+import EditPost from './src/screens/EditPost'
 import AppSnackBar from './src/components/AppSnackBar'
+
 
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
@@ -34,25 +35,29 @@ const App = () => {
             component={<Home />}
           />
       
-          <BottomTab.Screen
-            name="Deliveries"
-            component={<DeliveryList />}
-          />
+  //         <BottomTab.Screen
+  //           name="Deliveries"
+  //           component={<DeliveryList />}
+  //         />
 
-          <BottomTab.Screen
-            name="Chats"
-            component={<ChatList />}
-          />
+  //         <BottomTab.Screen
+  //           name="Chats"
+  //           component={<ChatList />}
+  //         />
 
-          <BottomTab.Screen
-            name="MyProfile"
-          />
-        </BottomTab.Navigator>
-      </NavigationContainer>
+  //         <BottomTab.Screen
+  //           name="MyProfile"
+  //         />
+  //       </BottomTab.Navigator>
+  //     </NavigationContainer>
 
-      <AppSnackBar />
-    </PaperProvider>
+  //     <AppSnackBar />
+  //   </PaperProvider>
+  // )
+
+  return (
+    <EditPost />
   )
 }
 
-export default App
+export default App;

@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { useQuery, requestServer } from '../utilities/requests'
 import { View, StyleSheet } from 'react-native'
 import {
-  Searchbar,
   List,
   ActivityIndicator,
   Chip
 } from 'react-native-paper'
+import { SearchBar } from 'react-native-elements';
+
 
 const styles = StyleSheet.create({
   selectedFiltersContainer: {
@@ -164,12 +165,31 @@ export default ({ onSearchSubmit }) => {
 
   return (
     <View>
-      <Searchbar
-        placeholder="¿Qué estás buscando?"
+       <View>
+      <SearchBar
+        placeholder="Buscar..."
         value={text}
         onChangeText={handleSearchUpdate}
         onSubmitEditing={handleSearchSubmit}
+        containerStyle={{
+          backgroundColor: 'transparent',
+          borderTopWidth: 0,
+          borderBottomWidth: 0,
+        }}
+        inputContainerStyle={{
+          backgroundColor: '#f0f0f0f',
+          borderRadius: 20,
+          border: 1,
+          borderColor: 'grey',
+          width: 395,
+        }}
+        inputStyle={{
+          fontSize: 16,
+        }}
       />
+    </View>
+
+    
 
       <View>
         <SelectedFiltersList

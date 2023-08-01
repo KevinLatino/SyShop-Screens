@@ -6,7 +6,7 @@ import { maybeCompleteAuthSession } from "expo-web-browser"
 import configuration from "../configuration"
   
 const googleLogoUri
-    = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/2008px-Google_%22G%22_Logo.svg.png"
+    = "https://cdn-icons-png.flaticon.com/512/2504/2504739.png"
 
 maybeCompleteAuthSession()
 
@@ -29,6 +29,8 @@ const styles = {
     gap: 15,
     justifyContent: "center",
     alignItems: "center",
+
+    
   },
   buttonText: {
     fontSize: 16,
