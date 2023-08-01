@@ -35,25 +35,25 @@ const App = () => {
             component={<Home />}
           />
       
-  //         <BottomTab.Screen
-  //           name="Deliveries"
-  //           component={<DeliveryList />}
-  //         />
+           <BottomTab.Screen
+             name="Deliveries"
+             component={<DeliveryList />}
+           />
 
-  //         <BottomTab.Screen
-  //           name="Chats"
-  //           component={<ChatList />}
-  //         />
+           <BottomTab.Screen
+             name="Chats"
+             component={<ChatList />}
+           />
 
-  //         <BottomTab.Screen
-  //           name="MyProfile"
-  //         />
-  //       </BottomTab.Navigator>
-  //     </NavigationContainer>
+           <BottomTab.Screen
+             name="MyProfile"
+           />
+         </BottomTab.Navigator>
+       </NavigationContainer>
 
-  //     <AppSnackBar />
-  //   </PaperProvider>
-  // )
+       <AppSnackBar />
+     </PaperProvider>
+   )
 
   return (
     <EditPost />
