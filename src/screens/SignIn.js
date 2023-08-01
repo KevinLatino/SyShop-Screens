@@ -20,8 +20,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     gap: "1.5rem",
-    alignItems: 'center', // Center items horizontally
-    justifyContent: 'center', // Center items vertically
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingTop: "1rem",
     paddingBottom: "1rem"
   },
@@ -32,7 +32,8 @@ const styles = StyleSheet.create({
     display: "flex",
     textAlign: "center",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    marginTop: "1rem",
   },
   subtitle: {
     fontSize: 20,
@@ -41,14 +42,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center"
-  }, 
-  Button:{
+  },
+  Button: {
     display: "flex",
     width: 225,
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#c20000"
+  },
+  thirdText: {
+    fontSize: 18,
+    color: "#344340",
+    fontWeight: "bold",
+    display: "flex",
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center"
   }
 })
 
@@ -107,7 +117,7 @@ export default () => {
 
   return (
     <View style={styles.container}>
-    <Text style={styles.title }>Bienvenido </Text>
+      <Text style={styles.title}> Bienvenido </Text>
       <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
 
       <TextField
@@ -126,7 +136,7 @@ export default () => {
       />
 
       <Button
-      style={styles.Button}
+        style={styles.Button}
         mode="contained"
         onPress={handleSignInWithPlainAccount}
         disabled={hasErrors()}
@@ -136,7 +146,7 @@ export default () => {
 
       <PageDivider />
 
-      <PageSubtitle text="O también" />
+      <Text style={styles.thirdText}>O también</Text>
 
       <GoogleSignInButton
         text="Iniciar sesión con google"
