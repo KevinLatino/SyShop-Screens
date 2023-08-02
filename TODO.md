@@ -1,6 +1,6 @@
 # Cosas por hacer
 
-- [ ] Actualizar los imports
-- [ ] Pulir el código
-- [ ] Terminar los screens que faltan
-- [ ] Hacer lo de Stripe
+- [ ] Terminar de implementar la funcionalidad en Chat.js
+- [ ] Terminar ChooseLocation.js
+- [ ] Hacer EditProfile.js
+- [ ] Volver a intentar a implementar el formulario de pago con Stripe
