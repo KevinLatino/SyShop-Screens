@@ -9,6 +9,7 @@ export default ({ data, ...flatListProps }) => {
       </View>
     )
   }
+
   return (
     <FlatList
       data={data}
