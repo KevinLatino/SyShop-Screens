@@ -1,20 +1,14 @@
-// import axios from 'axios'
-import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
-import { signOnWithGoogleAccount } from '../utilities/api-calls'
-// import formatApiUrl from '../utilities/format-api-url'
-import useForm from '../hooks/useForm'
+import { useState } from 'react'
+import { useMutation, requestServer } from '../utilities/requests'
+import { useNavigation } from '@react-navigation/native'
+import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
+import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
 import TextField from '../components/TextField'
-import PageTitle from '../components/PageTitle'
-import PageSubtitle from './PageSubtitle'
-import PageDivider from '../components/PageDivider'
 import GoogleSignInButton from '../components/GoogleSignInButton'
-import { View, StyleSheet } from 'react-native'
-import { Button } from 'react-native-paper'
-import { StatusBar } from 'expo-status-bar'
-import { Text } from 'react-native-paper'
-// import NetworkError from '../utilities/NetworkError'
+import { Text, Button, Divider } from 'react-native-paper'
+import { View, StyleSheet, ActivityIndicator } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
@@ -43,7 +37,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  Button: {
+  button: {
     display: "flex",
     width: 225,
     textAlign: "center",
@@ -62,32 +56,11 @@ const styles = StyleSheet.create({
   }
 })
 
-const signInWithPlainAccount = async (credentials, setSession) => {
-  // const apiUrl = formatApiUrl("/users_service/sign_in_user_with_plain_account")
-
-  // const { data, statusText } = await axios.post(apiUrl, credentials)
-
-  // if (statusText !== "OK") {
-  //   throw NetworkError("Could not sign in with a plain account")
-  // }
-
-  // const session = {
-  //   token: data.token,
-  //   customerId: data.user_id
-  // }
-
-  // setSession(session)
-  console.log("Siuuu")
-}
-
 export default () => {
-  const {
-    fields,
-    setField,
-    getField,
-    getError,
-    hasErrors
-  } = useForm(
+  const navigation = useNavigation()
+  const [_, setSession] = useAtom(sessionAtom)
+  const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
+  const form = useForm(
     {
       email: "",
       password: ""
@@ -97,63 +70,97 @@ export default () => {
       password: makeNotEmptyChecker("Contraseña vacía")
     }
   )
-  const [_, setSession] = useAtom(sessionAtom)
+  const signInWithPlainAccountMutation = useMutation(
+    () => signInWithPlainAccount(form.fields)
+  )
+  const signInWithGoogleAccountMutation = useMutation(
+    () => signInWithGoogleAccount(form.fields, googleUniqueIdentifier)
+  )
 
-  const handleSignInWithPlainAccount = async (_) => {
-    try {
-      await signInWithPlainAccount(fields, setSession)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const isSignInLoading = (
+    (signInWithPlainAccountMutation.isLoading) ||
+    (signInWithGoogleAccountMutation.isLoading)
+  )
 
-  const handleSignInWithGoogleAccount = async (userInformation) => {
-    try {
-      await signOnWithGoogleAccount(userInformation, setSession)
-    } catch (error) {
-      console.log(error)
-    }
+  const signInResult = 
+    signInWithPlainAccountMutation.result !== null 
+    ? signInWithPlainAccountMutation.result
+    : signInWithGoogleAccountMutation.result
+
+  if (signInResult !== null) {
+    setSession({
+      token: signInResult.token,
+      customerId: signInResult.user_id
+    })
+
+    navigation.navigate("Home")
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> Bienvenido </Text>
-      <Text style={styles.subtitle}>¡Inicia sesión para comenzar!</Text>
+      <Text style={styles.title}>
+        Bienvenido
+      </Text>
+
+      <Text style={styles.subtitle}>
+        ¡Inicia sesión para comenzar!
+      </Text>
+
+      <Divider style={{ width: "90%"}} />
 
       <TextField
-        value={getField("email")}
-        onChangeText={setField("email")}
-        error={getError("email")}
+        value={form.getField("email")}
+        onChangeText={form.setField("email")}
+        error={form.getError("email")}
         placeholder="Correo electrónico"
       />
 
       <TextField
-        value={getField("password")}
-        onChangeText={setField("password")}
-        error={getError("password")}
+        value={form.getField("password")}
+        onChangeText={form.setField("password")}
+        error={form.getError("password")}
         placeholder="Contraseña"
         secureTextEntry
       />
 
       <Button
-        style={styles.Button}
+        style={styles.button}
         mode="contained"
         onPress={handleSignInWithPlainAccount}
-        disabled={hasErrors()}
+        disabled={hasErrors() || isSignInLoading}
       >
-        Iniciar sesión
+        {
+          signInWithPlainAccountMutation.isLoading
+          ? (
+            <View>
+              <ActivityIndicator animating />
+            </View>
+          )
+          : "Iniciar sesión"
+        }
       </Button>
 
-      <PageDivider />
+      <Divider style={{ width: "90%" }} />
 
-      <Text style={styles.thirdText}>O también</Text>
+      <Text style={styles.thirdText}>
+        O también
+      </Text>
 
-      <GoogleSignInButton
-        text="Iniciar sesión con google"
-        onSignIn={handleSignInWithGoogleAccount}
-      />
-
-      <StatusBar style="auto" />
+      {
+        signInWithGoogleAccountMutation.isLoading
+        ? (
+          <View>
+            <ActivityIndicator animating />
+          </View>
+        )
+        : (
+          <GoogleSignInButton
+            text="Iniciar sesión con google"
+            onSignIn={handleSignInWithGoogleAccount}
+            disabled={isSignInLoading}
+          />
+        )
+      }
     </View>
   )
 }

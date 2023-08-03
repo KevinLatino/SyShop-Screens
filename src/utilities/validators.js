@@ -19,3 +19,11 @@ export const checkEmail = (email) => {
 
   return null
 }
+
+export const checkPhoneNumber = (phoneNumber) => {
+  if (!validator.isMobilePhone(phoneNumber, "es-CR")) {
+    return "Número telefónico inválido"
+  }
+
+  return null
+}

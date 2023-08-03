@@ -48,20 +48,26 @@ export const useQuery = (queryCallback) => {
 }
 
 export const useMutation = (mutationCallback) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
 
   const execute = () => {
     mutationCallback()
-      .then((callbackResult) => setResult(callbackResult))
+      .then((callbackResult) => {
+        setIsLoading(false)
+        setResult(callbackResult)
+      })
       .catch((callbackError) => setError(callbackError))
 
+    setIsLoading(true)
     setResult(null)
     setError(null)
   }
 
   return {
     execute,
+    isLoading,
     result,
     error
   }
