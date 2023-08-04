@@ -1,4 +1,9 @@
 import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { useAtom } from 'jotai'
+import { sessionAtom } from '../context'
+import { requestServer } from '../utilities/requests'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { Card, Divider, Chip, IconButton, Text } from 'react-native-paper'
 
 const styles = {
@@ -24,20 +29,28 @@ const formatPostSubtitle = (post) => {
   return subtitle
 }
 
-const likePost = (post_id, customer_id) => {
-  // Esto es temporal hasta que guarden las sesiones en el localStorage
-  console.log(`Customer (id=${customer_id}) liked post (id=${post_id})`)
+const likePost = async (postId, customerId) => {
+  const payload = {
+    customer_id: customerId,
+    post_id: postId
+  }
+  const _ = await requestServer(
+    "/posts_service/like_post",
+    payload
+  )
 }
 
 export default ({ post }) => {
-  const [doesCustomerLikePost, setDoesCustomerLikePost] = useState(
-    post.does_customer_like_post
+  const [session, _] = useAtom(sessionAtom)
+  const likePostMutation = useMutation(
+    () => likePost(post.post_id, session.customerId)
   )
+  const [isLiked, setIsLiked] = useState(post.does_customer_like_post)
 
-  const handleLikePress = () => {
-    likePost(post.post_id, "")
+  const handleLike = () => {
+    likePostMutation.mutate()
 
-    setDoesCustomerLikePost(!doesCustomerLikePost)
+    setIsLiked(!isLiked)
   }
 
   const categoriesChips = post
@@ -49,7 +62,6 @@ export default ({ post }) => {
           </Chip>
         )
       })
-
   const likesText = `${post.likes} ${post.likes === 1 ? "like" : "likes"}`
 
   return (
@@ -83,11 +95,15 @@ export default ({ post }) => {
       </Card.Content>
 
       <Card.Actions>
-        <IconButton
-          mode="contained"
-          icon={doesCustomerLikePost ? "heart" : "heart-outline"}
-          onPress={handleLikePress}
-        />
+        {
+          likePostMutation.isLoading ?
+          <LoadingSpinner /> :
+          <IconButton
+            mode="contained"
+            icon={isLiked ? "heart" : "heart-outline"}
+            onPress={handleLike}
+          />
+        }
       </Card.Actions>
     </Card>
   )

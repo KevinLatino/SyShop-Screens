@@ -1,12 +1,12 @@
 # Generales
 - [ ] Migrar todo el código a react-query
+- [ ] Manejar errores del servidor
 
 # Componentes por hacer
 - [ ] PaymentForm (Stripe)
 
 # Componentes por terminar
 - [ ] OrderForm (continuar la compra mediante Stripe + suscribirse a la mutación)
-- [ ] PostTile (suscribirse a la mutación de al dar like)
 
 # Screens por hacer
 - [ ] MyProfile (incluir drawer de configuración y listados)
@@ -14,8 +14,6 @@
 
 # Screens por terminar
 - [ ] Rehacer PostView
-- [ ] Rehacer EditPost
-- [ ] Rehacer EditProfile
 - [ ] Chat (actualizar el código + terminar)
 - [ ] ChooseLocation
     + [ ] Outsourcear el código que llama Geoapify en una librearía aparte
