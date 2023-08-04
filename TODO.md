@@ -1,6 +1,7 @@
 # Generales
 - [ ] Migrar todo el código a react-query
 - [ ] Manejar errores del servidor
+- [ ] Hacer el modal de ChooseLocation un screen separado mediante la navegación
 
 # Componentes por hacer
 - [ ] PaymentForm (Stripe)
@@ -15,7 +16,3 @@
 # Screens por terminar
 - [ ] Rehacer PostView
 - [ ] Chat (actualizar el código + terminar)
-- [ ] ChooseLocation
-    + [ ] Outsourcear el código que llama Geoapify en una librearía aparte
-    + [ ] Actualizar el código
-    + [ ] Terminar el screen
