@@ -1,11 +1,12 @@
-import axios from 'axios'
-import configuration from '../configuration'
-import formatApiUrl from '../utilities/format-api-url'
-import useAsync from '../hooks/useAsync'
 import { useState } from 'react'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
-import { FlatList, View, StyleSheet } from 'react-native'
+import { autocompleteAddress } from '../utilities/geoapify'
+import { requestServer } from '../utilities/requests'
+import ScrollView from '../components/ScrollView'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { View, StyleSheet } from 'react-native'
 import {
   TouchableRipple,
   List,
@@ -26,9 +27,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 10,
     bottom: 10
-  },
-  disabledAddressAutocompleteResultTile: {
-    backgroundColor: "darkgray"
   }
 })
 
@@ -39,59 +37,34 @@ const formatLocationSubtitle = (location) => {
   return formatted
 }
 
-const getAddressAutocompleteResults = async (searchedText) => {
-  if (searchedText === "") {
-    return null
-  }
-
-  const baseUrl = "https://api.geoapify.com/v1/geocode/autocomplete?"
-  const queryParameters = new URLSearchParams()
-
-  queryParameters.append("apiKey", configuration.GEOAPIFY_API_KEY)
-  queryParameters.append("text", searchedText)
-  queryParameters.append("lang", "es")
-  queryParameters.append("filter", "countrycode:cr")
-  queryParameters.append("format", "json")
-
-  const url = baseUrl + queryParameters.toString()
-  const { data } = await axios.get(url)
-  const searchResults = data.results
-
-  return searchResults
-}
-
-const storeLocation = async (geoapifyLocation, session) => {
+const addLocation = async (geoapifyAddress, customerId) => {
   const location = {
-    place_name: geoapifyLocation.name,
-    street_address: geoapifyLocation.address_line1,
-    city: geoapifyLocation.city,
-    state: geoapifyLocation.state ?? geoapifyLocation.province,
-    zip_code: geoapifyLocation.postcode,
+    place_name: geoapifyAddress.name,
+    street_address: geoapifyAddress.address_line1,
+    city: geoapifyAddress.city,
+    state: geoapifyAddress.state ?? geoapifyAddress.province,
+    zip_code: geoapifyAddress.postcode,
   }
-  const url = formatApiUrl("/locations_service/add_customer_location")
-
-  const { statusText } = await axios.post(url, {
-    customer_id: session.customerId,
-    ...location,
-  })
-
-  if (statusText !== "OK") {
-    throw Error("Could not store customer's new location")
+  const payload = {
+    customer_id: customerId,
+    ...location
   }
+  const _ = await requestServer(
+    "/locations_service/add_customer_location",
+    payload
+  )
 }
 
-const getLocations = async (session) => {
-  const url = formatApiUrl("/locations_service/get_customer_locations")
-
-  const { data, statusText } = await axios.post(url, {
-    customer_id: session.customerId
-  })
-
-  if (statusText !== "OK") {
-    throw Error("Could not get customer locations")
+const fetchLocations = async (customerId) => {
+  const payload = {
+    customer_id: customerId
   }
+  const locations = await requestServer(
+    "/locations_service/get_customer_locations",
+    payload
+  )
 
-  return data
+  return locations
 }
 
 const LocationTile = ({ location }) => {
@@ -106,72 +79,54 @@ const LocationTile = ({ location }) => {
   )
 }
 
-const AddressAutocompleteResultTile = ({ result, onSelect }) => {
-  const isDisabled = result.name === undefined
+const AddressAutocompleteTile = ({ address, onSelect }) => {
+  const isDisabled = address.name === undefined
 
   return (
     <TouchableRipple
-      onPress={() => onSelect(result)}
+      onPress={() => onSelect(address)}
       disabled={isDisabled}
-      style={isDisabled ? styles.disabledAddressAutocompleteResultTile : {}}
+      style={isDisabled ? { backgroundColor: "darkgray" } : {}}
     >
       <List.Item
-        key={result.place_id}
-        title={result.formatted}
+        key={address.place_id}
+        title={address.formatted}
         left={(props) => <List.Icon {...props} icon="map-marker" />}
       />
     </TouchableRipple>
   )
 }
 
-const AddLocationFloatingActionButton = ({ onPress }) => {
-  return (
-    <FAB
-      icon="plus"
-      style={styles.fab}
-      onPress={onPress}
-    />
-  )
-}
-
 const AddressAutocompleteInput = ({ onSelect }) => {
   const [searchedText, setSearchedText] = useState("")
-  const [
-    runGetAddressAutocompleteResults,
-    addressAutocompleteResults,
-    getAddressAutocompleteResultsError
-  ] = useAsync(() => getAddressAutocompleteResults(searchedText))
-
-  const resultTiles = (addressAutocompleteResults !== null)
-    ? addressAutocompleteResults.map(
-      (result) => {
-        return (
-          <AddressAutocompleteResultTile
-            key={result.place_id}
-            result={result}
-            onSelect={onSelect}
-          />
-        )
-      }
-    )
-    : null
-
-  const handleSearch = (newSearchedText) => {
-    runGetAddressAutocompleteResults()
-    setSearchedText(newSearchedText)
-  }
+  const addressesQuery = useQuery(
+    "autocompletedAddresses",
+    () => autocompleteAddress(searchedText)
+  )
 
   return (
     <View>
       <Searchbar
         value={searchedText}
-        onChangeText={handleSearch}
+        onChangeText={setSearchedText}
         placeholder="Ubicación"
       />
 
       <View>
         <List.Section>
-          {resultTiles}
+          {
+            addressesQuery.isLoading ?
+            <LoadingSpinner /> :
+            addressesQuery.data.map((address) => {
+              return (
+                <AddressAutocompleteTile
+                  key={address.place_id}
+                  result={address}
+                  onSelect={onSelect}
+                />
+              )
+            })
+          }
         </List.Section>
       </View>
     </View>
@@ -179,17 +134,13 @@ const AddressAutocompleteInput = ({ onSelect }) => {
 }
 
 const AddLocationModal = ({ visible, hideModal }) => {
-  const [selectedLocation, setSelectedLocation] = useState(null)
+  const [selectedAddress, setSelectedAddress] = useState(null)
   const [session, _] = useAtom(sessionAtom)
-  console.log(selectedLocation)
+  const addLocationMutation = useMutation(
+    () => addLocation(selectedAddress, session.customerId)
+  )
 
-  const handlePress = async () => {
-    try {
-      await storeLocation(selectedLocation, session)
-    } catch (error) {
-      console.log(error)
-    }
-
+  if (addLocationMutation.isSuccess) {
     hideModal()
   }
 
@@ -197,14 +148,20 @@ const AddLocationModal = ({ visible, hideModal }) => {
     <Portal>
       <Modal visible={visible} onDismiss={hideModal}>
         <Surface elevation={5}>
-          <AddressAutocompleteInput onSelect={setSelectedLocation} />
+          <AddressAutocompleteInput onSelect={setSelectedAddress} />
 
           <Button
             mode="contained"
-            onPress={handlePress}
-            disabled={selectedLocation === null}
+            onPress={addLocationMutation.mutate()}
+            disabled={
+              selectedAddress === null || addLocationMutation.isLoading
+            }
           >
-            Añadir domicilio
+            {
+              addLocationMutation.isLoading ?
+              <LoadingSpinner /> :
+              "Añadir domicilio"
+            }
           </Button>
         </Surface>
       </Modal>
@@ -215,27 +172,32 @@ const AddLocationModal = ({ visible, hideModal }) => {
 export default () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [session, _] = useAtom(sessionAtom)
-  const [
-    runGetLocations,
-    locations,
-    getLocationsError
-  ] = useAsync(() => getLocations(session))
+  const locationsQuery = useQuery(
+    "customerLocations",
+    () => fetchLocations(session.customerId)
+  )
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={locations}
-        keyExtractor={(location) => location.location_id}
-        renderItem={(location) => <LocationTile location={location} />}
-        onStartReached={runGetLocations}
-      />
+      {
+        locationsQuery.isLoading ?
+        <LoadingSpinner /> :
+        <ScrollView
+          data={locationsQuery.data}
+          keyExtractor={(location) => location.location_id}
+          renderItem={(location) => <LocationTile location={location} />}
+          onStartReached={locationsQuery.refetch}
+        />
+      }
 
       <AddLocationModal
         visible={isModalVisible}
         hideModal={() => setIsModalVisible(false)}
       />
 
-      <AddLocationFloatingActionButton
+      <FAB
+        icon="plus"
+        style={styles.fab}
         onPress={() => setIsModalVisible(true)}
       />
     </View>
