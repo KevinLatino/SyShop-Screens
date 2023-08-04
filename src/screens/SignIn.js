@@ -5,6 +5,7 @@ import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
+import { showMessage } from '../components/AppSnackBar'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import { Text, Button, Divider } from 'react-native-paper'
@@ -56,6 +57,30 @@ const styles = StyleSheet.create({
   }
 })
 
+const signInWithPlainAccount = async (credentials) => {
+  const payload = {
+    ...credentials
+  }
+  const session = await requestServer(
+    "/users_service/sign_in_user_with_plain_account",
+    payload
+  )
+
+  return session
+}
+
+const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
+  const payload = {
+    google_unique_identifier: googleUniqueIdentifier
+  }
+  const session = await requestServer(
+    "/users_service/sign_in_user_with_google_account",
+    payload
+  )
+
+  return session
+}
+
 export default () => {
   const navigation = useNavigation()
   const [_, setSession] = useAtom(sessionAtom)
@@ -74,8 +99,24 @@ export default () => {
     () => signInWithPlainAccount(form.fields)
   )
   const signInWithGoogleAccountMutation = useMutation(
-    () => signInWithGoogleAccount(form.fields, googleUniqueIdentifier)
+    () => signInWithGoogleAccount(googleUniqueIdentifier)
   )
+
+  const handleSignInWithPlainAccount = () => {
+    if (form.hasErrors()) {
+      showMessage(
+        "Por favor provee la información necesaria para iniciar sesión"
+      )
+
+      return
+    }
+
+    signInWithPlainAccountMutation.execute()
+  }
+
+  const handleSignInWithGoogleAccount = (userInformation) => {
+    setGoogleUniqueIdentifier(userInformation["id"])
+  }
 
   const isSignInLoading = (
     (signInWithPlainAccountMutation.isLoading) ||
@@ -86,6 +127,10 @@ export default () => {
     signInWithPlainAccountMutation.result !== null 
     ? signInWithPlainAccountMutation.result
     : signInWithGoogleAccountMutation.result
+
+  if (googleUniqueIdentifier !== null) {
+    signInWithPlainAccountMutation.execute()
+  }
 
   if (signInResult !== null) {
     setSession({

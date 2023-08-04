@@ -5,6 +5,8 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { selectPictureFromGallery } from '../utilities/camera'
 import { showError } from '../components/AppSnackBar'
+import { makeNotEmptyChecker } from '../utilities/validators'
+import TextField from '../components/TextField'
 import { View, StyleSheet } from 'react-native'
 import {
   TouchableRipple,
@@ -58,12 +60,15 @@ export default () => {
   const form = useForm(
     {
       name: "",
-      firstSurname: "",
-      secondSurname: "",
-      phoneNumber: ""
+      first_surname: "",
+      second_surname: "",
+      phone_number: ""
     },
     {
-      // Pendiente
+      name: makeNotEmptyChecker("Nombre vacío"),
+      first_surname: makeNotEmptyChecker("Primer apellido vacío"),
+      second_surname: makeNotEmptyChecker("Segundo apellido vacío"),
+      phone_number: makeNotEmptyChecker("Número telefónico vacío")
     }
   )
 
@@ -72,6 +77,11 @@ export default () => {
       <PictureChooser
         picture={picture}
         onChangePicture={setPicture}
+      />
+
+      <TextField
+        value={form.getField("name")}
+        placeholder="Nombre"
       />
     </View>
   )
