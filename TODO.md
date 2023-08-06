@@ -16,4 +16,5 @@
 - [ ] Implementar navegación hacia el formulario de pago en PostView
 - { } Actualizar SignIn
 - { } Actualizar SignUp
-- [ ] Hacer el modal de ChooseLocation un screen separado mediante la navegación
+- [ ] Quitar la lógica de modales e implementar lógica de navegación entre
+    ChooseLocation y AddLocation

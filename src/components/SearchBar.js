@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { requestServer } from '../utilities/requests'
+import SearchInput from './SearchInput'
 import LoadingSpinner from './LoadingSpinner'
 import { View, StyleSheet } from 'react-native'
 import { List, Chip } from 'react-native-paper'
-import { SearchBar } from 'react-native-elements';
 
 const styles = StyleSheet.create({
   selectedCategoriesList: {
@@ -110,26 +110,11 @@ export default ({ onSearchSubmit }) => {
   return (
     <View>
       <View>
-        <SearchBar
+        <SearchInput
           placeholder="Buscar..."
           value={text}
           onChangeText={handleSearchUpdate}
           onSubmitEditing={() => onSearchSubmit(text, categoriesNames)}
-          containerStyle={{
-            backgroundColor: 'transparent',
-            borderTopWidth: 0,
-            borderBottomWidth: 0,
-          }}
-          inputContainerStyle={{
-            backgroundColor: '#f0f0f0f',
-            borderRadius: 20,
-            border: 1,
-            borderColor: 'grey',
-            width: 395,
-          }}
-          inputStyle={{
-            fontSize: 16,
-          }}
         />
       </View>
 
