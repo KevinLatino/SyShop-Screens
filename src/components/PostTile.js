@@ -1,10 +1,5 @@
-import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
-import { requestServer } from '../utilities/requests'
-import LoadingSpinner from '../components/LoadingSpinner'
-import { Card, Divider, Chip, IconButton, Text } from 'react-native-paper'
+import { Card, Divider, Chip, Text } from 'react-native-paper'
+import LikeButton from './LikeButton'
 
 const styles = {
   extraInformationView: {
@@ -29,30 +24,7 @@ const formatPostSubtitle = (post) => {
   return subtitle
 }
 
-const likePost = async (postId, customerId) => {
-  const payload = {
-    customer_id: customerId,
-    post_id: postId
-  }
-  const _ = await requestServer(
-    "/posts_service/like_post",
-    payload
-  )
-}
-
 export default ({ post }) => {
-  const [session, _] = useAtom(sessionAtom)
-  const likePostMutation = useMutation(
-    () => likePost(post.post_id, session.customerId)
-  )
-  const [isLiked, setIsLiked] = useState(post.does_customer_like_post)
-
-  const handleLike = () => {
-    likePostMutation.mutate()
-
-    setIsLiked(!isLiked)
-  }
-
   const categoriesChips = post
       .categories
       .map((category) => {
@@ -95,15 +67,9 @@ export default ({ post }) => {
       </Card.Content>
 
       <Card.Actions>
-        {
-          likePostMutation.isLoading ?
-          <LoadingSpinner /> :
-          <IconButton
-            mode="contained"
-            icon={isLiked ? "heart" : "heart-outline"}
-            onPress={handleLike}
-          />
-        }
+        <LikeButton
+          doesCustomerLikePost={post.does_customer_like_post}
+        />
       </Card.Actions>
     </Card>
   )

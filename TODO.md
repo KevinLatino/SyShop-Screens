@@ -1,7 +1,6 @@
 # Generales
 - [ ] Migrar todo el código a react-query
 - [ ] Manejar errores del servidor
-- [ ] Hacer el modal de ChooseLocation un screen separado mediante la navegación
 
 # Componentes por hacer
 - [ ] PaymentForm (Stripe)
@@ -14,5 +13,7 @@
 - [ ] Todos los listados personalizados de usuarios (me gustas, comprados, etc.)
 
 # Screens por terminar
-- [ ] Rehacer PostView
-- [ ] Chat (actualizar el código + terminar)
+- [ ] Implementar navegación hacia el formulario de pago en PostView
+- { } Actualizar SignIn
+- { } Actualizar SignUp
+- [ ] Hacer el modal de ChooseLocation un screen separado mediante la navegación

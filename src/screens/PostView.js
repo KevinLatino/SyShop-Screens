@@ -1,245 +1,195 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  Button,
-  TouchableOpacity,
-  StyleSheet
-} from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { useState } from 'react'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { useRoute } from '@react-navigation/native'
+import { useCounter } from '../utilities/hooks'
+import { useAtom } from 'jotai'
+import { sessionAtom } from '../context'
+import { requestServer } from '../utilities/requests'
+import { queryClient } from '../context'
+import TextField from '../components/TextField'
+import ScrollView from '../components/ScrollView'
+import LoadingSpinner from '../components/LoadingSpinner'
+import CommentTile from '../components/CommentTile'
+import LikeButton from '../components/LikeButton'
+import { View, Text, Button, IconButton, Chip } from 'react-native'
+import { SliderBox } from 'react-native-image-slider-box'
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  postContainer: {
-    marginBottom: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    elevation: 3,
-  },
-  image: {
-    width: '100%',
-    height: 300,
-    resizeMode: 'cover',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  postInfo: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    color: '#000000',
-    marginBottom: 8,
-  },
-  details: {
-    fontSize: 14,
-    color: '#888888',
-    marginBottom: 4,
-  },
-  showCommentsButton: {
-    backgroundColor: '#FFFFFF',
-    padding: 8,
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    alignItems: 'center',
-  },
-  showCommentsButtonText: {
-    color: '#800000',
-    fontWeight: 'bold',
-  },
-  commentsContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    elevation: 3,
-    padding: 16,
-    marginHorizontal: 16,
-    marginBottom: 8,
-  },
-  commentsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000000',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#DDDDDD',
-    marginBottom: 8,
-  },
-  commentContainer: {
-    marginBottom: 8,
-  },
-  commenterName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333333',
-  },
-  commentText: {
-    fontSize: 14,
-    color: '#000000',
-  },
-  commentInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
-    borderTopWidth: 1,
-    borderTopColor: '#DDDDDD',
-    paddingTop: 8,
-    backgroundColor: '#FFFFFF',
-    elevation: 3,
-    paddingHorizontal: 16,
-    width: '100%',
-  },
-  commentInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#000000',
-    paddingVertical: 8,
-  },
-  container2: {
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    height: 60,
-    paddingHorizontal: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-  },
-  iconContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-})
+const fetchPost = async (postId, customerId) => {
+  const payload = {
+    post_id: postId,
+    customer_id: customerId
+  }
+  const post = await requestServer(
+    "/posts_service/get_post_by_id",
+    payload
+  )
 
-export default () => {
-  const [comment, setComment] = useState('');
-  const [comments, setComments] = useState([]);
-  const [showComments, setShowComments] = useState(false);
-  const [showFooter, setShowFooter] = useState(true);
+  return post
+}
 
-  // Datos de ejemplo de la publicación
-  const post = {
-    title: 'Título de la publicación',
-    description: 'Descripción de la publicación',
-    price: '50000',
-    date: '17 de julio de 2023',
-    image: require('./chaya.jpg'), // Reemplaza con la ruta de tu imagen
-  };
+const fetchPostComments = async (postId, pageNumber) => {
+  const payload = {
+    post_id: postId,
+    start: pageNumber * 20,
+    amount: 20
+  }
+  const comments = await requestServer(
+    "/comments_service/get_post_comments",
+    payload
+  )
 
-  const [commenterName, setCommenterName] = useState('Corogod');
+  return comments
+}
 
-  const handleCommentChange = (text) => {
-    setComment(text);
-  };
+const addPostComment = async (postId, customerId, text) => {
+  const payload = {
+    post_id: postId,
+    customer_id: customerId,
+    text
+  }
+  const _ = await requestServer(
+    "/comments_service/add_comment",
+    payload
+  )
+}
 
-  const handleAddComment = () => {
-    if (comment.trim() !== '') {
-      // Agrega el comentario al arreglo de comentarios
-      const newComment = {
-        commenterName,
-        comment,
-      };
-      setComments([...comments, newComment]);
-      setComment('');
-    }
-  };
+const CommentInput = ({ postId, customerId }) => {
+  const [text, setText] = useState("")
+  const addCommentMutation = useMutation(
+    () => addPostComment(postId, customerId, text)
+  )
 
-  const toggleShowComments = () => {
-    setShowComments(!showComments);
-    setShowFooter(!showComments); // Ocultar el footer al ver los comentarios
-  };
+  const handleCommentSubmit = async () => {
+    addCommentMutation.mutate()
+
+    await queryClient.refetchQueries({
+      queryKey: "postComments"
+    })
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.postContainer}>
-        <Image source={post.image} style={styles.image} />
-        <View style={styles.postInfo}>
-          <Text style={styles.title}>{post.title}</Text>
-          <Text style={styles.description}>{post.description}</Text>
-          <Text style={styles.details}>Precio: {post.price}</Text>
-          <Text style={styles.details}>Fecha de publicación: {post.date}</Text>
+    <View>
+      <TextField
+        value={text}
+        onChangeText={setText}
+        multiline
+        numberOflines={4}
+        placeholder="Escribe un comentario"
+      />
+
+      <IconButton
+        icon="send"
+        mode="contained"
+        disabled={text === ""}
+        onPress={handleCommentSubmit}
+      />
+    </View>
+  )
+}
+
+const CommentsScrollView = ({ postId }) => {
+  const [session, _] = useAtom(sessionAtom)
+  const pageNumber = useCounter()
+  const commentsQuery = useQuery(
+    "postComments",
+    () => fetchPostComments(postId, pageNumber.value)
+  )
+
+  if (commentsQuery.isLoading) {
+    return (
+      <LoadingSpinner />
+    )
+  }
+
+  return (
+    <View>
+      <CommentInput
+        customerId={session.customerId}
+        postId={postId}
+      />
+
+      <ScrollView
+        data={commentsQuery.data}
+        keyExtractor={(comment) => comment.comment_id}
+        renderItem={(comment) => <CommentTile comment={comment} />}
+        onEndReached={pageNumber.increment}
+      />
+    </View>
+  )
+}
+
+const PostView = ({ post }) => {
+  const categoriesChips = post.categories.map((category) => {
+    return (
+      <Chip
+        mode="flat"
+        icon="shape"
+      >
+        {category}
+      </Chip>
+    )
+  })
+
+  return (
+    <View>
+      <SliderBox
+        images={post.multimedia}
+      />
+
+      <Text variant="bodySmall">
+        {post.store_name} ({post.publication_date})
+      </Text>
+
+      <Text variant="bodyLarge">
+        {post.title}
+      </Text>
+
+      <Text variant="bodySmall">
+        {
+          post.amount > 1 ?
+          `${post.amount} unidades disponibles` :
+          null
+        }
+      </Text>
+
+      <Text variant="bodyMedium">
+        {post.description}
+      </Text>
+
+      <View>
+        <View>
+          {categoriesChips}
         </View>
+
+        <LikeButton />
       </View>
 
-      <TouchableOpacity onPress={toggleShowComments} style={styles.showCommentsButton}>
-        <Text style={styles.showCommentsButtonText}>
-          {showComments ? 'Ocultar comentarios' : 'Ver comentarios'}
-        </Text>
-      </TouchableOpacity>
-      <View style={styles.container2}>
-      <TouchableOpacity style={styles.iconContainer}>
-        <FontAwesome name="home" size={24} color="#80000" />
-      </TouchableOpacity>
-      
-      <TouchableOpacity style={styles.iconContainer}>
-        <FontAwesome name="home" size={24} color="#80000" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.iconContainer}>
-        <FontAwesome name="home" size={24} color="#80000" />
-      </TouchableOpacity>
-      
-      <TouchableOpacity style={styles.iconContainer}>
-        <FontAwesome name="home" size={24} color="#80000" />
-      </TouchableOpacity>
-      
-      <TouchableOpacity style={styles.iconContainer}>
-        <FontAwesome name="home" size={24} color="#80000" />
-      </TouchableOpacity>
-      
-      
+      <Button>
+        Comprar (₡{post.price})
+      </Button>
+    </View>
+  )
+}
 
-</View>
+export default () => {
+  const route = useRoute()
+  const [session, _] = useAtom(sessionAtom)
 
+  const postId = route.params.post_id
+  const postQuery = useQuery(
+    "post",
+    () => fetchPost(postId, session.customerId)
+  )
 
-      {showComments && (
-        <View style={styles.commentsContainer}>
-          <Text style={styles.commentsTitle}>Comentarios</Text>
-          <View style={styles.divider} />
-          {comments.map((item, index) => (
-            <View key={index} style={styles.commentContainer}>
-              <Text style={styles.commenterName}>{item.commenterName}</Text>
-              <Text style={styles.commentText}>{item.comment}</Text>
-            </View>
-          ))}
-        </View>
-      )}
+  return (
+    <View>
+      {
+        postQuery.isLoading ?
+        <LoadingSpinner /> :
+        <PostView post={postQuery.data} />
+      }
 
-      {showComments && (
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder="Añade un comentario..."
-            value={comment}
-            onChangeText={handleCommentChange}
-          />
-          <Button
-            title="Publicar"
-            onPress={handleAddComment}
-            color="#800000"
-          />
-        </View>
-      )}
-
-
+      <CommentsScrollView postId={postId} />
     </View>
   )
 }
