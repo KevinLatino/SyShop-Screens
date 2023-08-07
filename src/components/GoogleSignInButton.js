@@ -1,14 +1,15 @@
-import { useEffect } from 'react'
-import { View, Text, Image, TouchableOpacity } from 'react-native'
-import * as Google from 'expo-auth-session/providers/google'
 import axios from 'axios'
-import { maybeCompleteAuthSession } from "expo-web-browser"
+import * as Google from 'expo-auth-session/providers/google'
 import configuration from "../configuration"
+import { useEffect } from 'react'
+import { showMessage } from './AppSnackBar'
+import { maybeCompleteAuthSession } from "expo-web-browser"
+import { View, Text, Image, TouchableOpacity } from 'react-native'
   
+maybeCompleteAuthSession()
+
 const googleLogoUri
     = "https://cdn-icons-png.flaticon.com/512/2504/2504739.png"
-
-maybeCompleteAuthSession()
 
 const styles = {
   button: {
@@ -29,8 +30,6 @@ const styles = {
     gap: 15,
     justifyContent: "center",
     alignItems: "center",
-
-    
   },
   buttonText: {
     fontSize: 16,
@@ -50,7 +49,7 @@ const getUserInformation = async (accessToken) => {
   return data
 }
 
-export default ({ text, onSignIn }) => {
+export default ({ text, onSignIn, ...touchableOpacityProps }) => {
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: configuration.GOOGLE_WEB_CLIENT_ID,
     androidClientId: configuration.GOOGLE_ANDROID_CLIENT_ID,
@@ -64,6 +63,7 @@ export default ({ text, onSignIn }) => {
 
       getUserInformation(accessToken)
         .then((userInformation) => onSignIn(userInformation))
+        .catch((_) => showMessage("No se pudo acceder mediante Google"))
     }
   }, [response])
 
@@ -71,6 +71,7 @@ export default ({ text, onSignIn }) => {
     <TouchableOpacity
       style={styles.button}
       onPress={() => promptAsync()}
+      {...touchableOpacityProps}
     >
       <View style={styles.buttonInnerView}>
         <Image source={{uri: googleLogoUri, width: 25, height: 25}} />

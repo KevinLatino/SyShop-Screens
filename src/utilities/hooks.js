@@ -1,8 +1,30 @@
-import React from 'react'
+import { useState } from 'react'
 
-export default (initialValues, errorHandlers) => {
-  const [fieldsState, setFieldsState] = React.useState(initialValues)
-  const [errorsState, setErrorsState] = React.useState({})
+export const useCounter = () => {
+  const [value, setValue] = useState(0)
+
+  const increment = () => {
+    const newValue = value + 1
+
+    setValue(newValue)
+  }
+
+  const decrement = () => {
+    const newValue= value === 0 ? 0 : value - 1
+
+    setValue(newValue)
+  }
+
+  return {
+    value,
+    increment,
+    decrement
+  }
+}
+
+export const useForm = (initialValues, errorHandlers) => {
+  const [fieldsState, setFieldsState] = useState(initialValues)
+  const [errorsState, setErrorsState] = useState({})
 
   const getField = (name) => fieldsState[name]
 
@@ -34,13 +56,11 @@ export default (initialValues, errorHandlers) => {
     return Object.values(errorsState).some((v) => v !== null)
   }
 
-  const fields = fieldsState
-
   return {
     getField,
     setField,
     getError,
     hasErrors,
-    fields
+    fields: fieldsState
   }
 }

@@ -1,18 +1,19 @@
-import axios from 'axios'
-import validator from 'validator'
-import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
-import { signOnWithGoogleAccount } from '../utilities/api-calls'
-import useForm from '../hooks/useForm'
+import { useState } from 'react'
+import { useMutation, requestServer } from '../utilities/requests'
+import { useNavigation } from '@react-navigation/native'
+import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
+import { showMessage } from '../components/AppSnackBar'
+import {
+  makeNotEmptyChecker,
+  checkEmail,
+  checkPhoneNumber
+} from '../utilities/validation'
 import TextField from '../components/TextField'
-import PageTitle from '../components/PageTitle'
-import PageSubtitle from './PageSubtitle'
-import PageDivider from '../components/PageDivider'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import { View, StyleSheet } from 'react-native'
-import { Button, Text } from 'react-native-paper'
-import { StatusBar } from 'expo-status-bar'
+import { Button, Text, Divider, ActivityIndicator } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -32,21 +33,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  Button: {
-      display: "flex",
-      width: 225,
-      textAlign: "center",
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "#c20000"
-    },
-  Subtitle: {
+  subtitle: {
     fontSize: 20,
     color: "gray",
     display: "flex",
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center"
+  },
+  button: {
+    display: "flex",
+    width: 225,
+    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#c20000"
   },
   thirdText: {
     fontSize: 18,
@@ -57,44 +58,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   }
-  
 })
 
-const signUpWithPlainAccount = async (userInformation, setSession) => {
-  // const apiUrl = formatApiUrl(
-  //   "/customers_service/sign_up_customer_with_plain_account"
-  // )
+const signUpWithPlainAccount = async (userInformation) => {
+  const payload = {
+    ...userInformation
+  }
+  const session = await requestServer(
+    "/customers_service/sign_up_customer_with_plain_account",
+    payload
+  )
 
-  // const { data, statusText } = await axios.post(apiUrl, userInformation)
-
-  // if (statusText !== "OK") {
-  //   throw NetworkError("Could not sign up the customer with a plain account")
-  // }
-
-  // const session = {
-  //   token: data.token,
-  //   customerId: data.user_id
-  // }
-
-  // setSession(session)
-  console.log("pene")
+  return session
 }
 
-const checkPhoneNumber = (phoneNumber) => {
-  if (!validator.isMobilePhone(phoneNumber, "es-CR")) {
-    return "Número telefónico inválido"
-  }
+const signUpWithGoogleAccount = async (userInformation, googleUniqueIdentifier) => {
+  delete userInformation["email"]
+  delete userInformation["password"]
 
-  return null
+  const payload = {
+    ...userInformation,
+    google_unique_identifier: googleUniqueIdentifier
+  }
+  const session = await requestServer(
+    "/customers_service/sign_up_customer_with_google_account",
+    payload
+  )
+
+  return session
 }
 
 export default () => {
-  const {
-    getField,
-    setField,
-    getError,
-    fields
-  } = useForm(
+  const navigation = useNavigation()
+  const [_, setSession] = useAtom(sessionAtom)
+  const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
+  const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
+  const form = useForm(
     {
       name: "",
       first_surname: "",
@@ -109,100 +108,145 @@ export default () => {
       first_surname: makeNotEmptyChecker("Primer apellido vacío"),
       second_surname: makeNotEmptyChecker("Segundo apellido vacío"),
       phone_number: checkPhoneNumber,
-      picture: "",
       email: checkEmail,
       password: makeNotEmptyChecker("Contraseña vacía")
     }
   )
-  const [_, setSession] = useAtom(sessionAtom)
+  const signUpWithPlainAccountMutation = useMutation(
+    () => signUpWithPlainAccount(form.fields)
+  )
+  const signUpWithGoogleAccountMutation = useMutation(
+    () => signUpWithGoogleAccount(form.fields, googleUniqueIdentifier)
+  )
 
-  const handleSignUpWithPlainAccount = async (_) => {
-    try {
-      await signUpWithPlainAccount(fields, setSession)
-    } catch (error) {
-      console.log(error)
+  const signUpResult = 
+    signUpWithPlainAccountMutation.result !== null 
+    ? signUpWithPlainAccountMutation.result
+    : signUpWithGoogleAccountMutation.result
+
+  if (signUpResult !== null) {
+    setSession({
+      token: signUpResult.token,
+      customerId: signUpResult.user_id
+    })
+
+    navigation.navigate("Home")
+  }
+
+  const isSignUpLoading = (
+    (signUpWithPlainAccountMutation.isLoading) ||
+    (signUpWithGoogleAccountMutation.isLoading)
+  )
+
+  const handleSignUp = async () => {
+    if (form.hasErrors()) {
+      showMessage("Por favor provee la información necesaria para registrarte")
+
+      return
+    }
+
+    if (signingUpWithPlainAccount) {
+      signUpWithPlainAccountMutation.execute()
+    } else {
+      signUpWithGoogleAccountMutation.execute()
     }
   }
 
-  const handleSignUpWithGoogleAccount = async (userInformation) => {
-    try {
-      await signOnWithGoogleAccount(userInformation, setSession)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const fillUpFormWithGoogleData= (userInformation) => {
+    const [firstSurname, secondSurname] = userInformation["familyName"].split(" ", 2)
 
-  console.log(fields)
+    form.setField("name")(userInformation["name"])
+    form.setField("first_surname")(firstSurname)
+    form.setField("first_surname")(secondSurname)
+
+    setSigninUpWithPlainAccount(false)
+    setGoogleUniqueIdentifier(userInformation["id"])
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Registrarse</Text>
+      <Text style={styles.title}>
+        Registrarse
+      </Text>
 
-      <PageDivider />
+      <Divider style={{ width: "90%" }} />
 
-      <Text style={styles.Subtitle}>Ingresa tus datos personales</Text>
+      <Text style={styles.subtitle}>
+        Ingresa tus datos personales
+      </Text>
 
       <TextField
-        value={getField("name")}
-        onChangeText={setField("name")}
-        error={getError("name")}
+        value={form.getField("name")}
+        onChangeText={form.setField("name")}
+        error={form.getError("name")}
         placeholder="Nombre"
       />
 
       <TextField
-        value={getField("first_surname")}
-        onChangeText={setField("first_surname")}
-        error={getError("first_surname")}
+        value={form.getField("first_surname")}
+        onChangeText={form.setField("first_surname")}
+        error={form.getError("first_surname")}
         placeholder="Primer apellido"
       />
 
       <TextField
-        value={getField("second_surname")}
-        onChangeText={setField("second_surname")}
-        error={getError("second_surname")}
+        value={form.getField("second_surname")}
+        onChangeText={form.setField("second_surname")}
+        error={form.getError("second_surname")}
         placeholder="Segundo apellido"
       />
 
       <TextField
-        value={getField("phone_number")}
-        onChangeText={setField("phone_number")}
-        error={getError("phone_number")}
+        value={form.getField("phone_number")}
+        onChangeText={form.setField("phone_number")}
+        error={form.getError("phone_number")}
         placeholder="Número telefónico"
       />
 
-      <TextField
-        value={getField("email")}
-        onChangeText={setField("email")}
-        error={getError("email")}
-        placeholder="Correo electrónico"
-      />
+      {
+        signingUpWithPlainAccount ??
+        (
+          <View>
+            <TextField
+              value={form.getField("email")}
+              onChangeText={form.setField("email")}
+              error={form.getError("email")}
+              placeholder="Correo electrónico"
+            />
 
-      <TextField
-        value={getField("password")}
-        onChangeText={setField("password")}
-        error={getError("password")}
-        placeholder="Contraseña"
-        secureTextEntry
-      />
+            <TextField
+              value={form.getField("password")}
+              onChangeText={form.setField("password")}
+              error={form.getError("password")}
+              placeholder="Contraseña"
+              secureTextEntry
+            />
+          </View>
+        )
+      }
 
       <Button
-      style={styles.Button}
+        style={styles.button}
         mode="contained"
-        onPress={handleSignUpWithPlainAccount}
+        onPress={handleSignUp}
       >
-        Registrarse
+        {
+          isSignUpLoading
+          ? <ActivityIndicator animating />
+          : "Registrarse"
+        }
       </Button>
 
-      <PageDivider />
+      <Divider style={{ width: "90%" }} />
 
-      <Text style={styles.thirdText}>También puedes registrarte con:</Text>
+      <Text style={styles.thirdText}>
+        También puedes registrarte con
+      </Text>
 
       <GoogleSignInButton
         text="Registrate con Google"
-        onSignIn={handleSignUpWithGoogleAccount}
+        onSignIn={fillUpFormWithGoogleData}
       />
-
-      <StatusBar style="auto" />
     </View>
   )
 }

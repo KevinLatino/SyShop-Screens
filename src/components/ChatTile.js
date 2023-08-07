@@ -29,7 +29,10 @@ export default ({ chat }) => {
     const chatId = chat.chat_id
 
     navigation.navigate("Chat", {
-      chatId
+      chatId,
+      receiverId: chat.user.user_id,
+      receiverName: chat.user.name,
+      receiverPicture: chat.user.picture
     })
   }
 

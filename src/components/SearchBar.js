@@ -1,16 +1,13 @@
 import { useState } from 'react'
-import { useQuery, requestServer } from '../utilities/requests'
+import { useQuery } from '@tanstack/react-query'
+import { requestServer } from '../utilities/requests'
+import SearchInput from './SearchInput'
+import LoadingSpinner from './LoadingSpinner'
 import { View, StyleSheet } from 'react-native'
-import {
-  List,
-  ActivityIndicator,
-  Chip
-} from 'react-native-paper'
-import { SearchBar } from 'react-native-elements';
-
+import { List, Chip } from 'react-native-paper'
 
 const styles = StyleSheet.create({
-  selectedFiltersContainer: {
+  selectedCategoriesList: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
@@ -38,86 +35,38 @@ const fetchCategories = async (text) => {
   return categoriesNames
 }
 
-const fetchStores = async (text) => {
-  if (text === "") {
-    return []
-  }
-
-  const payload = {
-    search: text,
-    start: 0,
-    amount: 3
-  }
-
-  const storesNames = await requestServer(
-    "/stores_service/search_stores_by_name",
-    payload
-  )
-
-  return storesNames
-}
-
-const makeToggler = (array, setArray) => {
-  const toggler = (element) => {
-    if (array.includes(element)) {
-      const newArray = array
-        .filter((e) => e !== element)
-
-      setArray(newArray)
-    } else {
-      const newArray = [...array, element]
-
-      setArray(newArray)
-    }
-  }
-
-  return toggler
-}
-
-const SelectedFiltersList = ({ names, onChipClose, chipsIcon, chipsStyle }) => {
-  const chips = names
-    .map((name) => {
+const SelectedCategoriesList = ({ categoriesNames, onDelete }) => {
+  const chips = categoriesNames
+    .map((categoryName) => {
       return (
         <Chip
-          key={name}
-          onClose={() => onChipClose(name)}
-          icon={chipsIcon}
+          key={categoryName}
+          onClose={() => onDelete(categoryName)}
+          icon="shape"
           closeIcon="close"
-          style={{
-            ...chipsStyle,
-            width: "fit-content"
-          }}
+          style={{ width: "fit-content" }}
         >
-          {name}
+          {categoryName}
         </Chip>
       )
     })
 
   return (
-    <View style={styles.selectedFiltersContainer}>
+    <View style={styles.selectedCategoriesList}>
       {chips}
     </View>
   )
 }
 
-const RecommendedFiltersList = ({ names, onTilePress, tilesIcon, tilesStyle }) => {
-  if (names === null) {
-    return (
-      <View>
-        <ActivityIndicator animating />
-      </View>
-    )
-  }
-
-  const listItems = names
-      .map((name) => {
+const RecommendedCategoriesList = ({ categoriesNames, onToggle }) => {
+  const listItems = categoriesNames
+      .map((categoryName) => {
         return (
           <List.Item
-            key={name}
-            title={name}
-            left={(props) => <List.Icon {...props} icon={tilesIcon} />}
-            onPress={() => onTilePress(name)}
-            style={tilesStyle}
+            key={categoryName}
+            title={categoryName}
+            left={(props) => <List.Icon {...props} icon="shape" />}
+            onPress={() => onToggle(categoryName)}
           />
         )
       })
@@ -132,18 +81,22 @@ const RecommendedFiltersList = ({ names, onTilePress, tilesIcon, tilesStyle }) =
 export default ({ onSearchSubmit }) => {
   const [text, setText] = useState("")
   const [categoriesNames, setCategoriesNames] = useState([])
-  const [storesNames, setStoresNames] = useState([])
-  const categoriesQuery = useQuery(() => fetchCategories(text))
-  const storesQuery = useQuery(() => fetchStores(text))
+  const categoriesQuery = useQuery(
+    "foundCategories",
+    () => fetchCategories(text)
+  )
 
   const toggleCategoryName = (categoryName) => {
-    makeToggler(categoriesNames, setCategoriesNames)(categoryName)
+    if (categoriesNames.includes(categoryName)) {
+      const newCategoriesNames = categoriesNames
+        .filter((c) =>  c !== categoryName)
 
-    setText("")
-  }
+      setCategoriesNames(newCategoriesNames)
+    } else {
+      const newCategoriesNames = [...categoriesNames, categoryName]
 
-  const toggleStoreName = (storeName) => {
-    makeToggler(storesNames, setStoresNames)(storeName)
+      setCategoriesNames(newCategoriesNames)
+    }
 
     setText("")
   }
@@ -151,57 +104,24 @@ export default ({ onSearchSubmit }) => {
   const handleSearchUpdate = (newText) => {
     setText(newText)
 
-    categoriesQuery.refresh()
-    storesQuery.refresh()
-  }
-
-  const handleSearchSubmit = () => {
-    onSearchSubmit(
-      text,
-      categoriesNames,
-      storesNames
-    )
+    categoriesQuery.refetch()
   }
 
   return (
     <View>
-       <View>
-      <SearchBar
-        placeholder="Buscar..."
-        value={text}
-        onChangeText={handleSearchUpdate}
-        onSubmitEditing={handleSearchSubmit}
-        containerStyle={{
-          backgroundColor: 'transparent',
-          borderTopWidth: 0,
-          borderBottomWidth: 0,
-        }}
-        inputContainerStyle={{
-          backgroundColor: '#f0f0f0f',
-          borderRadius: 20,
-          border: 1,
-          borderColor: 'grey',
-          width: 395,
-        }}
-        inputStyle={{
-          fontSize: 16,
-        }}
-      />
-    </View>
-
-    
+      <View>
+        <SearchInput
+          placeholder="Buscar..."
+          value={text}
+          onChangeText={handleSearchUpdate}
+          onSubmitEditing={() => onSearchSubmit(text, categoriesNames)}
+        />
+      </View>
 
       <View>
-        <SelectedFiltersList
-          names={categoriesNames}
-          onChipClose={(categoryName) => toggleCategoryName(categoryName)}
-          chipsIcon="shape"
-        />
-
-        <SelectedFiltersList
-          names={storesNames}
-          onChipClose={(storeName) => toggleStoreName(storeName)}
-          chipsIcon="store"
+        <SelectedCategoriesList
+          categoriesNames={categoriesNames}
+          onDelete={toggleCategoryName}
         />
       </View>
 
@@ -210,21 +130,14 @@ export default ({ onSearchSubmit }) => {
           Categorías
         </List.Subheader>
 
-        <RecommendedFiltersList
-          names={categoriesQuery.result}
-          onTilePress={(categoryName) => toggleCategoryName(categoryName)}
-          tilesIcon="shape"
-        />
-
-        <List.Subheader>
-          Tiendas
-        </List.Subheader>
-
-        <RecommendedFiltersList
-          names={storesQuery.result}
-          onTilePress={(storeName) => toggleStoreName(storeName)}
-          tilesIcon="store"
-        />
+        {
+          categoriesQuery.isLoading ?
+          <LoadingSpinner /> :
+          <RecommendedCategoriesList
+            categoriesNames={categoriesQuery.data}
+            onToggle={toggleCategoryName}
+          />
+        }
       </List.Section>
     </View>
   )

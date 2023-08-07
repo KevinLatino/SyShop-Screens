@@ -56,7 +56,7 @@ export default () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const navigation = useNavigation()
 
-  const navigateToSearchResults = (text, categoriesNames, storesNames) => {
+  const handleSearchSubmit = (text, categoriesNames, storesNames) => {
     navigation.navigate("SearchResults", {
       text,
       categoriesNames,
@@ -74,7 +74,7 @@ export default () => {
           onDismiss={() => setIsModalVisible(false)}
         >
           <Surface elevation={5}>
-            <SearchBar onSearchSubmit={navigateToSearchResults} />
+            <SearchBar onSearchSubmit={handleSearchSubmit} />
           </Surface>
         </Modal>
       </Portal>

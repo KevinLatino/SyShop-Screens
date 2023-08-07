@@ -1,22 +1,16 @@
 import { useState } from 'react'
-import { useAtom } from 'jotai'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useCounter } from '../hooks/useCounter'
+import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import { useQuery, requestServer } from '../utilities/requests'
-import { launchImageLibrary } from 'react-native-image-picker'
-import { View, Image, StyleSheet } from 'react-native'
-import { Surface, TouchableRipple, ActivityIndicator } from 'react-native-paper'
-import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat'
+import { useRoute } from '@react-navigation/native'
+import { requestServer } from '../utilities/requests'
+import { selectPictureFromGallery } from '../utilities/camera'
+import Images from 'react-native-chat-images'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-
-const styles = StyleSheet.create({
-  imageMessageBubble: {
-    borderRadius: 10,
-    padding: 5
-  }
-})
+import { View, List, Avatar } from 'react-native'
+import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat'
 
 const parseRawTextMessage = (rawTextMessage) => {
   return {
@@ -39,31 +33,15 @@ const fetchMessages = async (chatId, pageNumber) => {
   return messages
 }
 
-const ImageMessageBubble = ({ image }) => {
-  const navigation = useNavigation()
-
-  const navigateToImageView = () => {
-    navigation.navigate(
-      "Chat.ImageView",
-      {
-        image
-      }
-    )
+const addMessage = async (message, senderId, receiverId) {
+  const payload = {
+    sender_id: senderId,
+    receiver_id: receiverId,
+    ...message
   }
-
-  return (
-    <TouchableRipple
-      onPress={navigateToImageView}
-    >
-      <Surface
-        elevation={5}
-        style={styles.imageMessageBubble}
-      >
-        <Image
-          source={{ uri: image, width: 50, height: 50 }}
-        />
-      </Surface>
-    </TouchableRipple>
+  const _ = await requestServer(
+    "/chat_service/add_message",
+    payload
   )
 }
 
@@ -89,8 +67,8 @@ const MessageBubble = ({ currentMessage, ...props }) => {
 
     case "image":
       return (
-        <ImageMessageBubble
-          image={currentMessage.content}
+        <Images
+          images={[currentMessage.content]}
         />
       )
   }
@@ -133,82 +111,78 @@ const ScrollDownButton = () => {
   )
 }
 
-export const ImageView = () => {
+export default () => {
   const route = useRoute()
+  const [session, _] = useAtom(sessionAtom)
+  const pageNumber = useCounter()
+  const [messages, setMessages] = useState([])
 
-  const { image } = route.params
+  const { chatId, receiverId, receiverName } = route.params
+  const messagesQuery = useQuery(
+    "chatMessages",
+    async () => {
+      const fetchedMessages = await fetchMessages(chatId, pageNumber.value)
+      const allMessages = GiftedChat.append(messages, fetchedMessages)
+
+      setMessages(allMessages)
+    }
+  )
+  const addMessageMutation = useMutation(
+    (message) => addMessage(message, session.customerId, receiverId)
+  )
+
+  const handleTextMessageSend = ({ text }) => {
+    const message = {
+      content: text,
+      content_type: "text"
+    }
+
+    addMessageMutation.mutate(message)
+  }
+
+  const handlePictureMessageChoosen = async () => {
+    const picture = await selectPictureFromGallery()
+
+    const message = {
+      content: picture,
+      content_type: "image"
+    }
+
+    addMessageMutation.mutate(message)
+  }
 
   return (
     <View>
-      <Image
-        source={{ uri: image }}
+      <List.Item
+        title={receiverName}
+        left={(props) => {
+          return (
+            <Avatar
+              {...props}
+              source={{ uri: receiverPicture }}
+            />
+        )}}
+      />
+
+      <GiftedChat
+        placeholder='Mensaje...'
+        renderBubble={(props) => <MessageBubble {...props} />}
+        renderSend={(props) => <SendTextMessageButton {...props} />}
+        renderActions={(props) => <SendImageMessageButton {...props} />}
+        scrollToBottomComponent={<ScrollDownButton />}
+
+        messages={messages}
+        onSend={handleTextMessageSend}
+        onPressActionButton={handlePictureMessageChoosen}
+        user={{
+          user_id: session.customerId
+        }}
+        onLoadEarlier={pageNumber.increment}
+
+        infiniteScroll
+        loadEarlier={false}
+        scrollToBottom
       />
     </View>
-  )
-}
-
-export default () => {
-  const route = useRoute()
-  const [messages, setMessages] = useState([])
-  const [session, _] = useAtom(sessionAtom)
-  const pageNumber = useCounter()
-
-  const { chatId } = route.params
-  const messagesQuery = useQuery(async () => {
-    const fetchedMessages = await fetchMessages(chatId, pageNumber.value)
-    const allMessages = GiftedChat.append(messages, fetchedMessages)
-
-    setMessages(allMessages)
-  })
-
-  if (messagesQuery.result === null) {
-    return (
-      <View>
-        <ActivityIndicator animating />
-      </View>
-    )
-  }
-
-  const handleTextMessageSend = (textMessage) => {
-    // Esto es temporal, falta acomodar la navegación
-    console.log("Se envía un texto")
-  }
-
-  const handleChoosePictureMessage = async () => {
-    const chooseResponse = await launchImageLibrary({
-      includeBase64: true,
-      selectionLimit: 1
-    })
-
-    if (chooseResponse.didCancel || chooseResponse.errorCode !== null) {
-      return
-    }
-
-    const [ image ] = chooseResponse.assets
-
-    // Esto es temporal, falta acomodar la navegación
-    console.log("Se envía una imagen: " + image.base64)
-  }
-
-  return (
-    <GiftedChat
-      placeholder='Mensaje...'
-      renderBubble={(props) => <MessageBubble {...props} />}
-      renderSend={(props) => <SendTextMessageButton {...props} />}
-      renderActions={(props) => <SendImageMessageButton {...props} />}
-      scrollToBottomComponent={<ScrollDownButton />}
-
-      messages={messages}
-      onSend={handleTextMessageSend}
-      onLoadEarlier={pageNumber.increment}
-      onPressActionButton={handleChoosePictureMessage}
-      user={{
-        user_id: session.user_id
-      }}
-
-      infiniteScroll
-      loadEarlier={false}
-      scrollToBottom
-    />
   )
 }
