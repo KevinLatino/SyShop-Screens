@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { useCounter } from '../hooks/useCounter'
+import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { useRoute } from '@react-navigation/native'
@@ -9,7 +9,8 @@ import { selectPictureFromGallery } from '../utilities/camera'
 import Images from 'react-native-chat-images'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { View, List, Avatar } from 'react-native'
+import { View } from 'react-native'
+import { List, Avatar } from 'react-native-paper'
 import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat'
 
 const parseRawTextMessage = (rawTextMessage) => {
@@ -33,7 +34,7 @@ const fetchMessages = async (chatId, pageNumber) => {
   return messages
 }
 
-const addMessage = async (message, senderId, receiverId) {
+const addMessage = async (message, senderId, receiverId) => {
   const payload = {
     sender_id: senderId,
     receiver_id: receiverId,
@@ -117,7 +118,11 @@ export default () => {
   const pageNumber = useCounter()
   const [messages, setMessages] = useState([])
 
-  const { chatId, receiverId, receiverName } = route.params
+  if (route.params === undefined) {
+    return null
+  }
+
+  const { chatId, receiverId, receiverName, receiverPicture } = route.params
   const messagesQuery = useQuery(
     "chatMessages",
     async () => {
@@ -128,7 +133,7 @@ export default () => {
     }
   )
   const addMessageMutation = useMutation(
-    (message) => addMessage(message, session.customerId, receiverId)
+    (message, customerId, receiverId) => addMessage(message, customerId, receiverId)
   )
 
   const handleTextMessageSend = ({ text }) => {
@@ -137,7 +142,7 @@ export default () => {
       content_type: "text"
     }
 
-    addMessageMutation.mutate(message)
+    addMessageMutation.mutate(message, session.customerId, receiverId)
   }
 
   const handlePictureMessageChoosen = async () => {
@@ -148,7 +153,7 @@ export default () => {
       content_type: "image"
     }
 
-    addMessageMutation.mutate(message)
+    addMessageMutation.mutate(message, session.customerId, receiverId)
   }
 
   return (

@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
-import useCounter from '../hooks/useCounter'
-import { useQuery, requestServer } from '../utilities/requests'
+import { useCounter} from '../utilities/hooks'
+import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
-import Slider from '@miblanchard/react-native-slider'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { Slider } from '@miblanchard/react-native-slider'
 import {
     View,
     ScrollView as ReactNativeScrollView,
@@ -195,17 +197,18 @@ const SearchedCategoriesScrollView = ({ categoriesNames }) => {
 
 const StoresResultsScrollView = ({ searchedText }) => {
     const pageNumber = useCounter()
-    const storesQuery = useQuery(() => fetchStores(searchedText, pageNumber.value))
+    const storesQuery = useQuery(
+        "stores",
+        () => fetchStores(searchedText, pageNumber.value)
+    )
 
-    if (storesQuery.result === null) {
+    if (storesQuery.isLoading) {
         return (
-            <View>
-                <ActivityIndicator animating />
-            </View>
+            <LoadingSpinner />
         )
     }
 
-    const storesCards = storesQuery.result.map((store) => {
+    const storesCards = storesQuery.data.map((store) => {
         return (
             <StoreTile
                 key={store.user_id}
@@ -226,33 +229,37 @@ const StoresResultsScrollView = ({ searchedText }) => {
 }
 
 const PostsResults = ({ searchedText }) => {
-    const maximumPriceQuery = useQuery(() => fetchMaximumPrice())
+    const maximumPriceQuery = useQuery(
+        "maximumPrice",
+        () => fetchMaximumPrice()
+    )
 
-    if (maximumPriceQuery.result === null) {
+    if (maximumPriceQuery.isLoading) {
         return (
-            <View>
-                <ActivityIndicator animating />
-            </View>
+            <LoadingSpinner />
         )
     }
 
     const pageNumber = useCounter()
     const [searchFilters, setSearchFilters] = useState({
         minimumPrice: 0,
-        maximumPrice: maximumPriceQuery.result,
+        maximumPrice: maximumPriceQuery.data,
         sortingProperty: "publicacion_date",
         sortingSchema: "descending"
     })
-    const postsQuery = useQuery(() => fetchPosts(
-        searchedText,
-        filters,
-        pageNumber.value
-    ))
+    const postsQuery = useQuery(
+        "postsResults",
+        () => fetchPosts(
+            searchedText,
+            searchFilters,
+            pageNumber.value
+        )
+    )
 
     const handleChangeFilters = (newSearchFilters) => {
         setSearchFilters(newSearchFilters)
 
-        postsQuery.refresh()
+        postsQuery.refetch()
     }
 
     return (
@@ -262,11 +269,15 @@ const PostsResults = ({ searchedText }) => {
                 onChangeFilters={handleChangeFilters}
             />
 
-            <ScrollView
-                data={postsQuery.result}
-                renderItem={(post) => <PostTile post={post} />}
-                onEndReached={pageNumber.increment}
-            />
+            {
+                postsQuery.isLoading ?
+                <LoadingSpinner /> :
+                <ScrollView
+                    data={postsQuery.data}
+                    renderItem={(post) => <PostTile post={post} />}
+                    onEndReached={pageNumber.increment}
+                />
+            }
         </View>
     )
 }

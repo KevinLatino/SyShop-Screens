@@ -1,9 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
+import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
-import { useCounter } from '../hooks/useCounter'
 import { sessionAtom } from '../context'
-import { requestServer, useQuery } from '../utilities/requests'
+import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { View, ActivityIndicator } from 'react-native'
 
 const fetchChats = async (customerId, pageNumber) => {
@@ -24,20 +26,19 @@ export default () => {
   const [session, _] = useAtom(sessionAtom)
   const pageNumber = useCounter()
   const chatsQuery = useQuery(
+    "listOfChats",
     () => fetchChats(session.customerId, pageNumber.value)
   )
 
-  if (chatsQuery.result === null) {
+  if (chatsQuery.isLoading) {
     return (
-      <View>
-        <ActivityIndicator animating />
-      </View>
+      <LoadingSpinner />
     )
   }
 
   return (
     <ScrollView
-      data={chatsQuery.result}
+      data={chatsQuery.data}
       renderItem={(chat) => <ChatTile chat={chat} />}
       onEndReached={pageNumber.increment}
     />

@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { requestServer, useQuery } from '../utilities/requests'
+import { useQuery } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
+import { requestServer } from '../utilities/requests'
 import { useNavigation } from '@react-navigation/native'
-import useCounter from '../hooks/useCounter'
+import { useCounter } from '../utilities/hooks'
 import {
   Portal,
   Modal,
@@ -14,6 +15,17 @@ import {
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { View, StyleSheet } from 'react-native'
+
+const styles = StyleSheet.create({
+  fab: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    margin: 15
+  }
+})
 
 const fetchPosts = async (customerId, pageNumber) => {
   const payload = {
@@ -32,19 +44,20 @@ const fetchPosts = async (customerId, pageNumber) => {
 const PostsList = () => {
   const pageNumber = useCounter()
   const [session, _] = useAtom(sessionAtom)
-  const postsQuery = useQuery(() => fetchPosts(session.customerId, pageNumber))
+  const postsQuery = useQuery(
+    "feedPosts",
+    () => fetchPosts(session.customerId, pageNumber.value)
+  )
 
-  if (postsQuery.result === null) {
+  if (postsQuery.isLoading) {
     return (
-      <View>
-        <ActivityIndicator animating />
-      </View>
+      <LoadingSpinner />
     )
   }
 
   return (
     <ScrollView
-      data={postsQuery.result}
+      data={postsQuery.data}
       renderItem={(post) => <PostTile post={post} />}
       onStartReached={postsQuery.refresh}
       onEndReached={pageNumber.increment}

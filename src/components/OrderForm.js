@@ -68,7 +68,7 @@ export default () => {
       () => fetchPost(postId, session.customerId)
     )
     const createSaleIntentMutation = useMutation(
-      () => createSaleIntent(postId, session.customerId, amount)
+      (postId, customerId, amount) => createSaleIntent(postId, customerId, amount)
     )
 
     if (createSaleIntentMutation.isSuccess) {
@@ -97,7 +97,9 @@ export default () => {
 
             <Button
                 mode="outlined"
-                onPress={createSaleIntentMutation.mutate}
+                onPress={
+                  () => createSaleIntentMutation.mutate(postId, session.customerId, amount)
+                }
             >
               {
                 createSaleIntentMutation.isLoading ?

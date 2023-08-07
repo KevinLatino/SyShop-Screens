@@ -1,9 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
-import { useQuery, requestServer } from '../utilities/requests'
+import { requestServer } from '../utilities/requests'
 import { View } from 'react-native'
-import { List, ActivityIndicator } from 'react-native-paper'
+import { List } from 'react-native-paper'
 import DeliveryTile from '../components/DeliveryTile'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 const fetchActiveDeliveries = async (customerId) => {
   const payload = {
@@ -30,14 +32,6 @@ const fetchInactiveDeliveries = async (customerId) => {
 }
 
 const DeliveriesListItems = ({ deliveries }) => {
-  if (deliveries === null) {
-    return (
-      <View>
-        <ActivityIndicator animating />
-      </View>
-    )
-  }
-
   const deliviriesListItems = deliveries.map((delivery) => {
     return (
       <DeliveryTile
@@ -57,9 +51,11 @@ const DeliveriesListItems = ({ deliveries }) => {
 export default () => {
   const [session, _] = useAtom(sessionAtom)
   const activeDeliveriesQuery = useQuery(
+    "activeDeliveries",
     () => fetchActiveDeliveries(session.customerId)
   )
   const inactiveDeliveriesQuery = useQuery(
+    "inactiveDeliveries",
     () => fetchInactiveDeliveries(session.customerId)
   )
 
@@ -69,13 +65,21 @@ export default () => {
         Entregas activas
       </List.Subheader>
 
-      <DeliveriesListItems deliveries={activeDeliveriesQuery.result} />
+      {
+        activeDeliveriesQuery.isLoading ?
+        <LoadingSpinner /> :
+        <DeliveriesListItems deliveries={activeDeliveriesQuery.data} />
+      }
 
       <List.Subheader>
         Entregas inactivas
       </List.Subheader>
 
-      <DeliveriesListItems deliveries={inactiveDeliveriesQuery.result} />
+      {
+        inactiveDeliveriesQuery.isLoading ?
+        <LoadingSpinner /> :
+        <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
+      }
     </List.Section>
   )
 }

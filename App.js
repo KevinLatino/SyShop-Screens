@@ -1,4 +1,6 @@
 import 'react-native-gesture-handler'
+import { useAtom } from 'jotai'
+import { sessionAtom } from './src/context'
 import { PaperProvider } from 'react-native-paper'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
@@ -8,63 +10,86 @@ import { queryClient } from './src/context'
 import Home from './src/screens/Home'
 import DeliveryList from './src/screens/DeliveryList'
 import ChatList from './src/screens/ChatList'
+import Chat from './src/screens/Chat'
 import Welcome from './src/screens/Welcome'
+import SearchResults from './src/screens/SearchResults'
 import AppSnackBar from './src/components/AppSnackBar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { View } from 'react-native'
 
 
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
 
-const App = () => {
+const NavigationComponent = () => {
   return (
-    <QueryClientProvider queryClient={queryClient}>
-      <PaperProvider>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Chat"
-              component={<Chat />}
-            />
+    <View>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Chat"
+          >
+            {() => <Chat />}
+          </Stack.Screen>
 
-            <Stack.Screen
-              name="SearchResults"
-              component={<SearchResults />}
-            />
-          </Stack.Navigator>
+          <Stack.Screen
+            name="SearchResults"
+          >
+            {() => <SearchResults />}
+          </Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
 
-          <BottomTab.Navigator>
+      <NavigationContainer>
+        <BottomTab.Navigator>
             <BottomTab.Screen
               name="Home"
-              component={<Home />}
-            />
+            >
+              {() => <Home />}
+            </BottomTab.Screen>
 
             <BottomTab.Screen
               name="Deliveries"
-              component={<DeliveryList />}
-            />
+            >
+              {() => <DeliveryList />}
+            </BottomTab.Screen>
 
             <BottomTab.Screen
               name="Chats"
-              component={<ChatList />}
-            />
+            >
+              {() => <ChatList />}
+            </BottomTab.Screen>
 
             <BottomTab.Screen
               name="MyProfile"
-            />
+            >
+              {() => null}
+            </BottomTab.Screen>
           </BottomTab.Navigator>
-        </NavigationContainer>
+      </NavigationContainer>
+    </View>
+  )
+}
 
+const App = () => {
+  const [session, _] = useAtom(sessionAtom)
+
+  return (
+    <QueryClientProvider queryClient={queryClient}>
+      <PaperProvider>
+        {
+            session === null ?
+            (
+              <SafeAreaProvider>
+                <Welcome/>
+              </SafeAreaProvider>
+            ) :
+            <NavigationComponent />
+        }
         <AppSnackBar />
       </PaperProvider>
     </QueryClientProvider>
    )
-
-  return (
-    <SafeAreaProvider>
-      <Welcome/>
-    </SafeAreaProvider>
-  )
 }
 
 export default App;
