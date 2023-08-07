@@ -8,7 +8,9 @@ import { queryClient } from './src/context'
 import Home from './src/screens/Home'
 import DeliveryList from './src/screens/DeliveryList'
 import ChatList from './src/screens/ChatList'
+import Welcome from './src/screens/Welcome'
 import AppSnackBar from './src/components/AppSnackBar'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 
 const Stack = createStackNavigator()
@@ -57,6 +59,12 @@ const App = () => {
       </PaperProvider>
     </QueryClientProvider>
    )
+
+  return (
+    <SafeAreaProvider>
+      <Welcome/>
+    </SafeAreaProvider>
+  )
 }
 
 export default App;
