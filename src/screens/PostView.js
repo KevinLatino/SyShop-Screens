@@ -11,8 +11,8 @@ import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
-import { View, Text, Button, IconButton, Chip } from 'react-native'
 import { SliderBox } from 'react-native-image-slider-box'
+import { View, Text, Button, IconButton, Chip } from 'react-native'
 
 const fetchPost = async (postId, customerId) => {
   const payload = {
@@ -119,6 +119,8 @@ const CommentsScrollView = ({ postId }) => {
 }
 
 const PostView = ({ post }) => {
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false)
+
   const categoriesChips = post.categories.map((category) => {
     return (
       <Chip
@@ -164,7 +166,10 @@ const PostView = ({ post }) => {
         <LikeButton />
       </View>
 
-      <Button>
+      <Button
+        mode="contained"
+        onPress={() => setIsBottomSheetVisible(true)}
+      >
         Comprar (₡{post.price})
       </Button>
     </View>

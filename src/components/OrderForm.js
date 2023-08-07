@@ -1,11 +1,40 @@
 import { useState } from 'react'
-import { useQuery, requestServer } from '../utilities/requests'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
+import { requestServer } from '../utilities/requests'
+import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
-import { View, ActivityIndicator } from 'react-native'
+import { View } from 'react-native'
 import { Card, Text, Button } from 'react-native-paper'
+
+const fetchPost = async (postId, customerId) => {
+  const payload = {
+    post_id: postId,
+    customer_id: customerId
+  }
+  const post = await requestServer(
+    "/posts_service/get_post_by_id",
+    payload
+  )
+
+  return post
+}
+
+const createSaleIntent = async (postId, customerId, amount) => {
+  const payload = {
+    post_id: postId,
+    customer_id: customerId,
+    amount
+  }
+  const response = await requestServer(
+    "/sales_service/create_sale_intent",
+    payload
+  )
+
+  return response
+}
 
 const PostTile = ({ post }) => {
     return (
@@ -34,29 +63,24 @@ export default () => {
     const route = useRoute()
 
     const { postId } = route.params
-    const postQuery = useQuery(() => fetchPost(postId))
+    const postQuery = useQuery(
+      "postToBuy",
+      () => fetchPost(postId, session.customerId)
+    )
+    const createSaleIntentMutation = useMutation(
+      () => createSaleIntent(postId, session.customerId, amount)
+    )
 
-    const handlePurchase = async () => {
-        const payload = {
-            customer_id: session.customer_id,
-            post_id: postId,
-            amount: amount
-        }
-        const response = requestServer(
-            "/sales_service/create_sale_intent",
-            payload
-        )
-        const stripeClientSecret = response.stripe_client_secret
+    if (createSaleIntentMutation.isSuccess) {
+      const stripeClientSecret = createSaleIntentMutation.data.stripe_client_secret
 
-        // PENDIENTE: Seguir con la compra
-        console.log(stripeClientSecret)
+      // TEMPORAL: Falta implemetar navegación al formulario de pago
+      console.log("StripeClientSecret: " + stripeClientSecret)
     }
 
-    if (postQuery.result === null) {
+    if (postQuery.isLoading) {
         return (
-            <View>
-                <ActivityIndicator animating />
-            </View>
+          <LoadingSpinner />
         )
     }
 
@@ -73,9 +97,13 @@ export default () => {
 
             <Button
                 mode="outlined"
-                onPress={handlePurchase}
+                onPress={createSaleIntentMutation.mutate}
             >
-                Comprar
+              {
+                createSaleIntentMutation.isLoading ?
+                <LoadingSpinner /> :
+                "Comprar"
+              }
             </Button>
         </View>
     )
