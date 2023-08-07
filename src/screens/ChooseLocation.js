@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
+import { useQuery } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -57,21 +57,20 @@ const LocationsScrollView = () => {
 }
 
 export default () => {
-  const [isModalVisible, setIsModalVisible] = useState(false)
+  const navigation = useNavigation()
+
+  const navigateToAddLocation = () => {
+    navigation.navigate("AddLocation")
+  }
 
   return (
     <View style={styles.container}>
       <LocationsScrollView />
 
-      <AddLocationModal
-        visible={isModalVisible}
-        hideModal={() => setIsModalVisible(false)}
-      />
-
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => setIsModalVisible(true)}
+        onPress={navigateToAddLocation}
       />
     </View>
   )

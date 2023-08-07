@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
@@ -78,38 +79,35 @@ const AddressAutocompleteInput = ({ onSelect }) => {
   )
 }
 
-export default ({ visible, hideModal }) => {
+export default () => {
   const [selectedAddress, setSelectedAddress] = useState(null)
   const [session, _] = useAtom(sessionAtom)
+  const navigation = useNavigation()
   const addLocationMutation = useMutation(
     () => addLocation(selectedAddress, session.customerId)
   )
 
   if (addLocationMutation.isSuccess) {
-    hideModal()
+    navigation.navigate("ChooseLocation")
   }
 
   return (
-    <Portal>
-      <Modal visible={visible} onDismiss={hideModal}>
-        <Surface elevation={5}>
-          <AddressAutocompleteInput onSelect={setSelectedAddress} />
+    <View>
+      <AddressAutocompleteInput onSelect={setSelectedAddress} />
 
-          <Button
-            mode="contained"
-            onPress={addLocationMutation.mutate()}
-            disabled={
-              selectedAddress === null || addLocationMutation.isLoading
-            }
-          >
-            {
-              addLocationMutation.isLoading ?
-              <LoadingSpinner /> :
-              "Añadir domicilio"
-            }
-          </Button>
-        </Surface>
-      </Modal>
-    </Portal>
+      <Button
+        mode="contained"
+        onPress={addLocationMutation.mutate()}
+        disabled={
+          selectedAddress === null || addLocationMutation.isLoading
+        }
+      >
+        {
+          addLocationMutation.isLoading ?
+          <LoadingSpinner /> :
+          "Añadir domicilio"
+        }
+      </Button>
+    </View>
   )
 }
