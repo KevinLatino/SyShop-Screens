@@ -1,5 +1,4 @@
 # Generales
-- [ ] Migrar todo el código a react-query
 - [ ] Manejar errores del servidor
 - [ ] Instalar todos los screens en el contenedor de navegación
 
