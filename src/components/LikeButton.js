@@ -5,6 +5,7 @@ import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { IconButton } from 'react-native-paper'
 import LoadingSpinner from './LoadingSpinner'
+import { View } from 'react-native'
 
 const likePost = async (postId, customerId) => {
   const payload = {
@@ -17,28 +18,30 @@ const likePost = async (postId, customerId) => {
   )
 }
 
-export default ({ doesCustomerLikePost }) => {
+export default ({ postId, doesCustomerLikePost }) => {
   const [session, _] = useAtom(sessionAtom)
   const [isLiked, setIsLiked] = useState(doesCustomerLikePost)
   const likePostMutation = useMutation(
-    () => likePost(post.post_id, session.customerId)
+    (postId, customerId) => likePost(postId, customerId)
   )
 
   const handleLike = () => {
-    likePostMutation.mutate()
+    likePostMutation.mutate(postId, session.customerId)
 
     setIsLiked(!isLiked)
   }
 
   return (
-    {
-      likePostMutation.isLoading ?
-      <LoadingSpinner /> :
-      <IconButton
-        mode="contained"
-        icon={isLiked ? "heart" : "heart-outline"}
-        onPress={handleLike}
-      />
-    }
+    <View>
+      {
+        likePostMutation.isLoading ?
+        <LoadingSpinner /> :
+        <IconButton
+          mode="contained"
+          icon={isLiked ? "heart" : "heart-outline"}
+          onPress={handleLike}
+        />
+      }
+    </View>
   )
 }

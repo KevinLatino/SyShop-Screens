@@ -113,10 +113,10 @@ export default () => {
     }
   )
   const signUpWithPlainAccountMutation = useMutation(
-    () => signUpWithPlainAccount(form.fields)
+    (fields) => signUpWithPlainAccount(fields)
   )
   const signUpWithGoogleAccountMutation = useMutation(
-    () => signUpWithGoogleAccount(form.fields, googleUniqueIdentifier)
+    (fields, googleUniqueIdentifier) => signUpWithGoogleAccount(fields, googleUniqueIdentifier)
   )
 
   const signUpResult = 

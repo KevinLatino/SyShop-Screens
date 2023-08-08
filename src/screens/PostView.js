@@ -56,11 +56,11 @@ const addPostComment = async (postId, customerId, text) => {
 const CommentInput = ({ postId, customerId }) => {
   const [text, setText] = useState("")
   const addCommentMutation = useMutation(
-    () => addPostComment(postId, customerId, text)
+    (postId, customerId, text) => addPostComment(postId, customerId, text)
   )
 
   const handleCommentSubmit = async () => {
-    addCommentMutation.mutate()
+    addCommentMutation.mutate(postId, customerId, text)
 
     await queryClient.refetchQueries({
       queryKey: "postComments"
@@ -180,7 +180,7 @@ export default () => {
   const route = useRoute()
   const [session, _] = useAtom(sessionAtom)
 
-  const postId = route.params.post_id
+  const { postId } = route.params
   const postQuery = useQuery(
     "post",
     () => fetchPost(postId, session.customerId)

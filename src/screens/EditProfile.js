@@ -94,7 +94,7 @@ export default () => {
     }
   )
   const updateCustomerMutation = useMutation(
-    () => updateCustomer(session.customerId, form.fields)
+    (customerId, fields) => updateCustomer(customerId, fields)
   )
 
   return (
@@ -134,7 +134,9 @@ export default () => {
 
       <Button
         mode="contained"
-        onPress={updateCustomerMutation.mutate()}
+        onPress={
+          () => updateCustomerMutation.mutate(session.customerId, form.fields)
+        }
         disabled={form.hasErrors()}
       >
         {

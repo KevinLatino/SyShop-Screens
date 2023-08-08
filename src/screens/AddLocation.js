@@ -84,7 +84,7 @@ export default () => {
   const [session, _] = useAtom(sessionAtom)
   const navigation = useNavigation()
   const addLocationMutation = useMutation(
-    () => addLocation(selectedAddress, session.customerId)
+    (selectedAddress, customerId) => addLocation(selectedAddress, customerId)
   )
 
   if (addLocationMutation.isSuccess) {
@@ -97,7 +97,9 @@ export default () => {
 
       <Button
         mode="contained"
-        onPress={addLocationMutation.mutate()}
+        onPress={
+          () => addLocationMutation.mutate(selectedAddress, session.customerId)
+        }
         disabled={
           selectedAddress === null || addLocationMutation.isLoading
         }

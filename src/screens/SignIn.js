@@ -96,10 +96,10 @@ export default () => {
     }
   )
   const signInWithPlainAccountMutation = useMutation(
-    () => signInWithPlainAccount(form.fields)
+    (fields) => signInWithPlainAccount(fields)
   )
   const signInWithGoogleAccountMutation = useMutation(
-    () => signInWithGoogleAccount(googleUniqueIdentifier)
+    (googleUniqueIdentifier) => signInWithGoogleAccount(googleUniqueIdentifier)
   )
 
   const handleSignInWithPlainAccount = () => {
