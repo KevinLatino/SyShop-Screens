@@ -11,7 +11,9 @@ import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
+import OrderForm from '../components/OrderForm'
 import { ImageSlider } from 'react-native-image-slider-banner'
+import { BottomSheet } from 'react-native-btr'
 import { View, Text, Button, IconButton, Chip } from 'react-native'
 
 const fetchPost = async (postId, customerId) => {
@@ -174,6 +176,15 @@ const PostView = ({ post }) => {
       >
         Comprar (₡{post.price})
       </Button>
+
+
+      <BottomSheet
+        visible={isBottomSheetVisible}
+        onBackButtonPress={() => setIsBottomSheetVisible(false)}
+        onBackdropPress={() => setIsBottomSheetVisible(false)}
+      >
+        <OrderForm />
+      </BottomSheet>
     </View>
   )
 }

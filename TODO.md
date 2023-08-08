@@ -1,5 +1,6 @@
 # Generales
-- [ ] Manejar errores del servidor Arreglar lo de la navegación
+- [ ] Manejar errores del servidor
+- [ ] Actualizar el código que ejecuta a las mutaciones
 
 # Componentes por hacer
 - [ ] PaymentForm (Stripe)
@@ -10,6 +11,4 @@
 # Screens por hacer
 - [ ] MyProfile (incluir drawer de configuración y listados)
 - [ ] Todos los listados personalizados de usuarios (me gustas, comprados, etc.)
-
-# Screens por terminar
-- [ ] Implementar navegación hacia el formulario de ordenes en PostView
+- [ ] StoreView (hacer + implementar navegación desde PostTile y PostView)
