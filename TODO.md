@@ -1,6 +1,5 @@
 # Generales
 - [ ] Manejar errores del servidor
-- [ ] Actualizar el código que ejecuta a las mutaciones
 
 # Componentes por hacer
 - [ ] PaymentForm (Stripe)
