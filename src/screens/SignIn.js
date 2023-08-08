@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { useMutation, requestServer } from '../utilities/requests'
+import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
-import { makeNotEmptyChecker, checkEmail } from '../utilities/validation'
+import { requestServer } from '../utilities/requests'
+import { makeNotEmptyChecker, checkEmail } from '../utilities/validators'
 import { showMessage } from '../components/AppSnackBar'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { Text, Button, Divider } from 'react-native-paper'
 import { View, StyleSheet, ActivityIndicator } from 'react-native'
 
@@ -84,7 +86,6 @@ const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
 export default () => {
   const navigation = useNavigation()
   const [_, setSession] = useAtom(sessionAtom)
-  const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
   const form = useForm(
     {
       email: "",
@@ -111,11 +112,13 @@ export default () => {
       return
     }
 
-    signInWithPlainAccountMutation.execute()
+    signInWithPlainAccountMutation.mutate(form.fields)
   }
 
   const handleSignInWithGoogleAccount = (userInformation) => {
-    setGoogleUniqueIdentifier(userInformation["id"])
+    const googleUniqueIdentifier = userInformation["id"]
+
+    signInWithGoogleAccountMutation.mutate(googleUniqueIdentifier)
   }
 
   const isSignInLoading = (
@@ -123,16 +126,16 @@ export default () => {
     (signInWithGoogleAccountMutation.isLoading)
   )
 
-  const signInResult = 
-    signInWithPlainAccountMutation.result !== null 
-    ? signInWithPlainAccountMutation.result
-    : signInWithGoogleAccountMutation.result
+  const signInData =
+    signInWithPlainAccountMutation.isSuccess ?
+    signInWithPlainAccountMutation.data :
+    (
+      signInWithGoogleAccountMutation.isSuccess ?
+      signInWithGoogleAccountMutation.data :
+      null
+    )
 
-  if (googleUniqueIdentifier !== null) {
-    signInWithPlainAccountMutation.execute()
-  }
-
-  if (signInResult !== null) {
+  if (signInData !== null) {
     setSession({
       token: signInResult.token,
       customerId: signInResult.user_id
@@ -172,14 +175,12 @@ export default () => {
         style={styles.button}
         mode="contained"
         onPress={handleSignInWithPlainAccount}
-        disabled={hasErrors() || isSignInLoading}
+        disabled={form.hasErrors() || isSignInLoading}
       >
         {
           signInWithPlainAccountMutation.isLoading
           ? (
-            <View>
-              <ActivityIndicator animating />
-            </View>
+            <LoadingSpinner />
           )
           : "Iniciar sesión"
         }
@@ -194,9 +195,7 @@ export default () => {
       {
         signInWithGoogleAccountMutation.isLoading
         ? (
-          <View>
-            <ActivityIndicator animating />
-          </View>
+          <LoadingSpinner />
         )
         : (
           <GoogleSignInButton

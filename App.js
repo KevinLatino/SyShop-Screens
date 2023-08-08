@@ -2,30 +2,135 @@ import 'react-native-gesture-handler'
 import { useAtom } from 'jotai'
 import { sessionAtom } from './src/context'
 import { PaperProvider } from 'react-native-paper'
-import { QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
-import { queryClient } from './src/context'
 import Home from './src/screens/Home'
-import DeliveryList from './src/screens/DeliveryList'
-import ChatList from './src/screens/ChatList'
+import DeliveriesList from './src/screens/DeliveriesList'
+import ChatsList from './src/screens/ChatsList'
 import Chat from './src/screens/Chat'
 import Welcome from './src/screens/Welcome'
+import SignIn from './src/screens/SignIn'
+import SignUp from './src/screens/SignUp'
+import ChooseLocation from './src/screens/ChooseLocation'
+import AddLocation from './src/screens/AddLocation'
 import SearchResults from './src/screens/SearchResults'
+import PostView from './src/screens/PostView'
+import EditProfile from './src/screens/EditProfile'
 import AppSnackBar from './src/components/AppSnackBar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { View } from 'react-native'
 
-
+const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
 
-const NavigationComponent = () => {
+const BottomTabNavigator = () => {
   return (
-    <View>
+    <BottomTab.Navigator>
+      <BottomTab.Screen
+        name="Home"
+        options={{
+          tabBarLabel: "Inicio",
+          tabBarIcon: "home-variant"
+        }}
+      >
+        {() => <Home />}
+      </BottomTab.Screen>
+
+      <BottomTab.Screen
+        name="Deliveries"
+        options={{
+          tabBarLabel: "Entregas",
+          tabBarIcon: "moped"
+        }}
+      >
+        {() => <DeliveryList />}
+      </BottomTab.Screen>
+
+      <BottomTab.Screen
+        name="Chats"
+        options={{
+          tabBarLabel: "Mensajes",
+          tabBarIcon: "chat"
+        }}
+      >
+        {() => <ChatList />}
+      </BottomTab.Screen>
+
+      <BottomTab.Screen
+        name="MyProfile"
+        options={{
+          tabBarLabel: "Mi Perfil",
+          tabBarIcon: "account"
+        }}
+      >
+        {() => null}
+      </BottomTab.Screen>
+    </BottomTab.Navigator>
+  )
+}
+
+const StackNavigator = () => {
+  const [session, _] = useAtom(sessionAtom)
+
+  return (
+    <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator
+          initialRouteName={session === null ? "Welcome" : "Home"}
+          screenOptions={{
+            headerShown: false
+          }}
+        >
+          <Stack.Screen
+            name="BottomTabNavigator"
+          >
+            {() => <BottomTabNavigator />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="Welcome"
+          >
+            {() => <Welcome />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="SignIn"
+          >
+            {() => <SignIn />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="SignUp"
+          >
+            {() => <SignUp />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="Home"
+          >
+            {() => <Home />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="DeliveriesList"
+          >
+            {() => <DeliveriesList />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="ChatsList"
+          >
+            {() => <ChatsList />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="MyProfile"
+          >
+            {() => null}
+          </Stack.Screen>
+
           <Stack.Screen
             name="Chat"
           >
@@ -33,59 +138,46 @@ const NavigationComponent = () => {
           </Stack.Screen>
 
           <Stack.Screen
+            name="ChooseLocation"
+          >
+            {() => <ChooseLocation />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="AddLocation"
+          >
+            {() => <AddLocation />}
+          </Stack.Screen>
+
+          <Stack.Screen
             name="SearchResults"
           >
             {() => <SearchResults />}
           </Stack.Screen>
+
+          <Stack.Screen
+            name="PostView"
+          >
+            {() => <PostView />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="EditProfile"
+          >
+            {() => <EditProfile />}
+          </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
-
-      <NavigationContainer>
-        <BottomTab.Navigator>
-            <BottomTab.Screen
-              name="Home"
-            >
-              {() => <Home />}
-            </BottomTab.Screen>
-
-            <BottomTab.Screen
-              name="Deliveries"
-            >
-              {() => <DeliveryList />}
-            </BottomTab.Screen>
-
-            <BottomTab.Screen
-              name="Chats"
-            >
-              {() => <ChatList />}
-            </BottomTab.Screen>
-
-            <BottomTab.Screen
-              name="MyProfile"
-            >
-              {() => null}
-            </BottomTab.Screen>
-          </BottomTab.Navigator>
-      </NavigationContainer>
-    </View>
+    </SafeAreaProvider>
   )
 }
 
 const App = () => {
-  const [session, _] = useAtom(sessionAtom)
-
   return (
-    <QueryClientProvider queryClient={queryClient}>
+    <QueryClientProvider client={queryClient}>
       <PaperProvider>
-        {
-            session === null ?
-            (
-              <SafeAreaProvider>
-                <Welcome/>
-              </SafeAreaProvider>
-            ) :
-            <NavigationComponent />
-        }
+        <StackNavigator />
+
         <AppSnackBar />
       </PaperProvider>
     </QueryClientProvider>

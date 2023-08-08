@@ -1,6 +1,5 @@
 # Generales
-- [ ] Manejar errores del servidor
-- [ ] Instalar todos los screens en el contenedor de navegación
+- [ ] Manejar errores del servidor Arreglar lo de la navegación
 
 # Componentes por hacer
 - [ ] PaymentForm (Stripe)
@@ -14,5 +13,3 @@
 
 # Screens por terminar
 - [ ] Implementar navegación hacia el formulario de ordenes en PostView
-- [ ] Actualizar SignIn
-- [ ] Actualizar SignUp

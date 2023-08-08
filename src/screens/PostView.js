@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
-import { queryClient } from '../context'
 import TextField from '../components/TextField'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
-import { SliderBox } from 'react-native-image-slider-box'
+import { ImageSlider } from 'react-native-image-slider-banner'
 import { View, Text, Button, IconButton, Chip } from 'react-native'
 
 const fetchPost = async (postId, customerId) => {
@@ -55,6 +55,7 @@ const addPostComment = async (postId, customerId, text) => {
 
 const CommentInput = ({ postId, customerId }) => {
   const [text, setText] = useState("")
+  const queryClient = useQueryClient()
   const addCommentMutation = useMutation(
     (postId, customerId, text) => addPostComment(postId, customerId, text)
   )
@@ -134,8 +135,9 @@ const PostView = ({ post }) => {
 
   return (
     <View>
-      <SliderBox
-        images={post.multimedia}
+      <ImageSlider
+        data={post.multimedia}
+        autoPlay={false}
       />
 
       <Text variant="bodySmall">

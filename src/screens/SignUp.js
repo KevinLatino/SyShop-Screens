@@ -1,19 +1,21 @@
 import { useState } from 'react'
-import { useMutation, requestServer } from '../utilities/requests'
+import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { showMessage } from '../components/AppSnackBar'
+import { requestServer } from '../utilities/requests'
 import {
   makeNotEmptyChecker,
   checkEmail,
   checkPhoneNumber
-} from '../utilities/validation'
+} from '../utilities/validators'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { View, StyleSheet } from 'react-native'
-import { Button, Text, Divider, ActivityIndicator } from 'react-native-paper'
+import { Button, Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -119,15 +121,19 @@ export default () => {
     (fields, googleUniqueIdentifier) => signUpWithGoogleAccount(fields, googleUniqueIdentifier)
   )
 
-  const signUpResult = 
-    signUpWithPlainAccountMutation.result !== null 
-    ? signUpWithPlainAccountMutation.result
-    : signUpWithGoogleAccountMutation.result
+  const signUpData =
+    signUpWithPlainAccountMutation.isSuccess ?
+    signUpWithPlainAccountMutation.data :
+    (
+      signUpWithGoogleAccountMutation.isSuccess ?
+      signUpWithGoogleAccountMutation.data :
+      null
+    )
 
-  if (signUpResult !== null) {
+  if (signUpData !== null) {
     setSession({
-      token: signUpResult.token,
-      customerId: signUpResult.user_id
+      token: signUpData.token,
+      customerId: signUpData.user_id
     })
 
     navigation.navigate("Home")
@@ -146,9 +152,9 @@ export default () => {
     }
 
     if (signingUpWithPlainAccount) {
-      signUpWithPlainAccountMutation.execute()
+      signUpWithPlainAccountMutation.mutate(form.fields)
     } else {
-      signUpWithGoogleAccountMutation.execute()
+      signUpWithGoogleAccountMutation.mutate(form.fields, googleUniqueIdentifier)
     }
   }
 
@@ -231,9 +237,9 @@ export default () => {
         onPress={handleSignUp}
       >
         {
-          isSignUpLoading
-          ? <ActivityIndicator animating />
-          : "Registrarse"
+          isSignUpLoading ?
+          <LoadingSpinner /> :
+          "Registrarse"
         }
       </Button>
 
