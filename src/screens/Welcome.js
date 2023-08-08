@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
-import { View, Button, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
+import { Button } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const styles = StyleSheet.create({
@@ -64,12 +65,14 @@ export default () => {
       </View>
 
       <Button
+        mode="contained"
         onPress={() => navigation.navigate("SignIn")}
       >
         Iniciar sesión
       </Button>
 
       <Button
+        mode="contained"
         onPress={() => navigation.navigate("SignUp")}
       >
         Registrarse

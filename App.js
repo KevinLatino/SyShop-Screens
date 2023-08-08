@@ -25,7 +25,53 @@ const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
 
-const NavigationComponent = () => {
+const BottomTabNavigator = () => {
+  return (
+    <BottomTab.Navigator>
+      <BottomTab.Screen
+        name="Home"
+        options={{
+          tabBarLabel: "Inicio",
+          tabBarIcon: "home-variant"
+        }}
+      >
+        {() => <Home />}
+      </BottomTab.Screen>
+
+      <BottomTab.Screen
+        name="Deliveries"
+        options={{
+          tabBarLabel: "Entregas",
+          tabBarIcon: "moped"
+        }}
+      >
+        {() => <DeliveryList />}
+      </BottomTab.Screen>
+
+      <BottomTab.Screen
+        name="Chats"
+        options={{
+          tabBarLabel: "Mensajes",
+          tabBarIcon: "chat"
+        }}
+      >
+        {() => <ChatList />}
+      </BottomTab.Screen>
+
+      <BottomTab.Screen
+        name="MyProfile"
+        options={{
+          tabBarLabel: "Mi Perfil",
+          tabBarIcon: "account"
+        }}
+      >
+        {() => null}
+      </BottomTab.Screen>
+    </BottomTab.Navigator>
+  )
+}
+
+const StackNavigator = () => {
   const [session, _] = useAtom(sessionAtom)
 
   return (
@@ -33,7 +79,16 @@ const NavigationComponent = () => {
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName={session === null ? "Welcome" : "Home"}
+          screenOptions={{
+            headerShown: false
+          }}
         >
+          <Stack.Screen
+            name="BottomTabNavigator"
+          >
+            {() => <BottomTabNavigator />}
+          </Stack.Screen>
+
           <Stack.Screen
             name="Welcome"
           >
@@ -113,34 +168,6 @@ const NavigationComponent = () => {
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
-
-      <NavigationContainer>
-        <BottomTab.Navigator>
-            <BottomTab.Screen
-              name="Home"
-            >
-              {() => <Home />}
-            </BottomTab.Screen>
-
-            <BottomTab.Screen
-              name="Deliveries"
-            >
-              {() => <DeliveryList />}
-            </BottomTab.Screen>
-
-            <BottomTab.Screen
-              name="Chats"
-            >
-              {() => <ChatList />}
-            </BottomTab.Screen>
-
-            <BottomTab.Screen
-              name="MyProfile"
-            >
-              {() => null}
-            </BottomTab.Screen>
-          </BottomTab.Navigator>
-      </NavigationContainer>
     </SafeAreaProvider>
   )
 }
@@ -149,7 +176,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider>
-        <NavigationComponent />
+        <StackNavigator />
 
         <AppSnackBar />
       </PaperProvider>
