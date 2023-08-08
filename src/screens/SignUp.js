@@ -9,7 +9,7 @@ import {
   makeNotEmptyChecker,
   checkEmail,
   checkPhoneNumber
-} from '../utilities/validation'
+} from '../utilities/validators'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import { View, StyleSheet } from 'react-native'

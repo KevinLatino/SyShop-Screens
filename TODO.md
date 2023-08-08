@@ -1,6 +1,5 @@
 # Generales
 - [ ] Manejar errores del servidor
-- [ ] Instalar todos los screens en el contenedor de navegación
 
 # Componentes por hacer
 - [ ] PaymentForm (Stripe)
