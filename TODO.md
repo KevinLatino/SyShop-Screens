@@ -9,5 +9,5 @@
 
 # Screens por hacer
 - [ ] MyProfile (incluir drawer de configuración y listados)
-- [ ] Todos los listados personalizados de usuarios (me gustas, comprados, etc.)
 - [ ] StoreView (hacer + implementar navegación desde PostTile y PostView)
+- [ ] Implementar navegación desde los tiles a sus respectivos views
