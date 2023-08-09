@@ -1,5 +1,6 @@
-import { Card, Divider, Chip, Text } from 'react-native-paper'
+import { useNavigation } from '@react-navigation/native'
 import LikeButton from './LikeButton'
+import { Card, Divider, Chip, Text } from 'react-native-paper'
 
 const styles = {
   extraInformationView: {
@@ -25,6 +26,8 @@ const formatPostSubtitle = (post) => {
 }
 
 export default ({ post }) => {
+  const navigation = useNavigation()
+
   const categoriesChips = post
       .categories
       .map((category) => {
@@ -36,8 +39,16 @@ export default ({ post }) => {
       })
   const likesText = `${post.likes} ${post.likes === 1 ? "like" : "likes"}`
 
+  const navigateToPostView = () => {
+    navigation.navigate("PostView", {
+      postId: post.post_id
+    })
+  }
+
   return (
-    <Card>
+    <Card
+      onPress={navigateToPostView}
+    >
       <Card.Cover src={post.multimedia[0]} />
       <Card.Title
         title={post.title}
