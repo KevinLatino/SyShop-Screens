@@ -175,7 +175,7 @@ export default () => {
         Registrarse
       </Text>
 
-      <Divider style={{ width: "90%" }} />
+
 
       <Text style={styles.subtitle}>
         Ingresa tus datos personales

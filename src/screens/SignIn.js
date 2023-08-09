@@ -11,7 +11,7 @@ import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { Text, Button, Divider } from 'react-native-paper'
-import { View, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, StyleSheet, Image } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
@@ -21,6 +21,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: "1rem",
     paddingBottom: "1rem"
+  },
+  Image:{
+    with: "300px",
+    height: "300px",
+    display:  "flex",
+    alignItems: "center",
   },
   title: {
     fontSize: 50,
@@ -146,6 +152,7 @@ export default () => {
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>
         Bienvenido
       </Text>
@@ -154,7 +161,6 @@ export default () => {
         ¡Inicia sesión para comenzar!
       </Text>
 
-      <Divider style={{ width: "90%"}} />
 
       <TextField
         value={form.getField("email")}

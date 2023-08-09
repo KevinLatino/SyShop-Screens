@@ -1,82 +1,80 @@
-import { useNavigation } from '@react-navigation/native'
-import { View, Text, StyleSheet } from 'react-native'
-import { Button } from 'react-native-paper'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Button } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {Divider} from 'react-native-paper';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: "1.5rem",
-    alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: "1rem",
-    paddingBottom: "1rem"
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: 'black',
   },
   title: {
     fontSize: 35,
-    color: "#ffffff",
-    fontFamily: "  'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
-    fontWeight: "bold",
-    display: "flex",
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: "8rem",
+    color: '#ffffff',
+    fontFamily: "'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif",
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 20,
-    color: "gray",
-    display: "flex",
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
+    color: 'gray',
+    marginBottom: 40,
+    textAlign: 'center',
   },
-  Button: {
-    display: "flex",
-    width: 225,
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#c20000"
+  buttonContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
   },
-  thirdText: {
+  button: {
+    marginBottom: 20,
+    backgroundColor: '#c20000',
+    paddingVertical: 10,
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
     fontSize: 18,
-    color: "#344340",
-    fontWeight: "bold",
-    display: "flex",
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
+    fontWeight: 'bold',
   },
-  safeAreaView: {
-    backgroundColor: "#c63637",
-    width: "100hw",
-    height: "100vh" 
-  }
-})
+});
 
 export default () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={styles.safeAreaView}>
+    <SafeAreaView style={styles.container}>
       <View>
         <Text style={styles.title}>¡Empieza a comprar!</Text>
+        <Text style={styles.subtitle}>
+          ¡Inicia sesión o regístrate para encontrar el artículo que buscas y comprarlo en cuestión de minutos!
+        </Text>
       </View>
 
-      <Button
-        mode="contained"
-        onPress={() => navigation.navigate("SignIn")}
-      >
-        Iniciar sesión
-      </Button>
+      <View style={styles.buttonContainer}>
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={() => navigation.navigate('SignIn')}
+        >
+          <Text style={styles.buttonText}>Iniciar sesión</Text>
+        </Button>
 
-      <Button
-        mode="contained"
-        onPress={() => navigation.navigate("SignUp")}
-      >
-        Registrarse
-      </Button>
+
+
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={() => navigation.navigate('SignUp')}
+        >
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </Button>
+      </View>
     </SafeAreaView>
-  )
-}
+  );
+};
