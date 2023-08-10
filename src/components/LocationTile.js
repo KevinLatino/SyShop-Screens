@@ -7,11 +7,16 @@ const formatLocationSubtitle = (location) => {
   return formatted
 }
 
-export default ({ location, onPress }) => {
+export default ({ location, isSelected, onPress }) => {
   return (
     <TouchableRipple
       onPress={onPress}
     >
+      {
+        // Temporal, hay que aplicar estilos
+        isSelected ?? "Seleccionado"
+      }
+
       <List.Item
         title={location.place_name}
         description={formatLocationSubtitle(location)}

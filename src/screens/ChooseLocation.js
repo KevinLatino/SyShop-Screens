@@ -1,4 +1,5 @@
-import { useNavigation } from '@react-navigation/native'
+import { useState } from 'react'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
@@ -34,19 +35,37 @@ const fetchLocations = async (customerId) => {
   return locations
 }
 
+const createDelivery = async (saleId, locationId) => {
+  const payload = {
+    sale_id: saleId,
+    location_id: locationId
+  }
+  const _ = await requestServer(
+    "/deliveries_service/create_delivery",
+    payload
+  )
+}
+
 const LocationsScrollView = () => {
   const navigation = useNavigation()
+  const route = useRoute()
+  const [selectedLocation, setSelectedLocation] = useState()
   const [session, _] = useAtom(sessionAtom)
   const locationsQuery = useQuery(
     "customerLocations",
     () => fetchLocations(session.customerId)
   )
   const createDeliveryMutation = useMutation(
-    () => createDelivery()
+    (saleId, locationId) => createDelivery(saleId, locationId)
   )
+  const { saleId } = route.params
 
   const handleSelect = (location) => {
-    navigation.navigate("Home")
+    setSelectedLocation(location)
+  }
+
+  const handleSubmit = () => {
+    createDeliveryMutation.mutate(saleId, selectedLocation.location_id)
   }
 
   if (createDeliveryMutation.isSuccess) {
@@ -67,7 +86,15 @@ const LocationsScrollView = () => {
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
         renderItem={
-          (location) => <LocationTile location={location} onPress={() => handleSelect(location)} />
+          (location) => {
+            return (
+              <LocationTile
+                location={location}
+                isSelected={location.location_id == selectedLocation.location_id}
+                onPress={() => handleSelect(location)}
+              />
+            )
+          }
         }
         onStartReached={locationsQuery.refetch}
       />
