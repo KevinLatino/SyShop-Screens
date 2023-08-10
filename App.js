@@ -21,6 +21,7 @@ import EditProfile from './src/screens/EditProfile'
 import LikedPosts from './src/screens/LikedPosts'
 import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
+import StoreView from './src/screens/StoreView'
 import AppSnackBar from './src/components/AppSnackBar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -186,6 +187,12 @@ const StackNavigator = () => {
             name="ProfileView"
           >
             {() => <ProfileView />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="StoreView"
+          >
+            {() => <StoreView />}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>

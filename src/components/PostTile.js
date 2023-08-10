@@ -1,6 +1,12 @@
 import { useNavigation } from '@react-navigation/native'
 import LikeButton from './LikeButton'
-import { Card, Divider, Chip, Text } from 'react-native-paper'
+import {
+  Card,
+  Divider,
+  Chip,
+  Text,
+  IconButton
+} from 'react-native-paper'
 
 const styles = {
   extraInformationView: {
@@ -45,6 +51,12 @@ export default ({ post }) => {
     })
   }
 
+  const navigateToStoreView = () => {
+    navigation.navigate("StoreView", {
+      storeId: post.store_id
+    })
+  }
+
   return (
     <Card
       onPress={navigateToPostView}
@@ -78,6 +90,11 @@ export default ({ post }) => {
       </Card.Content>
 
       <Card.Actions>
+        <IconButton
+          icon="store"
+          onPress={navigateToStoreView}
+        />
+
         <LikeButton
           doesCustomerLikePost={post.does_customer_like_post}
         />
