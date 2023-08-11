@@ -1,9 +1,14 @@
 # Generales
-- [ ] Manejar errores del servidor
 - [ ] Aplicar estilos
 
-# Componentes por hacer
-- [ ] PaymentForm (Stripe)
+# Stripe
+- [ ] Implementar el componente PaymentForm
+- [ ] Implementar navegación desde OrderForm hasta OrderForm
+- [ ] Implementar la funcionalidad del pago
+
+# Tercera defensa
+- [ ] Manejar errores del servidor
+- [ ] Hacer la interfaz crack
 
 # Componentes por terminar
-- [ ] OrderForm (continuar la compra mediante Stripe)
+- [ ] StoreView (añadir un botón para iniciar un chat)
