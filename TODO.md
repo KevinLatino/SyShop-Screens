@@ -9,6 +9,3 @@
 # Tercera defensa
 - [ ] Manejar errores del servidor
 - [ ] Hacer la interfaz crack
-
-# Componentes por terminar
-- [ ] StoreView (añadir un botón para iniciar un chat)
