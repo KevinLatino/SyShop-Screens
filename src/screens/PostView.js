@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
-import { useRoute } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
@@ -11,8 +11,17 @@ import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
+import OrderForm from '../components/OrderForm'
 import { ImageSlider } from 'react-native-image-slider-banner'
-import { View, Text, Button, IconButton, Chip } from 'react-native'
+import { BottomSheet } from 'react-native-btr'
+import {
+  View,
+  Text,
+  Button,
+  IconButton,
+  Chip,
+  TouchableRipple
+} from 'react-native'
 
 const fetchPost = async (postId, customerId) => {
   const payload = {
@@ -120,6 +129,7 @@ const CommentsScrollView = ({ postId }) => {
 }
 
 const PostView = ({ post }) => {
+  const navigation = useNavigation()
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false)
 
   const categoriesChips = post.categories.map((category) => {
@@ -133,12 +143,26 @@ const PostView = ({ post }) => {
     )
   })
 
+  const navigateToStoreView = () => {
+    navigation.navigate("StoreView", {
+      storeId: post.store_id
+    })
+  }
+
   return (
     <View>
       <ImageSlider
         data={post.multimedia}
         autoPlay={false}
       />
+
+      <TouchableRipple
+        onPress={navigateToStoreView}
+      >
+        <Text variant="bodySmall">
+          {post.store_name}
+        </Text>
+      </TouchableRipple>
 
       <Text variant="bodySmall">
         {post.store_name} ({post.publication_date})
@@ -174,6 +198,15 @@ const PostView = ({ post }) => {
       >
         Comprar (₡{post.price})
       </Button>
+
+
+      <BottomSheet
+        visible={isBottomSheetVisible}
+        onBackButtonPress={() => setIsBottomSheetVisible(false)}
+        onBackdropPress={() => setIsBottomSheetVisible(false)}
+      >
+        <OrderForm />
+      </BottomSheet>
     </View>
   )
 }

@@ -18,6 +18,10 @@ import AddLocation from './src/screens/AddLocation'
 import SearchResults from './src/screens/SearchResults'
 import PostView from './src/screens/PostView'
 import EditProfile from './src/screens/EditProfile'
+import LikedPosts from './src/screens/LikedPosts'
+import PurchasesList from './src/screens/PurchasesList'
+import ProfileView from './src/screens/ProfileView'
+import StoreView from './src/screens/StoreView'
 import AppSnackBar from './src/components/AppSnackBar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -165,6 +169,30 @@ const StackNavigator = () => {
             name="EditProfile"
           >
             {() => <EditProfile />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="LikedPosts"
+          >
+            {() => <LikedPosts />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="PurchasesList"
+          >
+            {() => <PurchasesList />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="ProfileView"
+          >
+            {() => <ProfileView />}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="StoreView"
+          >
+            {() => <StoreView />}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>

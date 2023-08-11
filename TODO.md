@@ -1,15 +1,11 @@
 # Generales
-- [ ] Manejar errores del servidor Arreglar lo de la navegación
+- [ ] Aplicar estilos
 
-# Componentes por hacer
-- [ ] PaymentForm (Stripe)
+# Stripe
+- [ ] Implementar el componente PaymentForm
+- [ ] Implementar navegación desde OrderForm hasta OrderForm
+- [ ] Implementar la funcionalidad del pago
 
-# Componentes por terminar
-- [ ] OrderForm (continuar la compra mediante Stripe)
-
-# Screens por hacer
-- [ ] MyProfile (incluir drawer de configuración y listados)
-- [ ] Todos los listados personalizados de usuarios (me gustas, comprados, etc.)
-
-# Screens por terminar
-- [ ] Implementar navegación hacia el formulario de ordenes en PostView
+# Tercera defensa
+- [ ] Manejar errores del servidor
+- [ ] Hacer la interfaz crack

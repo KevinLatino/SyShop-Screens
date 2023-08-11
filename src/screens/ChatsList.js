@@ -6,7 +6,6 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, ActivityIndicator } from 'react-native'
 
 const fetchChats = async (customerId, pageNumber) => {
   const payload = {
