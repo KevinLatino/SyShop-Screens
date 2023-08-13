@@ -7,18 +7,46 @@ import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { View, StyleSheet } from 'react-native'
 import {
+    Text,
     Avatar,
     IconButton,
     Modal,
+    Portal,
     Drawer,
     Appbar,
-    List
+    List,
+    Surface
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
+    profileView: {
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 32,
+      padding: 32
+    },
+    profileViewData: {
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      gap: 16,
+      padding: 8
+    },
     informationEntry: {
-        border: "none",
-        borderBottom: "1.5px solid darkgray"
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 8,
+        width: "fit-content",
+        borderBottom: "1.5px solid darkgray",
+    },
+    avatar: {
+      width: 175,
+      height: 175,
+      borderRadius: "50%"
+    },
+    menuDrawer: {
+      height: "100vh",
+      width: "80%"
     }
 })
 
@@ -35,24 +63,33 @@ const fetchCustomer = async (customerId) => {
 }
 
 const InformationEntry = ({ icon, text }) => {
+  return (
     <View style={styles.informationEntry}>
         <IconButton
             icon={icon}
         />
 
         <Text>
-            {text}
+          {text}
         </Text>
     </View>
+  )
 }
 
 const Menu = () => {
-    const navigation = useNavigation()
-
     return (
+      <Surface elevation={5} style={styles.menuDrawer}>
         <Drawer.Section>
+            <List.Subheader>
+                Configuración
+            </List.Subheader>
+
+            <List.Subheader>
+                Otros
+            </List.Subheader>
+
             <Drawer.Item
-                label="Tus me gustas"
+                label="Tus me gusta"
                 onPress={() => navigation.navigate("LikedPosts")}
             />
 
@@ -60,19 +97,15 @@ const Menu = () => {
                 label="Tus compras"
                 onPress={() => navigation.navigate("PurchasesList")}
             />
-
-            <List.Subheader>
-                Configuración
-            </List.Subheader>
         </Drawer.Section>
+      </Surface>
     )
 }
 
-export default () => {
-    const [isDrawerVisible, setIsDrawerVisible] = useState(false)
+const ProfileView = () => {
     const [session, _] = useAtom(sessionAtom)
     const customerQuery = useQuery({
-        queryKey: "customer",
+        queryKey: ["customer"],
         queryFn: () => fetchCustomer(session.customerId)
     })
 
@@ -91,6 +124,31 @@ export default () => {
     } = customerQuery.data
 
     return (
+      <View style={styles.profileView}>
+        <Avatar.Image
+          style={styles.avatar}
+          source={{ uri: picture }}
+        />
+
+        <View style={styles.profileViewData}>
+          <InformationEntry
+              icon="account"
+              text={`${name} ${first_surname} ${second_surname}`}
+          />
+
+          <InformationEntry
+              icon="phone"
+              text={phone_number}
+          />
+        </View>
+      </View>
+    )
+}
+
+export default () => {
+    const [isDrawerVisible, setIsDrawerVisible] = useState(false)
+
+    return (
         <View>
             <Appbar.Header>
                 <Appbar.Action
@@ -99,24 +157,16 @@ export default () => {
                 />
             </Appbar.Header>
 
-            <Avatar source={{ uri: picture }} />
+            <ProfileView />
 
-            <InformationEntry
-                icon="account"
-                text={`${name} ${first_surname} ${second_surname}`}
-            />
-
-            <InformationEntry
-                icon="phone"
-                text={phone_number}
-            />
-
-            <Modal
-                visible={isDrawerVisible}
-                onDismiss={() => setIsDrawerVisible(false)}
-            >
-                <Menu />
-            </Modal>
+            <Portal>
+              <Modal
+                  visible={isDrawerVisible}
+                  onDismiss={() => setIsDrawerVisible(false)}
+              >
+                  <Menu />
+              </Modal>
+            </Portal>
         </View>
     )
 }

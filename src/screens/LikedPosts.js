@@ -25,7 +25,7 @@ export default () => {
     const pageNumber = useCounter()
     const [session, _] = useAtom(sessionAtom)
     const likedPostsQuery = useQuery({
-        queryKey: "likedPosts",
+        queryKey: ["likedPosts"],
         queryFn: () => fetchLikedPosts(session.customerId, pageNumber.value)
     })
 

@@ -25,7 +25,7 @@ export default () => {
     const pageNumber = useCounter()
     const [session, _] = useAtom(sessionAtom)
     const purchasesQuery = useQuery({
-        queryKey: "customerPurchases",
+        queryKey: ["customerPurchases"],
         queryFn: () => fetchPurchases(session.customerId, pageNumber.value)
     })
 

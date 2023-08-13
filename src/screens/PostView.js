@@ -73,7 +73,7 @@ const CommentInput = ({ postId, customerId }) => {
     addCommentMutation.mutate(postId, customerId, text)
 
     await queryClient.refetchQueries({
-      queryKey: "postComments"
+      queryKey: ["postComments"]
     })
   }
 

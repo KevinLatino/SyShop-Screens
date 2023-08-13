@@ -51,10 +51,10 @@ const LocationsScrollView = () => {
   const route = useRoute()
   const [selectedLocation, setSelectedLocation] = useState()
   const [session, _] = useAtom(sessionAtom)
-  const locationsQuery = useQuery(
-    "customerLocations",
-    () => fetchLocations(session.customerId)
-  )
+  const locationsQuery = useQuery({
+    queryKey: ["customerLocations"],
+    queryFn: () => fetchLocations(session.customerId)
+  })
   const createDeliveryMutation = useMutation(
     (saleId, locationId) => createDelivery(saleId, locationId)
   )

@@ -34,7 +34,7 @@ const styles = {
   buttonText: {
     fontSize: 16,
     fontWeight: 500,
-    fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
+    // fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
   }
 }
 
@@ -63,7 +63,11 @@ export default ({ text, onSignIn, ...touchableOpacityProps }) => {
 
       getUserInformation(accessToken)
         .then((userInformation) => onSignIn(userInformation))
-        .catch((_) => showMessage("No se pudo acceder mediante Google"))
+        .catch((error) => {
+          console.log(error)
+
+          showMessage("No se pudo acceder mediante Google")
+        })
     }
   }, [response])
 

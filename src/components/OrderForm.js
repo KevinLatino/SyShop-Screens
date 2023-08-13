@@ -63,10 +63,10 @@ export default () => {
     const route = useRoute()
 
     const { postId } = route.params
-    const postQuery = useQuery(
-      "postToBuy",
-      () => fetchPost(postId, session.customerId)
-    )
+    const postQuery = useQuery({
+      queryKey: ["postToBuy"],
+      queryFn: () => fetchPost(postId, session.customerId)
+    })
     const createSaleIntentMutation = useMutation(
       (postId, customerId, amount) => createSaleIntent(postId, customerId, amount)
     )

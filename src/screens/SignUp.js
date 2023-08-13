@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
@@ -20,11 +20,11 @@ import { Button, Text, Divider } from 'react-native-paper'
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: "1rem",
+    gap: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: "1rem",
-    paddingBottom: "1rem"
+    paddingTop: 16,
+    paddingBottom: 16
   },
   title: {
     fontSize: 35,
@@ -115,10 +115,12 @@ export default () => {
     }
   )
   const signUpWithPlainAccountMutation = useMutation(
-    (fields) => signUpWithPlainAccount(fields)
+    (credentields) => signUpWithPlainAccount(credentields)
   )
   const signUpWithGoogleAccountMutation = useMutation(
-    (fields, googleUniqueIdentifier) => signUpWithGoogleAccount(fields, googleUniqueIdentifier)
+    ({ googleUniqueIdentifier, ...userInformation }) => signUpWithGoogleAccount(
+      userInformation, googleUniqueIdentifier
+    )
   )
 
   const signUpData =
@@ -130,21 +132,23 @@ export default () => {
       null
     )
 
-  if (signUpData !== null) {
-    setSession({
-      token: signUpData.token,
-      customerId: signUpData.user_id
-    })
+  useEffect(() => {
+    if (signUpData !== null) {
+      setSession({
+        token: signUpData.token,
+        customerId: signUpData.user_id
+      })
 
-    navigation.navigate("Home")
-  }
+      navigation.navigate("Home")
+    }
+  }, [signUpData])
 
   const isSignUpLoading = (
     (signUpWithPlainAccountMutation.isLoading) ||
     (signUpWithGoogleAccountMutation.isLoading)
   )
 
-  const handleSignUp = async () => {
+  const handleSignUp = () => {
     if (form.hasErrors()) {
       showMessage("Por favor provee la información necesaria para registrarte")
 
@@ -152,21 +156,21 @@ export default () => {
     }
 
     if (signingUpWithPlainAccount) {
-      signUpWithPlainAccountMutation.mutate(form.fields)
+      signUpWithPlainAccountMutation.mutate({ credentields: form.fields })
     } else {
-      signUpWithGoogleAccountMutation.mutate(form.fields, googleUniqueIdentifier)
+      signUpWithGoogleAccountMutation.mutate({ googleUniqueIdentifier, ...(form.fields) })
     }
   }
 
-  const fillUpFormWithGoogleData= (userInformation) => {
-    const [firstSurname, secondSurname] = userInformation["familyName"].split(" ", 2)
+  const fillUpFormWithGoogleData = (userInformation) => {
+    const [firstSurname, secondSurname] = userInformation.family_name.split(" ", 2)
 
-    form.setField("name")(userInformation["name"])
-    form.setField("first_surname")(firstSurname)
-    form.setField("first_surname")(secondSurname)
+    form.setField("second_surname") (secondSurname)
+    form.setField("first_surname") (firstSurname)
+    form.setField("name") (userInformation.given_name)
 
     setSigninUpWithPlainAccount(false)
-    setGoogleUniqueIdentifier(userInformation["id"])
+    setGoogleUniqueIdentifier(userInformation.id)
   }
 
   return (
@@ -174,8 +178,6 @@ export default () => {
       <Text style={styles.title}>
         Registrarse
       </Text>
-
-
 
       <Text style={styles.subtitle}>
         Ingresa tus datos personales

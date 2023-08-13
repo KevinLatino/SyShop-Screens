@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
@@ -11,16 +11,16 @@ import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { Text, Button, Divider } from 'react-native-paper'
-import { View, StyleSheet, Image } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: "1.5rem",
+    gap: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: "1rem",
-    paddingBottom: "1rem"
+    paddingTop: 16,
+    paddingBottom: 16
   },
   Image:{
     with: "300px",
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: "1rem",
+    marginTop: 16,
   },
   subtitle: {
     fontSize: 20,
@@ -103,10 +103,10 @@ export default () => {
     }
   )
   const signInWithPlainAccountMutation = useMutation(
-    (fields) => signInWithPlainAccount(fields)
+    ({ ...credentials }) => signInWithPlainAccount(credentials)
   )
   const signInWithGoogleAccountMutation = useMutation(
-    (googleUniqueIdentifier) => signInWithGoogleAccount(googleUniqueIdentifier)
+    ({ googleUniqueIdentifier }) => signInWithGoogleAccount(googleUniqueIdentifier)
   )
 
   const handleSignInWithPlainAccount = () => {
@@ -118,13 +118,13 @@ export default () => {
       return
     }
 
-    signInWithPlainAccountMutation.mutate(form.fields)
+    signInWithPlainAccountMutation.mutate({ credentials: form.fields })
   }
 
   const handleSignInWithGoogleAccount = (userInformation) => {
     const googleUniqueIdentifier = userInformation["id"]
 
-    signInWithGoogleAccountMutation.mutate(googleUniqueIdentifier)
+    signInWithGoogleAccountMutation.mutate({ googleUniqueIdentifier })
   }
 
   const isSignInLoading = (
@@ -141,14 +141,16 @@ export default () => {
       null
     )
 
-  if (signInData !== null) {
-    setSession({
-      token: signInResult.token,
-      customerId: signInResult.user_id
-    })
+  useEffect(() => {
+    if (signInData !== null) {
+      setSession({
+        token: signInData.token,
+        customerId: signInData.user_id
+      })
 
-    navigation.navigate("Home")
-  }
+      navigation.navigate("Home")
+    }
+  }, [signInData])
 
   return (
     <View style={styles.container}>

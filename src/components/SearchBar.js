@@ -12,8 +12,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "flex-start",
     alignSelf: "flex-start",
-    gap: "0.25rem",
-    padding: "0.25rem"
+    gap: 4,
+    padding: 4
   }
 })
 
@@ -81,10 +81,10 @@ const RecommendedCategoriesList = ({ categoriesNames, onToggle }) => {
 export default ({ onSearchSubmit }) => {
   const [text, setText] = useState("")
   const [categoriesNames, setCategoriesNames] = useState([])
-  const categoriesQuery = useQuery(
-    "foundCategories",
-    () => fetchCategories(text)
-  )
+  const categoriesQuery = useQuery({
+    queryKey: ["foundCategories"],
+    queryFn: () => fetchCategories(text)
+  })
 
   const toggleCategoryName = (categoryName) => {
     if (categoriesNames.includes(categoryName)) {

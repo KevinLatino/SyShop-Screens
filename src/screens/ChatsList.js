@@ -11,7 +11,7 @@ const fetchChats = async (customerId, pageNumber) => {
   const payload = {
     start: pageNumber * 10,
     amount: 10,
-    customer_id: customerId
+    user_id: customerId
   }
   const chats = await requestServer(
     "/chat_service/get_user_chats",
@@ -24,10 +24,10 @@ const fetchChats = async (customerId, pageNumber) => {
 export default () => {
   const [session, _] = useAtom(sessionAtom)
   const pageNumber = useCounter()
-  const chatsQuery = useQuery(
-    "listOfChats",
-    () => fetchChats(session.customerId, pageNumber.value)
-  )
+  const chatsQuery = useQuery({
+    queryKey: ["listOfChats"],
+    queryFn: () => fetchChats(session.customerId, pageNumber.value)
+  })
 
   if (chatsQuery.isLoading) {
     return (

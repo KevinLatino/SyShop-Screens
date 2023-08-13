@@ -18,17 +18,16 @@ import {
     IconButton,
     Text,
     Menu,
-    ActivityIndicator,
     Button
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
     horizontalScrollView: {
-        rowGap: "0.5rem",
-        padding: "0.3rem"
+        rowGap: 8,
+        padding: 5
     },
     searchedTextDisplay: {
-        padding: "0.5rem",
+        padding: 8,
         borderRadius: 10
     }
 })
@@ -197,10 +196,10 @@ const SearchedCategoriesScrollView = ({ categoriesNames }) => {
 
 const StoresResultsScrollView = ({ searchedText }) => {
     const pageNumber = useCounter()
-    const storesQuery = useQuery(
-        "stores",
-        () => fetchStores(searchedText, pageNumber.value)
-    )
+    const storesQuery = useQuery({
+      queryKey: ["storesResults"],
+      queryFn: () => fetchStores(searchedText, pageNumber.value)
+    })
 
     if (storesQuery.isLoading) {
         return (
@@ -229,10 +228,10 @@ const StoresResultsScrollView = ({ searchedText }) => {
 }
 
 const PostsResults = ({ searchedText }) => {
-    const maximumPriceQuery = useQuery(
-        "maximumPrice",
-        () => fetchMaximumPrice()
-    )
+    const maximumPriceQuery = useQuery({
+      queryKey: ["maximumPrice"],
+      queryFn: () => fetchMaximumPrice()
+    })
 
     if (maximumPriceQuery.isLoading) {
         return (
@@ -247,14 +246,14 @@ const PostsResults = ({ searchedText }) => {
         sortingProperty: "publicacion_date",
         sortingSchema: "descending"
     })
-    const postsQuery = useQuery(
-        "postsResults",
-        () => fetchPosts(
-            searchedText,
-            searchFilters,
-            pageNumber.value
-        )
-    )
+    const postsQuery = useQuery({
+      queryKey: ["postsResults"],
+      queryFn: () => fetchPosts(
+        searchedText,
+        searchFilters,
+        pageNumber.value
+      )
+    })
 
     const handleChangeFilters = (newSearchFilters) => {
         setSearchFilters(newSearchFilters)

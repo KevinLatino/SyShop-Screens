@@ -17,8 +17,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    columnGap: "1rem",
-    padding: "1.25rem"
+    columnGap: 16,
+    padding: 20
   }
 })
 

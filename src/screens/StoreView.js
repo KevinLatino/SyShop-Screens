@@ -67,7 +67,7 @@ const StoreView = ({ storeId, customerId }) => {
   const navigation = useNavigation()
   const [session, _] = useAtom(sessionAtom)
   const storeQuery = useQuery({
-    queryKey: "store",
+    queryKey: ["store"],
     queryFn: () => fetchStore(storeId)
   })
   const followStoreMutation = useMutation(
@@ -152,7 +152,7 @@ const StoreView = ({ storeId, customerId }) => {
 const PostsList = ({ storeId, customerId }) => {
   const pageNumber = useCounter()
   const storePostsQuery = useQuery({
-    queryKey: "storePosts",
+    queryKey: ["storePosts"],
     queryFn: () => fetchStorePosts(storeId, customerId, pageNumber.value)
   })
 

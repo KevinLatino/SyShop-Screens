@@ -119,15 +119,15 @@ export default () => {
   const [messages, setMessages] = useState([])
 
   const { chat } = route.params
-  const messagesQuery = useQuery(
-    "chatMessages",
-    async () => {
+  const messagesQuery = useQuery({
+    queryKey: ["chatMessages"],
+    queryFn: async () => {
       const fetchedMessages = await fetchMessages(chat.chat_id, pageNumber.value)
       const allMessages = GiftedChat.append(messages, fetchedMessages)
 
       setMessages(allMessages)
     }
-  )
+  })
 
   const addMessageMutation = useMutation(
     (message, customerId, receiverId) => addMessage(
