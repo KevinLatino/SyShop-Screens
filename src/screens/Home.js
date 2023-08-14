@@ -9,8 +9,7 @@ import {
   Portal,
   Modal,
   Surface,
-  FAB,
-  ActivityIndicator
+  FAB
 } from 'react-native-paper'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
@@ -21,9 +20,14 @@ import { View, StyleSheet } from 'react-native'
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    bottom: 0,
+    top: "75vh",
+    left: "80vw"
+  },
+  searchBarModal: {
+    position: "absolute",
+    top: 0,
     left: 0,
-    margin: 15
+    width: "100%"
   }
 })
 
@@ -44,10 +48,10 @@ const fetchPosts = async (customerId, pageNumber) => {
 const PostsList = () => {
   const pageNumber = useCounter()
   const [session, _] = useAtom(sessionAtom)
-  const postsQuery = useQuery(
-    "feedPosts",
-    () => fetchPosts(session.customerId, pageNumber.value)
-  )
+  const postsQuery = useQuery({
+    queryKey: ["feedPosts"],
+    queryFn: () => fetchPosts(session.customerId, pageNumber.value)
+  })
 
   if (postsQuery.isLoading) {
     return (
@@ -85,6 +89,7 @@ export default () => {
         <Modal
           visible={isModalVisible}
           onDismiss={() => setIsModalVisible(false)}
+          contentContainerStyle={styles.searchBarModal}
         >
           <Surface elevation={5}>
             <SearchBar onSearchSubmit={handleSearchSubmit} />

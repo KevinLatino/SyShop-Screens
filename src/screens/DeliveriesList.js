@@ -21,7 +21,7 @@ const fetchActiveDeliveries = async (customerId) => {
 
 const fetchInactiveDeliveries = async (customerId) => {
   const payload = {
-    customerId
+    customer_id: customerId
   }
   const inactiveDeliveries = await requestServer(
     "/deliveries_service/get_customer_inactive_deliveries",
@@ -50,14 +50,14 @@ const DeliveriesListItems = ({ deliveries }) => {
 
 export default () => {
   const [session, _] = useAtom(sessionAtom)
-  const activeDeliveriesQuery = useQuery(
-    "activeDeliveries",
-    () => fetchActiveDeliveries(session.customerId)
-  )
-  const inactiveDeliveriesQuery = useQuery(
-    "inactiveDeliveries",
-    () => fetchInactiveDeliveries(session.customerId)
-  )
+  const activeDeliveriesQuery = useQuery({
+    queryKey: ["activeDeliveries"],
+    queryFn: () => fetchActiveDeliveries(session.customerId)
+  })
+  const inactiveDeliveriesQuery = useQuery({
+    queryKey: ["inactiveDeliveries"],
+    queryFn: () => fetchInactiveDeliveries(session.customerId)
+  })
 
   return (
     <List.Section>

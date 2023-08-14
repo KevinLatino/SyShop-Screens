@@ -45,10 +45,10 @@ const AddressAutocompleteTile = ({ address, onSelect }) => {
 
 const AddressAutocompleteInput = ({ onSelect }) => {
   const [searchedText, setSearchedText] = useState("")
-  const addressesQuery = useQuery(
-    "autocompletedAddresses",
-    () => autocompleteAddress(searchedText)
-  )
+  const addressesQuery = useQuery({
+    queryKey: ["autocompletedAddresses"],
+    queryFn: () => autocompleteAddress(searchedText)
+  })
 
   return (
     <View>

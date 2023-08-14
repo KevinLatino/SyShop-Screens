@@ -34,15 +34,15 @@ export const useForm = (initialValues, errorHandlers) => {
     const setter = (value) => {
       const error = errorHandler(value)
 
-      setFieldsState({
-        ...fieldsState,
+      setFieldsState(fs => ({
+        ...fs,
         [name]: value
-      })
+      }))
 
-      setErrorsState({
-        ...errorsState,
+      setErrorsState(es => ({
+        ...es,
         [name]: error
-      })
+      }))
     }
 
     return setter

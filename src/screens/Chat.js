@@ -118,22 +118,23 @@ export default () => {
   const pageNumber = useCounter()
   const [messages, setMessages] = useState([])
 
-  if (route.params === undefined) {
-    return null
-  }
-
-  const { chatId, receiverId, receiverName, receiverPicture } = route.params
-  const messagesQuery = useQuery(
-    "chatMessages",
-    async () => {
-      const fetchedMessages = await fetchMessages(chatId, pageNumber.value)
+  const { chat } = route.params
+  const messagesQuery = useQuery({
+    queryKey: ["chatMessages"],
+    queryFn: async () => {
+      const fetchedMessages = await fetchMessages(chat.chat_id, pageNumber.value)
       const allMessages = GiftedChat.append(messages, fetchedMessages)
 
       setMessages(allMessages)
     }
-  )
+  })
+
   const addMessageMutation = useMutation(
-    (message, customerId, receiverId) => addMessage(message, customerId, receiverId)
+    (message, customerId, receiverId) => addMessage(
+      message,
+      customerId,
+      receiverId
+    )
   )
 
   const handleTextMessageSend = ({ text }) => {
@@ -142,7 +143,7 @@ export default () => {
       content_type: "text"
     }
 
-    addMessageMutation.mutate(message, session.customerId, receiverId)
+    addMessageMutation.mutate(message, session.customerId, chat.user.user_id)
   }
 
   const handlePictureMessageChoosen = async () => {
@@ -153,18 +154,18 @@ export default () => {
       content_type: "image"
     }
 
-    addMessageMutation.mutate(message, session.customerId, receiverId)
+    addMessageMutation.mutate(message, session.customerId, chat.user.user_id)
   }
 
   return (
     <View>
       <List.Item
-        title={receiverName}
+        title={chat.user.name}
         left={(props) => {
           return (
             <Avatar
               {...props}
-              source={{ uri: receiverPicture }}
+              source={{ uri: chat.user.picture }}
             />
         )}}
       />

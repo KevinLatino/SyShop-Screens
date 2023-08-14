@@ -26,13 +26,8 @@ export default ({ chat }) => {
   const navigation = useNavigation()
 
   const navigateToChat = () => {
-    const chatId = chat.chat_id
-
     navigation.navigate("Chat", {
-      chatId,
-      receiverId: chat.user.user_id,
-      receiverName: chat.user.name,
-      receiverPicture: chat.user.picture
+      chat
     })
   }
 

@@ -1,13 +1,15 @@
-import { useNavigation } from '@react-navigation/native'
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
+import { showMessage } from '../components/AppSnackBar'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
 import { View, StyleSheet } from 'react-native'
-import { FAB } from 'react-native-paper'
+import { Button, FAB } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -33,12 +35,44 @@ const fetchLocations = async (customerId) => {
   return locations
 }
 
-const LocationsScrollView = () => {
-  const [session, _] = useAtom(sessionAtom)
-  const locationsQuery = useQuery(
-    "customerLocations",
-    () => fetchLocations(session.customerId)
+const createDelivery = async (saleId, locationId) => {
+  const payload = {
+    sale_id: saleId,
+    location_id: locationId
+  }
+  const _ = await requestServer(
+    "/deliveries_service/create_delivery",
+    payload
   )
+}
+
+const LocationsScrollView = () => {
+  const navigation = useNavigation()
+  const route = useRoute()
+  const [selectedLocation, setSelectedLocation] = useState()
+  const [session, _] = useAtom(sessionAtom)
+  const locationsQuery = useQuery({
+    queryKey: ["customerLocations"],
+    queryFn: () => fetchLocations(session.customerId)
+  })
+  const createDeliveryMutation = useMutation(
+    (saleId, locationId) => createDelivery(saleId, locationId)
+  )
+  const { saleId } = route.params
+
+  const handleSelect = (location) => {
+    setSelectedLocation(location)
+  }
+
+  const handleSubmit = () => {
+    createDeliveryMutation.mutate(saleId, selectedLocation.location_id)
+  }
+
+  if (createDeliveryMutation.isSuccess) {
+    showMessage("Tu entrega ahora está pendiente")
+
+    navigation.navigate("Home")
+  }
 
   if (locationsQuery.isLoading) {
     return (
@@ -47,12 +81,34 @@ const LocationsScrollView = () => {
   }
 
   return (
-    <ScrollView
-      data={locationsQuery.data}
-      keyExtractor={(location) => location.location_id}
-      renderItem={(location) => <LocationTile location={location} />}
-      onStartReached={locationsQuery.refetch}
-    />
+    <View>
+      <ScrollView
+        data={locationsQuery.data}
+        keyExtractor={(location) => location.location_id}
+        renderItem={
+          (location) => {
+            return (
+              <LocationTile
+                location={location}
+                isSelected={location.location_id == selectedLocation.location_id}
+                onPress={() => handleSelect(location)}
+              />
+            )
+          }
+        }
+        onStartReached={locationsQuery.refetch}
+      />
+
+      <Button
+        onPress={handleSubmit}
+      >
+        {
+          createDeliveryMutation.isLoading ?
+          <LoadingSpinner /> :
+          "Programar entrega"
+        }
+      </Button>
+    </View>
   )
 }
 

@@ -18,6 +18,10 @@ import AddLocation from './src/screens/AddLocation'
 import SearchResults from './src/screens/SearchResults'
 import PostView from './src/screens/PostView'
 import EditProfile from './src/screens/EditProfile'
+import LikedPosts from './src/screens/LikedPosts'
+import PurchasesList from './src/screens/PurchasesList'
+import ProfileView from './src/screens/ProfileView'
+import StoreView from './src/screens/StoreView'
 import AppSnackBar from './src/components/AppSnackBar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -39,149 +43,167 @@ const BottomTabNavigator = () => {
       </BottomTab.Screen>
 
       <BottomTab.Screen
-        name="Deliveries"
+        name="DeliveriesList"
         options={{
           tabBarLabel: "Entregas",
           tabBarIcon: "moped"
         }}
       >
-        {() => <DeliveryList />}
+        {() => <DeliveriesList />}
       </BottomTab.Screen>
 
       <BottomTab.Screen
-        name="Chats"
+        name="ChatsList"
         options={{
           tabBarLabel: "Mensajes",
           tabBarIcon: "chat"
         }}
       >
-        {() => <ChatList />}
+        {() => <ChatsList />}
       </BottomTab.Screen>
 
       <BottomTab.Screen
-        name="MyProfile"
+        name="ProfileView"
         options={{
           tabBarLabel: "Mi Perfil",
           tabBarIcon: "account"
         }}
       >
-        {() => null}
+        {() => <ProfileView />}
       </BottomTab.Screen>
     </BottomTab.Navigator>
   )
 }
 
-const StackNavigator = () => {
+const App = () => {
   const [session, _] = useAtom(sessionAtom)
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={session === null ? "Welcome" : "Home"}
-          screenOptions={{
-            headerShown: false
-          }}
-        >
-          <Stack.Screen
-            name="BottomTabNavigator"
-          >
-            {() => <BottomTabNavigator />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="Welcome"
-          >
-            {() => <Welcome />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="SignIn"
-          >
-            {() => <SignIn />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="SignUp"
-          >
-            {() => <SignUp />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="Home"
-          >
-            {() => <Home />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="DeliveriesList"
-          >
-            {() => <DeliveriesList />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="ChatsList"
-          >
-            {() => <ChatsList />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="MyProfile"
-          >
-            {() => null}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="Chat"
-          >
-            {() => <Chat />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="ChooseLocation"
-          >
-            {() => <ChooseLocation />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="AddLocation"
-          >
-            {() => <AddLocation />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="SearchResults"
-          >
-            {() => <SearchResults />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="PostView"
-          >
-            {() => <PostView />}
-          </Stack.Screen>
-
-          <Stack.Screen
-            name="EditProfile"
-          >
-            {() => <EditProfile />}
-          </Stack.Screen>
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
-  )
-}
-
-const App = () => {
-  return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider>
-        <StackNavigator />
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName={(session === null) ? "Welcome" : "Home"}
+              screenOptions={{
+                headerShown: false
+              }}
+            >
+              <Stack.Screen
+                name="BottomTabNavigator"
+              >
+                {() => <BottomTabNavigator />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="Welcome"
+              >
+                {() => <Welcome />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="SignIn"
+              >
+                {() => <SignIn />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="SignUp"
+              >
+                {() => <SignUp />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="Home"
+              >
+                {() => <BottomTabNavigator />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="DeliveriesList"
+              >
+                {() => <DeliveriesList />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="ChatsList"
+              >
+                {() => <ChatsList />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="MyProfile"
+              >
+                {() => null}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="Chat"
+              >
+                {() => <Chat />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="ChooseLocation"
+              >
+                {() => <ChooseLocation />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="AddLocation"
+              >
+                {() => <AddLocation />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="SearchResults"
+              >
+                {() => <SearchResults />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="PostView"
+              >
+                {() => <PostView />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="EditProfile"
+              >
+                {() => <EditProfile />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="LikedPosts"
+              >
+                {() => <LikedPosts />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="PurchasesList"
+              >
+                {() => <PurchasesList />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="ProfileView"
+              >
+                {() => <ProfileView />}
+              </Stack.Screen>
+
+              <Stack.Screen
+                name="StoreView"
+              >
+                {() => <StoreView />}
+              </Stack.Screen>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
 
         <AppSnackBar />
       </PaperProvider>
     </QueryClientProvider>
-   )
+  )
 }
 
 export default App;

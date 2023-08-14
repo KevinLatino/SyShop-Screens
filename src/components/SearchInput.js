@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     border: 1,
     borderColor: 'grey',
-    width: 395
+    width: "100%"
   },
   input: {
     fontSize: 16
