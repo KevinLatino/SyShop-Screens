@@ -38,7 +38,7 @@ export default () => {
   return (
     <ScrollView
       data={chatsQuery.data}
-      renderItem={(chat) => <ChatTile chat={chat} />}
+      renderItem={({ item }) => <ChatTile chat={item} />}
       onEndReached={pageNumber.increment}
     />
   )

@@ -1,6 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Image } from 'react-native'
-import { List, TouchableRipple } from 'react-native-paper'
+import { List, TouchableRipple, Avatar } from 'react-native-paper'
 
 const formatLastMessage = (message) => {
   const contentType = message.content_type
@@ -14,9 +13,9 @@ const formatLastMessage = (message) => {
   }
 }
 
-const UserChatPicture = (user) => {
+const UserChatPicture = ({ user }) => {
   return (
-    <Image
+    <Avatar.Image
       source={{ uri: user.picture }}
     />
   )

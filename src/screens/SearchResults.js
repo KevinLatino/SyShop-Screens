@@ -46,6 +46,35 @@ const fetchStores = async (searchedName, pageNumber) => {
     return stores
 }
 
+const fetchPosts = async (text, categories, filters, pageNumber) => {
+  console.log(filters)
+  const payload = {
+    start: pageNumber * 20,
+    amount: 20,
+    searched_text: text,
+    categories,
+    sorting_property: filters.sortingProperty,
+    sorting_schema: filters.sortingSchema,
+    minimum_price: filters.minimumPrice,
+    maximum_price: filters.maximumPrice
+  }
+
+  const posts = await requestServer(
+    "/posts_service/search_posts_by_metadata",
+    payload
+  )
+
+  return posts
+}
+
+const fetchMaximumPrice = async () => {
+  const maximumPrice = await requestServer(
+    "/posts_service/get_maximum_price"
+  )
+
+  return maximumPrice
+}
+
 const CategoryChip = ({ category }) => {
     return (
         <Chip
@@ -89,18 +118,23 @@ const SortingPropertyFilterMenu = ({
     isVisible,
     setIsVisible
 }) => {
+    const anchorText = sortingProperty === "publication_date" ?
+      "Fecha de publicación" :
+      "Precio"
     const anchor = (
         <Button
             mode="outlined"
             onPress={() => setIsVisible(true)}
         >
-            {
-                sortingProperty === "publication_date"
-                    ? "Fecha de publicación"
-                    : "Precio"
-            }
+          {anchorText}
         </Button>
     )
+
+    const handleSelect = (selectedSortingProperty) => {
+      onSelect(selectedSortingProperty)
+
+      setIsVisible(() => false)
+    }
 
     return (
         <Menu
@@ -110,12 +144,12 @@ const SortingPropertyFilterMenu = ({
         >
             <Menu.Item
                 title="Fecha de publicación"
-                onPress={() => onSelect("publication_date")}
+                onPress={() => handleSelect("publication_date")}
             />
 
             <Menu.Item
                 title="Precio"
-                onPress={() => onSelect("price")}
+                onPress={() => handleSelect("price")}
             />
         </Menu>
     )
@@ -130,32 +164,50 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
     } = filters
     const [isMenuVisible, setIsMenuVisible] = useState(false)
 
+    const sortingIcon = sortingSchema === "ascending" ?
+      "arrow-up-drop-circle-outline" :
+      "arrow-down-drop-circle-outline"
+
+    const handleToggleSortingSchema = () => {
+      const newSortingSchema = sortingSchema === "ascending" ?
+        "descending" :
+        "ascending"
+
+      onChangeFilters({
+        ...filters,
+        sortingSchema: newSortingSchema
+      })
+    }
+
+    const handleSelectSortingProperty = (selectedSortingProperty) => {
+      onChangeFilters(f => ({
+        ...f,
+        sortingProperty: selectedSortingProperty
+      }))
+    }
+
+    const handleChangePriceRange = ([newMinimumPrice, newMaximumPrice]) => {
+      onChangeFilters({
+        ...filters,
+        minimumPrice: newMinimumPrice,
+        maximumPrice: newMaximumPrice
+      })
+    }
+
     return (
         <View>
             <View>
                 <IconButton
                     mode="outlined"
-                    icon={
-                        sortingSchema === "ascending"
-                        ? "arrow-up-drop-circle-outline"
-                        : "arrow-down-drop-circle-outline"
-                    }
-                    onPress={() => onChangeFilters({
-                        ...filters,
-                        sortingSchema: sortingSchema === "ascending"
-                            ? "descending"
-                            : "ascending"
-                    })}
+                    icon={sortingIcon}
+                    onPress={handleToggleSortingSchema}
                 />
 
                 <SortingPropertyFilterMenu
                     isVisible={isMenuVisible}
                     setIsVisible={setIsMenuVisible}
                     sortingProperty={sortingProperty}
-                    onSelect={(sortingProperty) => onChangeFilters({
-                        ...filters,
-                        sortingProperty
-                    })}
+                    onSelect={handleSelectSortingProperty}
                 />
             </View>
 
@@ -165,9 +217,7 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
                     maximumValue={maximumPrice}
                     step={1000}
                     value={[minimumPrice, maximumPrice]}
-                    onValueChange={([minimum, maximum]) => onChangeFilters({
-                        ...filters, minimumPrice: minimum, maximumPrice: maximum
-                    })}
+                    onValueChange={handleChangePriceRange}
                 />
             </View>
         </View>
@@ -227,38 +277,43 @@ const StoresResultsScrollView = ({ searchedText }) => {
     )
 }
 
-const PostsResults = ({ searchedText }) => {
-    const maximumPriceQuery = useQuery({
-      queryKey: ["maximumPrice"],
-      queryFn: () => fetchMaximumPrice()
-    })
-
-    if (maximumPriceQuery.isLoading) {
-        return (
-            <LoadingSpinner />
-        )
-    }
-
+const PostsResults = ({ searchedText, categoriesNames }) => {
     const pageNumber = useCounter()
     const [searchFilters, setSearchFilters] = useState({
         minimumPrice: 0,
-        maximumPrice: maximumPriceQuery.data,
-        sortingProperty: "publicacion_date",
+        maximumPrice: null,
+        sortingProperty: "publication_date",
         sortingSchema: "descending"
+    })
+    const maximumPriceQuery = useQuery({
+      queryKey: ["maximumPrice"],
+      queryFn: () => fetchMaximumPrice(),
+      onSuccess: (maximumPrice) => setSearchFilters({
+        ...searchFilters,
+        maximumPrice
+      })
     })
     const postsQuery = useQuery({
       queryKey: ["postsResults"],
       queryFn: () => fetchPosts(
         searchedText,
+        categoriesNames,
         searchFilters,
         pageNumber.value
-      )
+      ),
+      enabled: maximumPriceQuery.isSuccess
     })
 
     const handleChangeFilters = (newSearchFilters) => {
         setSearchFilters(newSearchFilters)
 
         postsQuery.refetch()
+    }
+
+    if (maximumPriceQuery.isLoading) {
+        return (
+            <LoadingSpinner />
+        )
     }
 
     return (
@@ -307,6 +362,7 @@ export default () => {
 
             <PostsResults
                 searchedText={text}
+                categoriesNames={categoriesNames}
             />
         </View>
     )
