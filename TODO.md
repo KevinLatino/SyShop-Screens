@@ -9,6 +9,11 @@
 - [ ] Implementar navegación desde OrderForm hasta OrderForm
 - [ ] Implementar la funcionalidad del pago
 
+# Otros
+- [ ] Implementar ingresar una foto a la hora de crear una cuenta (con Google también)
+- [ ] Añadir títulos a los screens principales
+- [ ] Solucionar el problema del Drawer de ProfileView
+
 # Tercera defensa
 - [ ] Manejar errores del servidor
 - [ ] Hacer la interfaz crack

@@ -74,6 +74,8 @@ export default () => {
   const navigation = useNavigation()
 
   const handleSearchSubmit = (text, categoriesNames, storesNames) => {
+    setIsModalVisible(false)
+
     navigation.navigate("SearchResults", {
       text,
       categoriesNames,

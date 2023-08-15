@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import { createDrawerNavigator } from '@react-navigation/drawer'
 import Home from './src/screens/Home'
 import DeliveriesList from './src/screens/DeliveriesList'
 import ChatsList from './src/screens/ChatsList'
@@ -28,6 +29,31 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
+const ProfileViewDrawer = createDrawerNavigator()
+
+const ProfileViewDrawerNavigator = () =>  {
+  return (
+    <ProfileViewDrawer.Navigator open initialRouteName="ProfileView">
+      <ProfileViewDrawer.Screen
+        name="ProfileView"
+      >
+        {() => <ProfileView />}
+      </ProfileViewDrawer.Screen>
+
+      <ProfileViewDrawer.Screen
+        name="LikedPosts"
+      >
+        {() => <LikedPosts />}
+      </ProfileViewDrawer.Screen>
+
+      <ProfileViewDrawer.Screen
+        name="PurchasesList"
+      >
+        {() => <PurchasesList />}
+      </ProfileViewDrawer.Screen>
+    </ProfileViewDrawer.Navigator>
+  )
+}
 
 const BottomTabNavigator = () => {
   return (
@@ -69,7 +95,7 @@ const BottomTabNavigator = () => {
           tabBarIcon: "account"
         }}
       >
-        {() => <ProfileView />}
+        {() => <ProfileViewDrawerNavigator />}
       </BottomTab.Screen>
     </BottomTab.Navigator>
   )
@@ -89,12 +115,6 @@ const App = () => {
                 headerShown: false
               }}
             >
-              <Stack.Screen
-                name="BottomTabNavigator"
-              >
-                {() => <BottomTabNavigator />}
-              </Stack.Screen>
-
               <Stack.Screen
                 name="Welcome"
               >
@@ -129,12 +149,6 @@ const App = () => {
                 name="ChatsList"
               >
                 {() => <ChatsList />}
-              </Stack.Screen>
-
-              <Stack.Screen
-                name="MyProfile"
-              >
-                {() => null}
               </Stack.Screen>
 
               <Stack.Screen
