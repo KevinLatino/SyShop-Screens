@@ -6,10 +6,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
-import { createDrawerNavigator } from '@react-navigation/drawer'
 import Home from './src/screens/Home'
 import DeliveriesList from './src/screens/DeliveriesList'
 import ChatsList from './src/screens/ChatsList'
+import Settings from './src/screens/Settings'
 import Chat from './src/screens/Chat'
 import Welcome from './src/screens/Welcome'
 import SignIn from './src/screens/SignIn'
@@ -29,31 +29,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
-const ProfileViewDrawer = createDrawerNavigator()
-
-const ProfileViewDrawerNavigator = () =>  {
-  return (
-    <ProfileViewDrawer.Navigator open initialRouteName="ProfileView">
-      <ProfileViewDrawer.Screen
-        name="ProfileView"
-      >
-        {() => <ProfileView />}
-      </ProfileViewDrawer.Screen>
-
-      <ProfileViewDrawer.Screen
-        name="LikedPosts"
-      >
-        {() => <LikedPosts />}
-      </ProfileViewDrawer.Screen>
-
-      <ProfileViewDrawer.Screen
-        name="PurchasesList"
-      >
-        {() => <PurchasesList />}
-      </ProfileViewDrawer.Screen>
-    </ProfileViewDrawer.Navigator>
-  )
-}
 
 const BottomTabNavigator = () => {
   return (
@@ -89,13 +64,23 @@ const BottomTabNavigator = () => {
       </BottomTab.Screen>
 
       <BottomTab.Screen
+        name="Settings"
+        options={{
+          tabBarLabel: "Configuración",
+          tabBarIcon: "cog"
+        }}
+      >
+        {() => <Settings />}
+      </BottomTab.Screen>
+
+      <BottomTab.Screen
         name="ProfileView"
         options={{
           tabBarLabel: "Mi Perfil",
           tabBarIcon: "account"
         }}
       >
-        {() => <ProfileViewDrawerNavigator />}
+        {() => <ProfileView />}
       </BottomTab.Screen>
     </BottomTab.Navigator>
   )
@@ -220,4 +205,4 @@ const App = () => {
   )
 }
 
-export default App;
+export default App

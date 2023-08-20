@@ -5,7 +5,7 @@ import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { selectPictureFromGallery } from '../utilities/camera'
-import { showError } from '../components/AppSnackBar'
+import { showMessage } from '../components/AppSnackBar'
 import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -52,7 +52,7 @@ const PictureChooser = ({ picture, onChangePicture }) => {
 
       onChangePicture(picture)
     } catch (error) {
-      showError("Hubo un error al intentar seleccionar la imagen")
+      showMessage("Hubo un error al intentar seleccionar la imagen")
     }
   }
 
