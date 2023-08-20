@@ -1,15 +1,9 @@
 import axios from 'axios'
-
-export class RequestError extends Error {
-  constructor(message) {
-    super(message)
-
-    this.message = message
-  }
-}
+import configuration from '../configuration'
 
 export const requestServer = async (endpoint, payload) => {
-  const url = `http://localhost:8000${endpoint}`
+  const apiUrl = configuration.API_URL
+  const url = `${apiUrl}${endpoint}`
 
   const { data, statusText } = await axios.post(url, payload)
 

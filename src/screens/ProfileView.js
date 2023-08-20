@@ -1,6 +1,4 @@
-import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useNavigation } from '@react-navigation/native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -9,13 +7,7 @@ import { View, StyleSheet } from 'react-native'
 import {
     Text,
     Avatar,
-    IconButton,
-    Modal,
-    Portal,
-    Drawer,
-    Appbar,
-    List,
-    Surface
+    IconButton
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -76,33 +68,7 @@ const InformationEntry = ({ icon, text }) => {
   )
 }
 
-const Menu = () => {
-    return (
-      <Surface elevation={5} style={styles.menuDrawer}>
-        <Drawer.Section>
-            <List.Subheader>
-                Configuración
-            </List.Subheader>
-
-            <List.Subheader>
-                Otros
-            </List.Subheader>
-
-            <Drawer.Item
-                label="Tus me gusta"
-                onPress={() => navigation.navigate("LikedPosts")}
-            />
-
-            <Drawer.Item
-                label="Tus compras"
-                onPress={() => navigation.navigate("PurchasesList")}
-            />
-        </Drawer.Section>
-      </Surface>
-    )
-}
-
-const ProfileView = () => {
+export default () => {
     const [session, _] = useAtom(sessionAtom)
     const customerQuery = useQuery({
         queryKey: ["customer"],
@@ -142,31 +108,5 @@ const ProfileView = () => {
           />
         </View>
       </View>
-    )
-}
-
-export default () => {
-    const [isDrawerVisible, setIsDrawerVisible] = useState(false)
-
-    return (
-        <View>
-            <Appbar.Header>
-                <Appbar.Action
-                    icon="menu"
-                    onPress={() => setIsDrawerVisible(true)}
-                />
-            </Appbar.Header>
-
-            <ProfileView />
-
-            <Portal>
-              <Modal
-                  visible={isDrawerVisible}
-                  onDismiss={() => setIsDrawerVisible(false)}
-              >
-                  <Menu />
-              </Modal>
-            </Portal>
-        </View>
     )
 }

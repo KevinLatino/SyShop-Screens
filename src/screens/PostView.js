@@ -14,14 +14,14 @@ import LikeButton from '../components/LikeButton'
 import OrderForm from '../components/OrderForm'
 import { ImageSlider } from 'react-native-image-slider-banner'
 import { BottomSheet } from 'react-native-btr'
+import { View } from 'react-native'
 import {
-  View,
   Text,
   Button,
   IconButton,
   Chip,
   TouchableRipple
-} from 'react-native'
+} from 'react-native-paper'
 
 const fetchPost = async (postId, customerId) => {
   const payload = {
