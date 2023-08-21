@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRoute } from '@react-navigation/native'
-import { showMessage } from './AppSnackBar'
+import { showMessage } from '../components/AppSnackBar'
 import { CardField, useConfirmPayment } from '@stripe/stripe-react-native'
 import LoadingSpinner from './LoadingSpinner'
 import { View } from 'react-native'
