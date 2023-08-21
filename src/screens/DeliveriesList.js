@@ -3,7 +3,7 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { View } from 'react-native'
-import { List } from 'react-native-paper'
+import { List, Text } from 'react-native-paper'
 import DeliveryTile from '../components/DeliveryTile'
 import LoadingSpinner from '../components/LoadingSpinner'
 
@@ -60,26 +60,32 @@ export default () => {
   })
 
   return (
-    <List.Section>
-      <List.Subheader>
-        Entregas activas
-      </List.Subheader>
+    <View>
+      <Text variant="titleLarge">
+        Entregas que esperas
+      </Text>
 
-      {
-        activeDeliveriesQuery.isLoading ?
-        <LoadingSpinner /> :
-        <DeliveriesListItems deliveries={activeDeliveriesQuery.data} />
-      }
+      <List.Section>
+        <List.Subheader>
+          Entregas activas
+        </List.Subheader>
 
-      <List.Subheader>
-        Entregas inactivas
-      </List.Subheader>
+        {
+          activeDeliveriesQuery.isLoading ?
+          <LoadingSpinner /> :
+          <DeliveriesListItems deliveries={activeDeliveriesQuery.data} />
+        }
 
-      {
-        inactiveDeliveriesQuery.isLoading ?
-        <LoadingSpinner /> :
-        <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
-      }
-    </List.Section>
+        <List.Subheader>
+          Entregas inactivas
+        </List.Subheader>
+
+        {
+          inactiveDeliveriesQuery.isLoading ?
+          <LoadingSpinner /> :
+          <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
+        }
+      </List.Section>
+    </View>
   )
 }
