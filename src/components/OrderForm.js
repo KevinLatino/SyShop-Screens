@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { useRoute } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -60,6 +60,7 @@ const PostTile = ({ post }) => {
 export default () => {
     const [amount, setAmount] = useState(1)
     const [session, _] = useAtom(sessionAtom)
+    const navigation = useNavigation()
     const route = useRoute()
 
     const { postId } = route.params
@@ -74,8 +75,12 @@ export default () => {
     if (createSaleIntentMutation.isSuccess) {
       const stripeClientSecret = createSaleIntentMutation.data.stripe_client_secret
 
-      // TEMPORAL: Falta implemetar navegación al formulario de pago
-      console.log("StripeClientSecret: " + stripeClientSecret)
+      navigation.navigate(
+        "PaymentForm",
+        {
+          stripeClientSecret
+        }
+      )
     }
 
     if (postQuery.isLoading) {
