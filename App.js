@@ -2,10 +2,12 @@ import 'react-native-gesture-handler'
 import { useAtom } from 'jotai'
 import { sessionAtom } from './src/context'
 import { PaperProvider } from 'react-native-paper'
+import { StripeProvider } from '@stripe/stripe-react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import configuration from './src/configuration'
 import Home from './src/screens/Home'
 import DeliveriesList from './src/screens/DeliveriesList'
 import ChatsList from './src/screens/ChatsList'
@@ -23,6 +25,7 @@ import LikedPosts from './src/screens/LikedPosts'
 import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
+import PaymentForm from './src/screens/PaymentForm'
 import AppSnackBar from './src/components/AppSnackBar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -90,118 +93,134 @@ const App = () => {
   const [session, _] = useAtom(sessionAtom)
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <PaperProvider>
-        <SafeAreaProvider>
-          <NavigationContainer>
-            <Stack.Navigator
-              initialRouteName={(session === null) ? "Welcome" : "Home"}
-              screenOptions={{
-                headerShown: false
-              }}
-            >
-              <Stack.Screen
-                name="Welcome"
-              >
-                {() => <Welcome />}
-              </Stack.Screen>
+    <StripeProvider publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}>
+      <PaymentForm />
+    </StripeProvider>
+  )
 
-              <Stack.Screen
-                name="SignIn"
+  return (
+    <StripeProvider
+      publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}
+    >
+      <QueryClientProvider client={queryClient}>
+        <PaperProvider>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                initialRouteName={(session === null) ? "Welcome" : "Home"}
+                screenOptions={{
+                  headerShown: false
+                }}
               >
-                {() => <SignIn />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="Welcome"
+                >
+                  {() => <Welcome />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="SignUp"
-              >
-                {() => <SignUp />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="SignIn"
+                >
+                  {() => <SignIn />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="Home"
-              >
-                {() => <BottomTabNavigator />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="SignUp"
+                >
+                  {() => <SignUp />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="DeliveriesList"
-              >
-                {() => <DeliveriesList />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="Home"
+                >
+                  {() => <BottomTabNavigator />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="ChatsList"
-              >
-                {() => <ChatsList />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="DeliveriesList"
+                >
+                  {() => <DeliveriesList />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="Chat"
-              >
-                {() => <Chat />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="ChatsList"
+                >
+                  {() => <ChatsList />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="ChooseLocation"
-              >
-                {() => <ChooseLocation />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="Chat"
+                >
+                  {() => <Chat />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="AddLocation"
-              >
-                {() => <AddLocation />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="ChooseLocation"
+                >
+                  {() => <ChooseLocation />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="SearchResults"
-              >
-                {() => <SearchResults />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="AddLocation"
+                >
+                  {() => <AddLocation />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="PostView"
-              >
-                {() => <PostView />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="SearchResults"
+                >
+                  {() => <SearchResults />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="EditProfile"
-              >
-                {() => <EditProfile />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="PostView"
+                >
+                  {() => <PostView />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="LikedPosts"
-              >
-                {() => <LikedPosts />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="EditProfile"
+                >
+                  {() => <EditProfile />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="PurchasesList"
-              >
-                {() => <PurchasesList />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="LikedPosts"
+                >
+                  {() => <LikedPosts />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="ProfileView"
-              >
-                {() => <ProfileView />}
-              </Stack.Screen>
+                <Stack.Screen
+                  name="PurchasesList"
+                >
+                  {() => <PurchasesList />}
+                </Stack.Screen>
 
-              <Stack.Screen
-                name="StoreView"
-              >
-                {() => <StoreView />}
-              </Stack.Screen>
-            </Stack.Navigator>
-          </NavigationContainer>
-        </SafeAreaProvider>
+                <Stack.Screen
+                  name="ProfileView"
+                >
+                  {() => <ProfileView />}
+                </Stack.Screen>
 
-        <AppSnackBar />
-      </PaperProvider>
-    </QueryClientProvider>
+                <Stack.Screen
+                  name="StoreView"
+                >
+                  {() => <StoreView />}
+                </Stack.Screen>
+
+                <Stack.Screen
+                  name="PaymentForm"
+                >
+                  {() => <PaymentForm />}
+                </Stack.Screen>
+              </Stack.Navigator>
+            </NavigationContainer>
+          </SafeAreaProvider>
+
+          <AppSnackBar />
+        </PaperProvider>
+      </QueryClientProvider>
+    </StripeProvider>
   )
 }
 

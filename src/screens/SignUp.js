@@ -14,6 +14,7 @@ import {
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
+import PictureInput from '../components/PictureInput'
 import { View, StyleSheet } from 'react-native'
 import { Button, Text, Divider } from 'react-native-paper'
 
@@ -95,13 +96,13 @@ export default () => {
   const [_, setSession] = useAtom(sessionAtom)
   const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
   const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
+  const [picture, setPicture] = useState(null)
   const form = useForm(
     {
       name: "",
       first_surname: "",
       second_surname: "",
       phone_number: "",
-      picture: "",
       email: "",
       password: ""
     },
@@ -115,7 +116,7 @@ export default () => {
     }
   )
   const signUpWithPlainAccountMutation = useMutation(
-    (credentields) => signUpWithPlainAccount(credentields)
+    (userInformation) => signUpWithPlainAccount(userInformation)
   )
   const signUpWithGoogleAccountMutation = useMutation(
     ({ googleUniqueIdentifier, ...userInformation }) => signUpWithGoogleAccount(
@@ -156,9 +157,16 @@ export default () => {
     }
 
     if (signingUpWithPlainAccount) {
-      signUpWithPlainAccountMutation.mutate({ credentields: form.fields })
+      signUpWithPlainAccountMutation.mutate({
+        picture,
+        ...form.fields
+      })
     } else {
-      signUpWithGoogleAccountMutation.mutate({ googleUniqueIdentifier, ...(form.fields) })
+      signUpWithGoogleAccountMutation.mutate({
+        googleUniqueIdentifier,
+        picture,
+        ...form.fields
+      })
     }
   }
 
@@ -169,12 +177,18 @@ export default () => {
     form.setField("first_surname") (firstSurname)
     form.setField("name") (userInformation.given_name)
 
+    setPicture(userInformation.picture)
     setSigninUpWithPlainAccount(false)
     setGoogleUniqueIdentifier(userInformation.id)
   }
 
   return (
     <View style={styles.container}>
+      <PictureInput
+        picture={picture}
+        onChangePicture={setPicture}
+      />
+
       <Text style={styles.title}>
         Registrarse
       </Text>
@@ -212,7 +226,7 @@ export default () => {
       />
 
       {
-        signingUpWithPlainAccount ??
+        signingUpWithPlainAccount ?
         (
           <View>
             <TextField
@@ -230,7 +244,8 @@ export default () => {
               secureTextEntry
             />
           </View>
-        )
+        ) :
+        null
       }
 
       <Button
