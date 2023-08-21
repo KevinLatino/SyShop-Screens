@@ -207,7 +207,7 @@ export default () => {
         )
         : (
           <GoogleSignInButton
-            text="Iniciar sesión con Google"
+            text="Continúa con Google"
             onSignIn={handleSignInWithGoogleAccount}
             disabled={isSignInLoading}
           />

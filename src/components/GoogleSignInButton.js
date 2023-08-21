@@ -17,12 +17,12 @@ const styles = {
     paddingBottom: 15,
     paddingLeft: 15,
     paddingRight: 15,
-    borderRadius: 3,
+    borderRadius: 25,
     borderWidth: 1,
     boxShadow: "0 -1px 0 rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .25)",
-    borderColor: "silver",
+    borderColor: "#e9e9f2",
     color: "#757575",
-    backgroundColor: "white",
+    backgroundColor: "#e6e7e8",
     width: "fit-content"
   },
   buttonInnerView: {
@@ -34,7 +34,8 @@ const styles = {
   buttonText: {
     fontSize: 16,
     fontWeight: 500,
-    // fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
+
+  fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
   }
 }
 
