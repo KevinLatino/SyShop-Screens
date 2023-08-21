@@ -3,14 +3,15 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import EStyleSheet from 'react-native-extended-stylesheet'
+import { View } from 'react-native'
 import {
     Text,
     Avatar,
     IconButton
 } from 'react-native-paper'
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
     profileView: {
       justifyContent: "space-between",
       alignItems: "center",
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         gap: 8,
-        width: "fit-content",
+        // width: "fit-content",
         borderBottom: "1.5px solid darkgray",
     },
     avatar: {

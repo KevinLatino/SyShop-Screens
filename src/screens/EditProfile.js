@@ -9,10 +9,11 @@ import { showMessage } from '../components/AppSnackBar'
 import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import EStyleSheet from 'react-native-extended-stylesheet'
+import { View } from 'react-native'
 import { Button, TouchableRipple, Avatar } from 'react-native-paper'
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   container: {
     flexDirection: "column",
     justifyContent: "space-between",

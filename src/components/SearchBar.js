@@ -3,10 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { requestServer } from '../utilities/requests'
 import SearchInput from './SearchInput'
 import LoadingSpinner from './LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import EStyleSheet from 'react-native-extended-stylesheet'
+import { View } from 'react-native'
 import { List, Chip } from 'react-native-paper'
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   selectedCategoriesList: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -44,7 +45,7 @@ const SelectedCategoriesList = ({ categoriesNames, onDelete }) => {
           onClose={() => onDelete(categoryName)}
           icon="shape"
           closeIcon="close"
-          style={{ width: "fit-content" }}
+          // style={{ width: "fit-content" }}
         >
           {categoryName}
         </Chip>

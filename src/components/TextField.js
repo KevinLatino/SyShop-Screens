@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { View, TextInput, StyleSheet } from 'react-native'
+import EStyleSheet from 'react-native-extended-stylesheet'
+import { View, TextInput } from 'react-native'
 import { HelperText } from 'react-native-paper'
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   textInput: {
     borderWidth: 1,
     paddingStart: 20,

@@ -10,10 +10,11 @@ import { showMessage } from '../components/AppSnackBar'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
+import EStyleSheet from 'react-native-extended-stylesheet'
+import { View } from 'react-native'
 import { Text, Button, Divider } from 'react-native-paper'
-import { View, StyleSheet } from 'react-native'
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   container: {
     flex: 1,
     gap: 22,
@@ -23,8 +24,8 @@ const styles = StyleSheet.create({
     paddingBottom: 16
   },
   Image:{
-    with: "300px",
-    height: "300px",
+    with: 300, //grasa
+    height: 300, //grasa
     display:  "flex",
     alignItems: "center",
   },

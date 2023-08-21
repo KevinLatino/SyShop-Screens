@@ -8,7 +8,7 @@ export const requestServer = async (endpoint, payload) => {
   const { data, statusText } = await axios.post(url, payload)
 
   if (statusText !== "OK") {
-    throw RequestError("Response status was not OK")
+    throw Error("Response status was not OK")
   }
 
   return data

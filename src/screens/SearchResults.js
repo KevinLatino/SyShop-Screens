@@ -6,11 +6,11 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import EStyleSheet from 'react-native-extended-stylesheet'
 import { Slider } from '@miblanchard/react-native-slider'
 import {
     View,
-    ScrollView as ReactNativeScrollView,
-    StyleSheet
+    ScrollView as ReactNativeScrollView
 } from 'react-native'
 import {
     Card,
@@ -21,7 +21,7 @@ import {
     Button
 } from 'react-native-paper'
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
     horizontalScrollView: {
         rowGap: 8,
         padding: 5
@@ -79,7 +79,7 @@ const CategoryChip = ({ category }) => {
     return (
         <Chip
             icon="shape"
-            style={{ width: "fit-content" }}
+            // style={{ width: "fit-content" }}
         >
             {category}
         </Chip>

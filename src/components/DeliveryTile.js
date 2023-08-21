@@ -1,5 +1,5 @@
 import { showMessage } from '../components/AppSnackBar'
-import { Linking } from 'react-native'
+import * as Linking from 'expo-linking'
 import { List, TouchableRipple } from 'react-native-paper'
 
 const TrackLocationIcon = ({ delivery, ...props }) => {

@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native'
+import EStyleSheet from 'react-native-extended-stylesheet'
 import { SearchBar } from 'react-native-elements'
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   container: {
     backgroundColor: 'transparent',
     borderTopWidth: 0,
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     border: 1,
     borderColor: 'grey',
-    width: "100%"
+    flex: 1 // grasa
   },
   input: {
     fontSize: 16

@@ -23,7 +23,7 @@ const styles = {
     borderColor: "#e9e9f2",
     color: "#757575",
     backgroundColor: "#e6e7e8",
-    width: "fit-content"
+    width: ""
   },
   buttonInnerView: {
     flexDirection: "row",
@@ -34,8 +34,7 @@ const styles = {
   buttonText: {
     fontSize: 16,
     fontWeight: 500,
-
-  fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
+    // fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
   }
 }
 

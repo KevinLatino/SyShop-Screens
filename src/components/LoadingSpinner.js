@@ -1,7 +1,8 @@
-import { View, StyleSheet } from 'react-native'
+import { View } from 'react-native'
+import EStyleSheet from 'react-native-extended-stylesheet'
 import { ActivityIndicator } from "react-native-paper";
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",

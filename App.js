@@ -93,12 +93,6 @@ const App = () => {
   const [session, _] = useAtom(sessionAtom)
 
   return (
-    <StripeProvider publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}>
-      <PaymentForm />
-    </StripeProvider>
-  )
-
-  return (
     <StripeProvider
       publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}
     >

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useRoute } from '@react-navigation/native'
 import { showMessage } from '../components/AppSnackBar'
 import { CardField, useConfirmPayment } from '@stripe/stripe-react-native'
-import LoadingSpinner from './LoadingSpinner'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { View } from 'react-native'
 import { Button } from 'react-native-paper'
 
@@ -26,7 +26,9 @@ const styles = {
 }
 
 export default () => {
+  console.log("foo 1")
   const route = useRoute()
+  console.log("foo 2")
   const [cardDetails, setCardDetails] = useState(null)
   const stripePaymentConfirmer = useConfirmPayment()
 
