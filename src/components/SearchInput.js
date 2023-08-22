@@ -1,7 +1,7 @@
-import EStyleSheet from 'react-native-extended-stylesheet'
+import { StyleSheet } from 'react-native'
 import { SearchBar } from 'react-native-elements'
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
     borderTopWidth: 0,

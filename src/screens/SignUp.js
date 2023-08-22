@@ -15,11 +15,10 @@ import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
-import EStyleSheet from 'react-native-extended-stylesheet'
-import { View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { Button, Text, Divider } from 'react-native-paper'
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     gap: 16,

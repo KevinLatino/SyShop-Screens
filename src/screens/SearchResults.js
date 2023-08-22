@@ -6,10 +6,10 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
-import EStyleSheet from 'react-native-extended-stylesheet'
 import { Slider } from '@miblanchard/react-native-slider'
 import {
     View,
+    StyleSheet,
     ScrollView as ReactNativeScrollView
 } from 'react-native'
 import {
@@ -21,7 +21,7 @@ import {
     Button
 } from 'react-native-paper'
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
     horizontalScrollView: {
         rowGap: 8,
         padding: 5

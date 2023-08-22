@@ -15,10 +15,9 @@ import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
-import EStyleSheet from 'react-native-extended-stylesheet'
-import { View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   fab: {
     position: "absolute",
     top: "75vh",
