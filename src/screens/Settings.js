@@ -7,8 +7,7 @@ import { sessionAtom } from '../context'
 import { checkEmail, makeNotEmptyChecker } from '../utilities/validators'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
-import EStyleSheet from 'react-native-extended-stylesheet'
-import { View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import {
   Text,
   List,
@@ -20,7 +19,7 @@ import {
   Modal
 } from 'react-native-paper'
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   modal: {
     alignItems: "center",
     justifyContent: "space-between",

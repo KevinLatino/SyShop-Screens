@@ -3,11 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { requestServer } from '../utilities/requests'
 import SearchInput from './SearchInput'
 import LoadingSpinner from './LoadingSpinner'
-import EStyleSheet from 'react-native-extended-stylesheet'
-import { View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { List, Chip } from 'react-native-paper'
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   selectedCategoriesList: {
     flexDirection: "row",
     flexWrap: "wrap",

@@ -8,11 +8,10 @@ import { showMessage } from '../components/AppSnackBar'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
-import EStyleSheet from 'react-native-extended-stylesheet'
-import { View, Dimensions } from 'react-native'
+import { View, StyleSheet, Dimensions } from 'react-native'
 import { Button, FAB } from 'react-native-paper'
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     height: Dimensions.get("screen").height, //grasa
     width: Dimensions.get("screen").width //grasa
