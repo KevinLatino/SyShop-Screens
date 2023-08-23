@@ -5,6 +5,8 @@ export default ({ picture, onChangePicture, ...avatarProps }) => {
   const handleChangePicture = async () => {
     const newPicture = await selectPictureFromGallery()
 
+    console.log(newPicture)
+
     onChangePicture(newPicture)
   }
 

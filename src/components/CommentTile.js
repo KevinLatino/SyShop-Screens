@@ -1,3 +1,4 @@
+import Picture from './Picture'
 import { List, Avatar } from 'react-native-paper'
 
 export default ({ comment }) => {

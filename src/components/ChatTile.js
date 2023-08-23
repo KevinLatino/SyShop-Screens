@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
+import Picture from './Picture'
 import { List, TouchableRipple, Avatar } from 'react-native-paper'
 
 const formatLastMessage = (message) => {

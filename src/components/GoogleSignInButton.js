@@ -4,6 +4,7 @@ import configuration from "../configuration"
 import { useEffect } from 'react'
 import { showMessage } from './AppSnackBar'
 import { maybeCompleteAuthSession } from "expo-web-browser"
+import Picture from './Picture'
 import { View, Text, Image, TouchableOpacity } from 'react-native'
   
 maybeCompleteAuthSession()

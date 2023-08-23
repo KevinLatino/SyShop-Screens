@@ -6,6 +6,7 @@ import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
+import Picture from './Picture'
 import { View, StyleSheet } from 'react-native'
 import { Card, Text, Button } from 'react-native-paper'
 

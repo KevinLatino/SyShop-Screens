@@ -15,7 +15,12 @@ import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
-import { View, StyleSheet } from 'react-native'
+import {
+  View,
+  StyleSheet,
+  ScrollView as ReactNativeScrollView
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button, Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -26,6 +31,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 16,
     paddingBottom: 16
+  },
+  inputsContainer: {
+    flex: 1,
+    gap: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 35,
@@ -183,93 +194,97 @@ export default () => {
   }
 
   return (
-    <View style={styles.container}>
-      <PictureInput
-        picture={picture}
-        onChangePicture={setPicture}
-      />
+    <ReactNativeScrollView>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>
+          Registrarse
+        </Text>
 
-      <Text style={styles.title}>
-        Registrarse
-      </Text>
+        <Text style={styles.subtitle}>
+          Ingresa tus datos personales
+        </Text>
 
-      <Text style={styles.subtitle}>
-        Ingresa tus datos personales
-      </Text>
+        <PictureInput
+          picture={picture}
+          onChangePicture={setPicture}
+        />
 
-      <TextField
-        value={form.getField("name")}
-        onChangeText={form.setField("name")}
-        error={form.getError("name")}
-        placeholder="Nombre"
-      />
+        <View style={styles.inputsContainer}>
+          <TextField
+            value={form.getField("name")}
+            onChangeText={form.setField("name")}
+            error={form.getError("name")}
+            placeholder="Nombre"
+          />
 
-      <TextField
-        value={form.getField("first_surname")}
-        onChangeText={form.setField("first_surname")}
-        error={form.getError("first_surname")}
-        placeholder="Primer apellido"
-      />
+          <TextField
+            value={form.getField("first_surname")}
+            onChangeText={form.setField("first_surname")}
+            error={form.getError("first_surname")}
+            placeholder="Primer apellido"
+          />
 
-      <TextField
-        value={form.getField("second_surname")}
-        onChangeText={form.setField("second_surname")}
-        error={form.getError("second_surname")}
-        placeholder="Segundo apellido"
-      />
+          <TextField
+            value={form.getField("second_surname")}
+            onChangeText={form.setField("second_surname")}
+            error={form.getError("second_surname")}
+            placeholder="Segundo apellido"
+          />
 
-      <TextField
-        value={form.getField("phone_number")}
-        onChangeText={form.setField("phone_number")}
-        error={form.getError("phone_number")}
-        placeholder="Número telefónico"
-      />
+          <TextField
+            value={form.getField("phone_number")}
+            onChangeText={form.setField("phone_number")}
+            error={form.getError("phone_number")}
+            placeholder="Número telefónico"
+          />
 
-      {
-        signingUpWithPlainAccount ?
-        (
-          <View>
-            <TextField
-              value={form.getField("email")}
-              onChangeText={form.setField("email")}
-              error={form.getError("email")}
-              placeholder="Correo electrónico"
-            />
+          {
+            signingUpWithPlainAccount ?
+            (
+              <View style={styles.inputsContainer}>
+                <TextField
+                  value={form.getField("email")}
+                  onChangeText={form.setField("email")}
+                  error={form.getError("email")}
+                  placeholder="Correo electrónico"
+                />
 
-            <TextField
-              value={form.getField("password")}
-              onChangeText={form.setField("password")}
-              error={form.getError("password")}
-              placeholder="Contraseña"
-              secureTextEntry
-            />
-          </View>
-        ) :
-        null
-      }
+                <TextField
+                  value={form.getField("password")}
+                  onChangeText={form.setField("password")}
+                  error={form.getError("password")}
+                  placeholder="Contraseña"
+                  secureTextEntry
+                />
+              </View>
+            ) :
+            null
+          }
+        </View>
 
-      <Button
-        style={styles.button}
-        mode="contained"
-        onPress={handleSignUp}
-      >
-        {
-          isSignUpLoading ?
-          <LoadingSpinner /> :
-          "Registrarse"
-        }
-      </Button>
+        <Button
+          style={styles.button}
+          mode="contained"
+          onPress={handleSignUp}
+        >
+          {
+            isSignUpLoading ?
+            <LoadingSpinner /> :
+            "Registrarse"
+          }
+        </Button>
 
-      <Divider style={{ width: "90%" }} />
+        <Divider style={{ width: "90%" }} />
 
-      <Text style={styles.thirdText}>
-        También puedes registrarte con
-      </Text>
+        <Text style={styles.thirdText}>
+          También puedes registrarte con
+        </Text>
 
-      <GoogleSignInButton
-        text="Registrate con Google"
-        onSignIn={fillUpFormWithGoogleData}
-      />
-    </View>
+        <GoogleSignInButton
+          text="Registrate con Google"
+          onSignIn={fillUpFormWithGoogleData}
+        />
+      </SafeAreaView>
+    </ReactNativeScrollView>
   )
 }
