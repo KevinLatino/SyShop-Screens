@@ -163,7 +163,7 @@ export default () => {
         title={chat.user.name}
         left={(props) => {
           return (
-            <Avatar
+            <Avatar.Image
               {...props}
               source={{ uri: chat.user.picture }}
             />

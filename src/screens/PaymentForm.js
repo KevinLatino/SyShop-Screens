@@ -3,7 +3,7 @@ import { useRoute } from '@react-navigation/native'
 import { showMessage } from '../components/AppSnackBar'
 import { CardField, useConfirmPayment } from '@stripe/stripe-react-native'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View } from 'react-native'
+import { View, Dimensions } from 'react-native'
 import { Button } from 'react-native-paper'
 
 const styles = {
@@ -12,8 +12,8 @@ const styles = {
     alignItems: "center",
     gap: 24,
     padding: 8,
-    height: "100vh",
-    width: "100vw"
+    height: Dimensions.get("screen").height,
+    width: Dimensions.get("screen").width
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -26,9 +26,7 @@ const styles = {
 }
 
 export default () => {
-  console.log("foo 1")
   const route = useRoute()
-  console.log("foo 2")
   const [cardDetails, setCardDetails] = useState(null)
   const stripePaymentConfirmer = useConfirmPayment()
 

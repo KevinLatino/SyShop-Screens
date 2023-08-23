@@ -13,13 +13,13 @@ import { Button, FAB } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
-    height: Dimensions.get("screen").height, //grasa
-    width: Dimensions.get("screen").width //grasa
+    height: Dimensions.get("screen").height,
+    width: Dimensions.get("screen").width
   },
   fab: {
     position: 'absolute',
-    right: 10,
-    bottom: 10
+    bottom: Dimensions.get("screen").height * 0.85,
+    left: Dimensions.get("screen").width * 0.8
   }
 })
 

@@ -16,23 +16,21 @@ import { Text, Button, Divider } from 'react-native-paper'
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 22,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 22,
     paddingTop: 16,
     paddingBottom: 16
   },
   Image:{
-    with: 300, //grasa
+    width: 300, //grasa
     height: 300, //grasa
-    display:  "flex",
-    alignItems: "center",
+    alignItems: "center"
   },
   title: {
     fontSize: 50,
     color: "#344340",
     fontWeight: "bold",
-    display: "flex",
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -41,13 +39,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 20,
     color: "gray",
-    display: "flex",
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center"
   },
   button: {
-    display: "flex",
     width: 225,
     textAlign: "center",
     justifyContent: "center",
@@ -58,7 +54,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#344340",
     fontWeight: "bold",
-    display: "flex",
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center"
@@ -154,7 +149,6 @@ export default () => {
 
   return (
     <View style={styles.container}>
-
       <Text style={styles.title}>
         Bienvenido
       </Text>
@@ -162,7 +156,6 @@ export default () => {
       <Text style={styles.subtitle}>
         ¡Inicia sesión para comenzar!
       </Text>
-
 
       <TextField
         value={form.getField("email")}
@@ -201,17 +194,13 @@ export default () => {
       </Text>
 
       {
-        signInWithGoogleAccountMutation.isLoading
-        ? (
-          <LoadingSpinner />
-        )
-        : (
-          <GoogleSignInButton
-            text="Continúa con Google"
-            onSignIn={handleSignInWithGoogleAccount}
-            disabled={isSignInLoading}
-          />
-        )
+        signInWithGoogleAccountMutation.isLoading ?
+        <LoadingSpinner /> :
+        <GoogleSignInButton
+          text="Continúa con Google"
+          onSignIn={handleSignInWithGoogleAccount}
+          disabled={isSignInLoading}
+        />
       }
     </View>
   )
