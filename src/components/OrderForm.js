@@ -6,8 +6,18 @@ import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
-import { View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { Card, Text, Button } from 'react-native-paper'
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 24,
+    padding: 8
+  }
+})
 
 const fetchPost = async (postId, customerId) => {
   const payload = {
@@ -90,7 +100,7 @@ export default () => {
     }
 
     return (
-        <View>
+        <View style={styles.container}>
             <PostTile post={postQuery.result} />
 
             <NumericInput

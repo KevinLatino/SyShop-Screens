@@ -15,19 +15,19 @@ import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    top: "75vh",
-    left: "80vw"
+    top: Dimensions.get("screen").height * 0.75,
+    left: Dimensions.get("screen").width * 0.8
   },
   searchBarModal: {
     position: "absolute",
     top: 0,
     left: 0,
-    width: "100%"
+    flex: 1
   }
 })
 
@@ -58,6 +58,8 @@ const PostsList = () => {
       <LoadingSpinner />
     )
   }
+
+  console.log("AAAAAHHH", postsQuery)
 
   return (
     <ScrollView

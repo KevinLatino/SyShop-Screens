@@ -19,22 +19,19 @@ const styles = {
     paddingRight: 15,
     borderRadius: 25,
     borderWidth: 1,
-    boxShadow: "0 -1px 0 rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .25)",
     borderColor: "#e9e9f2",
     color: "#757575",
-    backgroundColor: "#e6e7e8",
-    width: ""
+    backgroundColor: "#e6e7e8"
   },
   buttonInnerView: {
     flexDirection: "row",
     gap: 15,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   buttonText: {
     fontSize: 16,
     fontWeight: 500,
-    // fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
   }
 }
 

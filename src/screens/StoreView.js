@@ -8,9 +8,15 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
-import { View } from 'react-native'
-import { Appbar } from 'react-native-paper'
+import { View, StyleSheet } from 'react-native'
+import { Appbar, Divider } from 'react-native-paper'
 import { ImageSlider } from 'react-native-image-slider-banner'
+
+const styles = StyleSheet.create({
+  container: {
+    gap: 16
+  }
+})
 
 const fetchStore = async (storeId) => {
   const payload = {
@@ -179,11 +185,13 @@ export default () => {
   const { storeId } = route.params
 
   return (
-    <View>
+    <View style={styles.container}>
       <StoreView
         storeId={storeId}
         customerId={session.customerId}
       />
+
+      <Divider />
 
       <PostsList
         storeId={storeId}

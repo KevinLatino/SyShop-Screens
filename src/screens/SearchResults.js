@@ -18,7 +18,8 @@ import {
     IconButton,
     Text,
     Menu,
-    Button
+    Button,
+    Divider
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -28,7 +29,15 @@ const styles = StyleSheet.create({
     },
     searchedTextDisplay: {
         padding: 8,
+        backgroundColor: "lightgray",
         borderRadius: 10
+    },
+    postsResultsFiltersInnerView: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 8,
+      padding: 8
     }
 })
 
@@ -196,7 +205,7 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
 
     return (
         <View>
-            <View>
+            <View style={styles.postsResultsFiltersInnerView}>
                 <IconButton
                     mode="outlined"
                     icon={sortingIcon}
@@ -323,6 +332,8 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
                 onChangeFilters={handleChangeFilters}
             />
 
+            <Divider />
+
             {
                 postsQuery.isLoading ?
                 <LoadingSpinner /> :
@@ -344,9 +355,13 @@ export default () => {
         <View>
             <SearchedTextDisplay searchedText={text} />
 
+            <Divider />
+
             <SearchedCategoriesScrollView
                 categoriesNames={categoriesNames}
             />
+
+            <Divider />
 
             <Text variant="titleMedium">
                 Tiendas
@@ -355,6 +370,8 @@ export default () => {
             <StoresResultsScrollView
                 searchedText={text}
             />
+
+            <Divider />
 
             <Text variant="titleMedium">
                 Publicaciones

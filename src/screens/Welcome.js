@@ -10,21 +10,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: 'black',
+    backgroundColor: 'black'
   },
   title: {
     fontSize: 35,
     color: '#ffffff',
-    // fontFamily: "'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif",
     fontWeight: 'bold',
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   subtitle: {
     fontSize: 20,
     color: 'gray',
     marginBottom: 40,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   buttonContainer: {
     paddingHorizontal: 20
@@ -32,13 +31,13 @@ const styles = StyleSheet.create({
   button: {
     marginBottom: 20,
     backgroundColor: '#c20000',
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   buttonText: {
     color: 'white',
     textAlign: 'center',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
 });
 

@@ -1,4 +1,4 @@
-import { List , Avatar } from 'react-native-paper'
+import { List, Avatar } from 'react-native-paper'
 
 export default ({ comment }) => {
   return (
@@ -7,9 +7,9 @@ export default ({ comment }) => {
       description={comment.text}
       left={(props) => {
         return (
-          <Avatar
+          <Avatar.Image
             {...props}
-            source={{uri: comment.user_picture}}
+            source={{ uri: comment.user_picture }}
           />
         )
       }}

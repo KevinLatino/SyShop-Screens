@@ -3,7 +3,7 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Dimensions } from 'react-native'
 import {
     Text,
     Avatar,
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 8,
         // width: "fit-content",
-        borderBottom: "1.5px solid darkgray",
+        borderBottom: "1.5px solid darkgray"
     },
     avatar: {
       width: 175,
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
       borderRadius: "50%"
     },
     menuDrawer: {
-      height: "100vh",
+      height: Dimensions.get("screen").height,
       width: "80%"
     }
 })

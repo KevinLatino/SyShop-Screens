@@ -10,9 +10,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     backgroundColor: '#f0f0f0f',
     borderRadius: 20,
-    border: 1,
+    borderWidth: 1,
     borderColor: 'grey',
-    flex: 1 // grasa
+    flex: 1
   },
   input: {
     fontSize: 16
