@@ -7,6 +7,7 @@ import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Slider } from '@miblanchard/react-native-slider'
 import {
     View,
@@ -321,7 +322,7 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
     if (maximumPriceQuery.isLoading) {
         return (
-            <LoadingSpinner />
+            <LoadingSpinner inScreen />
         )
     }
 
@@ -336,7 +337,7 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
             {
                 postsQuery.isLoading ?
-                <LoadingSpinner /> :
+                <LoadingSpinner inScreen /> :
                 <ScrollView
                     data={postsQuery.data}
                     renderItem={(post) => <PostTile post={post} />}
@@ -352,7 +353,7 @@ export default () => {
     const { text, categoriesNames } = route.params
 
     return (
-        <View>
+        <SafeAreaView>
             <SearchedTextDisplay searchedText={text} />
 
             <Divider />
@@ -381,6 +382,6 @@ export default () => {
                 searchedText={text}
                 categoriesNames={categoriesNames}
             />
-        </View>
+        </SafeAreaView>
     )
 }

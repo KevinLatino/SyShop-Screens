@@ -3,6 +3,7 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { List, Text } from 'react-native-paper'
 import DeliveryTile from '../components/DeliveryTile'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -60,7 +61,7 @@ export default () => {
   })
 
   return (
-    <View>
+    <SafeAreaView>
       <Text variant="titleLarge">
         Entregas que esperas
       </Text>
@@ -86,6 +87,6 @@ export default () => {
           <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
         }
       </List.Section>
-    </View>
+    </SafeAreaView>
   )
 }

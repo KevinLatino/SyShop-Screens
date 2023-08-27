@@ -4,6 +4,7 @@ import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import {
     Text,
@@ -31,11 +32,6 @@ const styles = StyleSheet.create({
         gap: 8,
         // width: "fit-content",
         borderBottom: "1.5px solid darkgray"
-    },
-    avatar: {
-      width: 175,
-      height: 175,
-      borderRadius: "50%"
     },
     menuDrawer: {
       height: Dimensions.get("screen").height,
@@ -78,7 +74,7 @@ export default () => {
 
     if (customerQuery.isLoading) {
         return (
-            <LoadingSpinner />
+            <LoadingSpinner inScreen />
         )
     }
 
@@ -91,9 +87,9 @@ export default () => {
     } = customerQuery.data
 
     return (
-      <View style={styles.profileView}>
+      <SafeAreaView style={styles.profileView}>
         <Avatar.Image
-          style={styles.avatar}
+          size={175}
           source={{ uri: formatBase64String(picture) }}
         />
 
@@ -108,6 +104,6 @@ export default () => {
               text={phone_number}
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
 }

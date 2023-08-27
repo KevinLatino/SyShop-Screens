@@ -15,7 +15,8 @@ import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet, Dimensions } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
   fab: {
@@ -55,7 +56,7 @@ const PostsList = () => {
 
   if (postsQuery.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
@@ -84,7 +85,7 @@ export default () => {
   }
 
   return (
-    <View>
+    <SafeAreaView>
       <PostsList />
 
       <Portal>
@@ -104,6 +105,6 @@ export default () => {
         style={styles.fab}
         onPress={() => setIsModalVisible(true)}
       />
-    </View>
+    </SafeAreaView>
   )
 }

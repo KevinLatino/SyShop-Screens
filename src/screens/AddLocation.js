@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
 import SearchInput from '../components/SearchInput'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
 import { TouchableRipple, List } from 'react-native-paper'
 
@@ -92,7 +93,7 @@ export default () => {
   }
 
   return (
-    <View>
+    <SafeAreaView>
       <AddressAutocompleteInput onSelect={setSelectedAddress} />
 
       <Button
@@ -110,6 +111,6 @@ export default () => {
           "Añadir domicilio"
         }
       </Button>
-    </View>
+    </SafeAreaView>
   )
 }

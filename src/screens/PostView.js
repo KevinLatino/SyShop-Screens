@@ -12,6 +12,7 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
 import OrderForm from '../components/OrderForm'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { ImageSlider } from 'react-native-image-slider-banner'
 import { BottomSheet } from 'react-native-btr'
 import { View } from 'react-native'
@@ -107,7 +108,7 @@ const CommentsScrollView = ({ postId }) => {
 
   if (commentsQuery.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
@@ -222,14 +223,14 @@ export default () => {
   )
 
   return (
-    <View>
+    <SafeAreaView>
       {
         postQuery.isLoading ?
-        <LoadingSpinner /> :
+        <LoadingSpinner inScreen /> :
         <PostView post={postQuery.data} />
       }
 
       <CommentsScrollView postId={postId} />
-    </View>
+    </SafeAreaView>
   )
 }

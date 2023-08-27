@@ -8,6 +8,7 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, StyleSheet } from 'react-native'
 import { Appbar, Divider } from 'react-native-paper'
 import { ImageSlider } from 'react-native-image-slider-banner'
@@ -82,7 +83,7 @@ const StoreView = ({ storeId, customerId }) => {
 
   if (storeQuery.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
@@ -164,7 +165,7 @@ const PostsList = ({ storeId, customerId }) => {
 
   if (storePostsQuery.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
@@ -185,7 +186,7 @@ export default () => {
   const { storeId } = route.params
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StoreView
         storeId={storeId}
         customerId={session.customerId}
@@ -197,6 +198,6 @@ export default () => {
         storeId={storeId}
         customerId={session.customerId}
       />
-    </View>
+    </SafeAreaView>
   )
 }

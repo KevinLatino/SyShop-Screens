@@ -96,7 +96,7 @@ export default () => {
 
     if (postQuery.isLoading) {
         return (
-          <LoadingSpinner />
+          <LoadingSpinner inScreen />
         )
     }
 

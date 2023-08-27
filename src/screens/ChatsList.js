@@ -6,6 +6,8 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Text } from 'react-native-paper'
 
 const fetchChats = async (customerId, pageNumber) => {
   const payload = {
@@ -31,15 +33,21 @@ export default () => {
 
   if (chatsQuery.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
   return (
-    <ScrollView
-      data={chatsQuery.data}
-      renderItem={({ item }) => <ChatTile chat={item} />}
-      onEndReached={pageNumber.increment}
-    />
+    <SafeAreaView>
+      <Text variant="titleLarge">
+        Tus mensajes
+      </Text>
+
+      <ScrollView
+        data={chatsQuery.data}
+        renderItem={({ item }) => <ChatTile chat={item} />}
+        onEndReached={pageNumber.increment}
+      />
+    </SafeAreaView>
   )
 }

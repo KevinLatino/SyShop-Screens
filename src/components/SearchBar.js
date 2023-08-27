@@ -3,10 +3,13 @@ import { useQuery } from '@tanstack/react-query'
 import { requestServer } from '../utilities/requests'
 import SearchInput from './SearchInput'
 import LoadingSpinner from './LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Dimensions } from 'react-native'
 import { List, Chip } from 'react-native-paper'
 
 const styles = StyleSheet.create({
+  container: {
+    width: Dimensions.get("screen").width
+  },
   selectedCategoriesList: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -108,7 +111,7 @@ export default ({ onSearchSubmit }) => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <View>
         <SearchInput
           placeholder="Buscar..."

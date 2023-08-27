@@ -10,7 +10,8 @@ import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
 import { formatBase64String } from '../utilities/formatting'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native'
 import { Button, TouchableRipple, Avatar } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -75,7 +76,7 @@ export default () => {
 
   if (customerQuery.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
@@ -99,7 +100,7 @@ export default () => {
   )
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <PictureChooser
         picture={picture}
         onChangePicture={setPicture}
@@ -146,6 +147,6 @@ export default () => {
           "Confirmar"
         }
       </Button>
-    </View>
+    </SafeAreaView>
   )
 }
