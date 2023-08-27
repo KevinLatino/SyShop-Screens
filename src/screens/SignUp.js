@@ -106,6 +106,7 @@ export default () => {
   const navigation = useNavigation()
   const [_, setSession] = useAtom(sessionAtom)
   const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
+  const [useUrlPicture, setUseUrlPicture] = useState(false)
   const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
   const [picture, setPicture] = useState(null)
   const form = useForm(
@@ -181,6 +182,11 @@ export default () => {
     }
   }
 
+  const handleChangePicture = (newPicture) => {
+    setUseUrlPicture(false)
+    setPicture(newPicture)
+  }
+
   const fillUpFormWithGoogleData = (userInformation) => {
     const [firstSurname, secondSurname] = userInformation.family_name.split(" ", 2)
 
@@ -188,9 +194,10 @@ export default () => {
     form.setField("first_surname") (firstSurname)
     form.setField("name") (userInformation.given_name)
 
-    setPicture(userInformation.picture)
-    setSigninUpWithPlainAccount(false)
-    setGoogleUniqueIdentifier(userInformation.id)
+    setPicture(_ => userInformation.picture)
+    setSigninUpWithPlainAccount(_ => false)
+    setUseUrlPicture(_ => true)
+    setGoogleUniqueIdentifier(_ => userInformation.id)
   }
 
   return (
@@ -206,7 +213,8 @@ export default () => {
 
         <PictureInput
           picture={picture}
-          onChangePicture={setPicture}
+          onChangePicture={handleChangePicture}
+          useUrl={useUrlPicture}
         />
 
         <View style={styles.inputsContainer}>
@@ -236,6 +244,7 @@ export default () => {
             onChangeText={form.setField("phone_number")}
             error={form.getError("phone_number")}
             placeholder="Número telefónico"
+            keyboardType="numeric"
           />
 
           {

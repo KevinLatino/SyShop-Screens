@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
+import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import {
@@ -93,7 +94,7 @@ export default () => {
       <View style={styles.profileView}>
         <Avatar.Image
           style={styles.avatar}
-          source={{ uri: picture }}
+          source={{ uri: formatBase64String(picture) }}
         />
 
         <View style={styles.profileViewData}>

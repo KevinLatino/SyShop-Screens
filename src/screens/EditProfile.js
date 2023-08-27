@@ -7,6 +7,7 @@ import { sessionAtom } from '../context'
 import { selectPictureFromGallery } from '../utilities/camera'
 import { showMessage } from '../components/AppSnackBar'
 import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
+import { formatBase64String } from '../utilities/formatting'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { View, StyleSheet } from 'react-native'
@@ -60,7 +61,7 @@ const PictureChooser = ({ picture, onChangePicture }) => {
     <TouchableRipple
       onPress={handlePictureChange}
     >
-      <Avatar.Image source={{ uri: picture }} />
+      <Avatar.Image source={{ uri: formatBase64String(picture) }} />
     </TouchableRipple>
   )
 }

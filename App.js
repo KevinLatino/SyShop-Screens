@@ -69,7 +69,7 @@ const BottomTabNavigator = () => {
       <BottomTab.Screen
         name="Settings"
         options={{
-          tabBarLabel: "Configuración",
+          tabBarLabel: "Ajustes",
           tabBarIcon: "cog"
         }}
       >

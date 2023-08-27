@@ -59,8 +59,6 @@ const PostsList = () => {
     )
   }
 
-  console.log("AAAAAHHH", postsQuery)
-
   return (
     <ScrollView
       data={postsQuery.data}

@@ -1,4 +1,4 @@
-import Picture from './Picture'
+import { formatBase64String } from '../utilities/formatting'
 import { List, Avatar } from 'react-native-paper'
 
 export default ({ comment }) => {
@@ -10,7 +10,7 @@ export default ({ comment }) => {
         return (
           <Avatar.Image
             {...props}
-            source={{ uri: comment.user_picture }}
+            source={{ uri: formatBase64String(comment.user_picture) }}
           />
         )
       }}

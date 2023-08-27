@@ -4,9 +4,9 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
+import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
-import Picture from './Picture'
 import { View, StyleSheet } from 'react-native'
 import { Card, Text, Button } from 'react-native-paper'
 
@@ -51,7 +51,7 @@ const PostTile = ({ post }) => {
     return (
         <Card>
             <Card.Cover
-                source={{ uri: post.multimedia[0] }}
+                source={{ uri: formatBase64String(post.multimedia[0]) }}
             />
 
             <Card.Title

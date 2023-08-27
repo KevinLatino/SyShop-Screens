@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { useCounter} from '../utilities/hooks'
 import { requestServer } from '../utilities/requests'
+import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -56,7 +57,6 @@ const fetchStores = async (searchedName, pageNumber) => {
 }
 
 const fetchPosts = async (text, categories, filters, pageNumber) => {
-  console.log(filters)
   const payload = {
     start: pageNumber * 20,
     amount: 20,
@@ -98,7 +98,7 @@ const CategoryChip = ({ category }) => {
 const StoreTile = ({ store }) => {
     return (
         <Card>
-            <Card.Cover source={{ uri: store.picture }} />
+            <Card.Cover source={{ uri: formatBase64String(store.picture) }} />
 
             <Card.Title title={store.name} />
 
