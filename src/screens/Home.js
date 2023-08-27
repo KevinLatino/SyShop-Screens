@@ -102,8 +102,8 @@ export default () => {
 
       <FAB
         icon="magnify"
-        style={styles.fab}
         onPress={() => setIsModalVisible(true)}
+        style={styles.fab}
       />
     </SafeAreaView>
   )

@@ -69,24 +69,20 @@ const PictureChooser = ({ picture, onChangePicture }) => {
 
 export default () => {
   const [session, _] = useAtom(sessionAtom)
-  const customerQuery = useQuery(
-    "customerToEdit",
-    () => fetchCustomer(session.customerId)
+  const customerQuery = useQuery({
+    queryKey: ["customerToEdit"],
+    queryFn: () => fetchCustomer(session.customerId)
+  })
+  const updateCustomerMutation = useMutation(
+    (customerId, fields) => updateCustomer(customerId, fields)
   )
-
-  if (customerQuery.isLoading) {
-    return (
-      <LoadingSpinner inScreen />
-    )
-  }
-
-  const [picture, setPicture] = useState(customerQuery.data.picture)
+  const [picture, setPicture] = useState(customerQuery.data?.picture)
   const form = useForm(
     {
-      name: customerQuery.data.name,
-      first_surname: customerQuery.data.first_surname,
-      second_surname: customerQuery.data.second_surname,
-      phone_number: customerQuery.data.phone_number
+      name: customerQuery.data?.name,
+      first_surname: customerQuery.data?.first_surname,
+      second_surname: customerQuery.data?.second_surname,
+      phone_number: customerQuery.data?.phone_number
     },
     {
       name: makeNotEmptyChecker("Nombre vacío"),
@@ -95,9 +91,12 @@ export default () => {
       phone_number: checkPhoneNumber
     }
   )
-  const updateCustomerMutation = useMutation(
-    (customerId, fields) => updateCustomer(customerId, fields)
-  )
+
+  if (customerQuery.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>

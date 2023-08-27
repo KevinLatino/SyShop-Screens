@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -9,7 +10,8 @@ import { View, StyleSheet, Dimensions } from 'react-native'
 import {
     Text,
     Avatar,
-    IconButton
+    IconButton,
+    FAB
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -36,6 +38,11 @@ const styles = StyleSheet.create({
     menuDrawer: {
       height: Dimensions.get("screen").height,
       width: "80%"
+    },
+    fab: {
+      position: "absolute",
+      top: Dimensions.get("screen").height * 0.75,
+      left: Dimensions.get("screen").width * 0.8
     }
 })
 
@@ -67,6 +74,7 @@ const InformationEntry = ({ icon, text }) => {
 
 export default () => {
     const [session, _] = useAtom(sessionAtom)
+    const navigation = useNavigation()
     const customerQuery = useQuery({
         queryKey: ["customer"],
         queryFn: () => fetchCustomer(session.customerId)
@@ -86,6 +94,10 @@ export default () => {
         phone_number
     } = customerQuery.data
 
+    const navigateToEditProfile = () => {
+      navigation.navigate("EditProfile")
+    }
+
     return (
       <SafeAreaView style={styles.profileView}>
         <Avatar.Image
@@ -104,6 +116,12 @@ export default () => {
               text={phone_number}
           />
         </View>
+
+        <FAB
+          icon="pencil"
+          onPress={navigateToEditProfile}
+          style={styles.fab}
+        />
       </SafeAreaView>
     )
 }
