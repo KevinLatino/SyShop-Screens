@@ -74,7 +74,7 @@ export default () => {
     queryFn: () => fetchCustomer(session.customerId)
   })
   const updateCustomerMutation = useMutation(
-    (customerId, fields) => updateCustomer(customerId, fields)
+    ({ customerId, fields }) => updateCustomer(customerId, fields)
   )
   const [picture, setPicture] = useState(customerQuery.data?.picture)
   const form = useForm(
@@ -91,6 +91,13 @@ export default () => {
       phone_number: checkPhoneNumber
     }
   )
+
+  const handleUpdate = () => {
+    updateCustomerMutation.mutate({
+      customerId: session.customerId,
+      fields: form.fields
+    })
+  }
 
   if (customerQuery.isLoading) {
     return (
@@ -135,9 +142,7 @@ export default () => {
 
       <Button
         mode="contained"
-        onPress={
-          () => updateCustomerMutation.mutate(session.customerId, form.fields)
-        }
+        onPress={handleUpdate}
         disabled={form.hasErrors()}
       >
         {

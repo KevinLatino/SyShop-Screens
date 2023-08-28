@@ -1,8 +1,8 @@
 import { useNavigation } from '@react-navigation/native'
 import LikeButton from './LikeButton'
+import { View } from 'react-native'
 import {
   Card,
-  Divider,
   Chip,
   Text,
   IconButton
@@ -13,7 +13,14 @@ const styles = {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
+    width: "100%"
+  },
+  contentView: {
+    flexDirection: "column",
+    justifyContent: "space-evenly",
+    alignItems: "flex-start",
+    gap: 12
   },
   categoriesView: {
     flexDirection: "row",
@@ -34,11 +41,13 @@ const formatPostSubtitle = (post) => {
 export default ({ post }) => {
   const navigation = useNavigation()
 
+  console.log("POST", post)
+
   const categoriesChips = post
       .categories
-      .map((category) => {
+      .map((category, index) => {
         return (
-          <Chip mode="flat">
+          <Chip mode="flat" key={index}>
             {category}
           </Chip>
         )
@@ -58,25 +67,21 @@ export default ({ post }) => {
   }
 
   return (
-    <Card
+    <Card elevation={5}
       onPress={navigateToPostView}
     >
       <Card.Cover src={post.multimedia[0]} />
       <Card.Title
         title={post.title}
         subtitle={formatPostSubtitle(post)}
+        titleVariant="titleLarge"
+        subtitleVariant="titleMedium"
       />
       
-      <Card.Content>
-        <Text variant="bodySmall">
+      <Card.Content style={styles.contentView}>
+        <Text variant="bodyLarge">
           {post.description}
         </Text>
-
-        <Text variant="bodyMedium">
-          {post.description}
-        </Text>
-
-        <Divider /> 
 
         <View style={styles.extraInformationView}>
           <View style={styles.categoriesView}>
@@ -96,6 +101,7 @@ export default ({ post }) => {
         />
 
         <LikeButton
+          postId={post.post_id}
           doesCustomerLikePost={post.does_customer_like_post}
         />
       </Card.Actions>

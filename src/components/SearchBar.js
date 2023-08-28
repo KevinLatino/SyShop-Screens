@@ -47,7 +47,6 @@ const SelectedCategoriesList = ({ categoriesNames, onDelete }) => {
           onClose={() => onDelete(categoryName)}
           icon="shape"
           closeIcon="close"
-          // style={{ width: "fit-content" }}
         >
           {categoryName}
         </Chip>

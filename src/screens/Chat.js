@@ -131,7 +131,7 @@ export default () => {
   })
 
   const addMessageMutation = useMutation(
-    (message, customerId, receiverId) => addMessage(
+    ({ message, customerId, receiverId }) => addMessage(
       message,
       customerId,
       receiverId
@@ -144,7 +144,11 @@ export default () => {
       content_type: "text"
     }
 
-    addMessageMutation.mutate(message, session.customerId, chat.user.user_id)
+    addMessageMutation.mutate({
+      message,
+      customerId: session.customerId,
+      receiverId: chat.user.user_id
+    })
   }
 
   const handlePictureMessageChoosen = async () => {

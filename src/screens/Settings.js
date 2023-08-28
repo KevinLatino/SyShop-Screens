@@ -55,6 +55,16 @@ const fetchCustomer = async (customerId) => {
   return customer
 }
 
+const deleteCustomer = async (customerId) => {
+  const payload = {
+    user_id: customerId
+  }
+  const _ = await requestServer(
+    "/users_service/delete_user",
+    payload
+  )
+}
+
 const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
   const [session, _] = useAtom(sessionAtom)
   const customerQuery = useQuery({
@@ -81,7 +91,9 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
 
   if (customerQuery.isLoading || changeEmailMutation.isLoading) {
     return (
-      <LoadingSpinner inScreen />
+      <Portal>
+        <LoadingSpinner inScreen />
+      </Portal>
     )
   }
 
@@ -157,7 +169,9 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
 
   if (changePasswordMutation.isLoading) {
     return (
-      <LoadingSpinner />
+      <Portal>
+        <LoadingSpinner />
+      </Portal>
     )
   }
 
@@ -204,6 +218,89 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
   )
 }
 
+const CloseSessionDialog = ({ isVisible, onDismiss }) => {
+  const [_, setSession] = useAtom(sessionAtom)
+
+  const handleCloseSession = () => {
+    setSession(null)
+  }
+
+  return (
+    <Portal>
+      <Dialog visible={isVisible} onDismiss={onDismiss}>
+        <Dialog.Icon icon="exit-run" />
+
+        <Dialog.Title>
+          ¿Estás seguro?
+        </Dialog.Title>
+
+        <Dialog.Content>
+          <Text variant="bodyLarge">
+            Estás apunto de cerrar sesión
+          </Text>
+        </Dialog.Content>
+
+        <Dialog.Actions>
+          <Button
+            onPress={onDismiss}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            onPress={handleCloseSession}
+          >
+            Confirmar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  )
+}
+
+const DeleteAccountDialog = ({ isVisible, onDismiss }) => {
+  const [session, _] = useAtom(sessionAtom)
+  const deleteCustomerMutation = useMutation(
+    ({ customerId }) => deleteCustomer(customerId)
+  )
+
+  const handleDeleteAccount = () => {
+    deleteCustomerMutation.mutate({ customerId: session.customerId })
+  }
+
+  return (
+    <Portal>
+      <Dialog visible={isVisible} onDismiss={onDismiss}>
+        <Dialog.Icon icon="delete" />
+
+        <Dialog.Title>
+          ¿Estás seguro?
+        </Dialog.Title>
+
+        <Dialog.Content>
+          <Text variant="bodyLarge">
+            No podrás recuperar tu cuenta después de eliminarla
+          </Text>
+        </Dialog.Content>
+
+        <Dialog.Actions>
+          <Button
+            onPress={onDismiss}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            onPress={handleDeleteAccount}
+          >
+            Confirmar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  )
+}
+
 const SettingEntry = ({ heading, icon, onPress, ...listItemProps }) => {
   return (
     <TouchableRipple
@@ -220,13 +317,11 @@ const SettingEntry = ({ heading, icon, onPress, ...listItemProps }) => {
 
 export default () => {
   const navigation = useNavigation()
-  const [_, setSession] = useAtom(sessionAtom)
+  const [session, _] = useAtom(sessionAtom)
   const [isChangeEmailDialogVisible, setIsChangeEmailDialogVisible] = useState(false)
   const [isChangePasswordDialogVisible, setIsChangePasswordDialogVisible] = useState(false)
-
-  const handleCloseSession = () => {
-    setSession(null)
-  }
+  const [isCloseSessionDialogVisible, setIsCloseSessionDialogVisible] = useState(false)
+  const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false)
 
   return (
     <SafeAreaView>
@@ -267,23 +362,42 @@ export default () => {
 
         <SettingEntry
           heading="Cerrar sesión"
-          onPress={handleCloseSession}
+          onPress={() => setIsCloseSessionDialogVisible(true)}
         />
 
         <SettingEntry
           heading="Eliminar cuenta"
+          onPress={() => setIsDeleteAccountDialogVisible(true)}
           titleStyle={{ color: "red" }}
         />
       </List.Section>
 
-      <ChangeEmailDialog
-        isVisible={isChangeEmailDialogVisible}
-        onDismiss={() => setIsChangeEmailDialogVisible(false)}
+      {
+        isChangeEmailDialogVisible ?
+        <ChangeEmailDialog
+          isVisible={isChangeEmailDialogVisible}
+          onDismiss={() => setIsChangeEmailDialogVisible(false)}
+        /> :
+        null
+      }
+
+      {
+        isChangePasswordDialogVisible ?
+        <ChangePasswordDialog
+          isVisible={isChangePasswordDialogVisible}
+          onDismiss={() => setIsChangePasswordDialogVisible(false)}
+        /> :
+        null
+      }
+
+      <CloseSessionDialog
+        isVisible={isCloseSessionDialogVisible}
+        onDismiss={() => setIsCloseSessionDialogVisible(false)}
       />
 
-      <ChangePasswordDialog
-        isVisible={isChangePasswordDialogVisible}
-        onDismiss={() => setIsChangePasswordDialogVisible(false)}
+      <DeleteAccountDialog
+        isVisible={isDeleteAccountDialogVisible}
+        onDismiss={() => setIsDeleteAccountDialogVisible(false)}
       />
     </SafeAreaView>
   )

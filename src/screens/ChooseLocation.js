@@ -57,7 +57,7 @@ const LocationsScrollView = () => {
     queryFn: () => fetchLocations(session.customerId)
   })
   const createDeliveryMutation = useMutation(
-    (saleId, locationId) => createDelivery(saleId, locationId)
+    ({ saleId, locationId }) => createDelivery(saleId, locationId)
   )
   const { saleId } = route.params
 
@@ -66,7 +66,10 @@ const LocationsScrollView = () => {
   }
 
   const handleSubmit = () => {
-    createDeliveryMutation.mutate(saleId, selectedLocation.location_id)
+    createDeliveryMutation.mutate({
+      saleId,
+      locationId: selectedLocation.location_id
+    })
   }
 
   if (createDeliveryMutation.isSuccess) {
@@ -87,12 +90,12 @@ const LocationsScrollView = () => {
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
         renderItem={
-          (location) => {
+          ({ item }) => {
             return (
               <LocationTile
-                location={location}
-                isSelected={location.location_id == selectedLocation.location_id}
-                onPress={() => handleSelect(location)}
+                location={item}
+                isSelected={item.location_id == selectedLocation.location_id}
+                onPress={() => handleSelect(item)}
               />
             )
           }

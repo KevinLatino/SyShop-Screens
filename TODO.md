@@ -1,5 +1,9 @@
 # Ya
-+ [ ] Terminar de implementar la funcionalidad en Settings
++ [ ] Arreglar SearchResults
++ [ ] Arreglar Chat
++ [ ] Arreglar EditProfile
++ [ ] Terminar de implementar la funcionalidad de pago
++ [ ] Arreglar huecos en la navegación
 + [ ] Quitar los colores de los pop-ups
 + [ ] Añadir padding arriba de los screens
 + [ ] Cambiar color y fuente del tema

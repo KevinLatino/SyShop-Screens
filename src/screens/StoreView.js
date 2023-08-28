@@ -5,12 +5,13 @@ import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
+import { formatLocation } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, StyleSheet } from 'react-native'
-import { Appbar, Divider } from 'react-native-paper'
+import { Appbar, Text, Divider } from 'react-native-paper'
 import { ImageSlider } from 'react-native-image-slider-banner'
 
 const styles = StyleSheet.create({
@@ -19,9 +20,10 @@ const styles = StyleSheet.create({
   }
 })
 
-const fetchStore = async (storeId) => {
+const fetchStore = async (storeId, customerId) => {
   const payload = {
-    store_id: storeId
+    store_id: storeId,
+    customer_id: customerId
   }
   const store = await requestServer(
     "/stores_service/get_store_by_id",
@@ -73,32 +75,21 @@ const followStore = async (storeId, customerId) => {
 const StoreView = ({ storeId, customerId }) => {
   const navigation = useNavigation()
   const [session, _] = useAtom(sessionAtom)
+  const [isFollowing, setIsFollowing] = useState(null)
   const storeQuery = useQuery({
     queryKey: ["store"],
-    queryFn: () => fetchStore(storeId)
+    queryFn: () => fetchStore(storeId, session.customerId),
+    onSuccess: () => setIsFollowing(storeQuery.data.does_customer_follow_store)
   })
   const followStoreMutation = useMutation(
-    (storeId, customerId) => followStore(storeId, customerId)
+    ({ storeId, customerId }) => followStore(storeId, customerId)
   )
 
-  if (storeQuery.isLoading) {
-    return (
-      <LoadingSpinner inScreen />
-    )
-  }
-
-  const {
-    name,
-    description,
-    multimedia,
-    location,
-    follower_count,
-    does_customer_follow_store
-  } = storeQuery.data
-  const [isFollowing, setIsFollowing] = useState(does_customer_follow_store)
-
   const handleFollow = () => {
-    followStoreMutation.mutate(storeId, customerId)
+    followStoreMutation.mutate({
+      storeId,
+      customerId
+    })
 
     setIsFollowing(!isFollowing)
   }
@@ -118,6 +109,20 @@ const StoreView = ({ storeId, customerId }) => {
     })
   }
 
+  if (storeQuery.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
+
+  const {
+    name,
+    description,
+    multimedia,
+    location,
+    follower_count
+  } = storeQuery.data
+
   return (
     <View>
       <Appbar.Header>
@@ -129,6 +134,7 @@ const StoreView = ({ storeId, customerId }) => {
         />
 
         <Appbar.Action
+          disabled={isFollowing === null}
           icon={isFollowing ? "check" : "plus"}
           onPress={handleFollow}
         />
@@ -173,7 +179,7 @@ const PostsList = ({ storeId, customerId }) => {
     <ScrollView
       data={storePostsQuery.data}
       keyExtractor={(post) => post.post_id}
-      renderItem={(post) => <PostTile post={post} />}
+      renderItem={({ item }) => <PostTile post={item} />}
       onEndReached={pageNumber.increment}
     />
   )

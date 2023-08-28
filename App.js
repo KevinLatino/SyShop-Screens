@@ -92,6 +92,8 @@ const BottomTabNavigator = () => {
 const App = () => {
   const [session, _] = useAtom(sessionAtom)
 
+  console.log("SESSION", session)
+
   return (
     <StripeProvider
       publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}

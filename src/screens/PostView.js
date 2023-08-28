@@ -15,14 +15,54 @@ import OrderForm from '../components/OrderForm'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ImageSlider } from 'react-native-image-slider-banner'
 import { BottomSheet } from 'react-native-btr'
-import { View } from 'react-native'
+import {
+  View,
+  StyleSheet,
+  ScrollView as ReactNativeScrollView
+} from 'react-native'
 import {
   Text,
+  Divider,
   Button,
   IconButton,
   Chip,
   TouchableRipple
 } from 'react-native-paper'
+
+const styles = StyleSheet.create({
+  informationView: {
+    flexDirection: "column",
+    justifyContent: "space-evenly",
+    alignItems: "flex-start",
+    gap: 16,
+    padding: 16
+  },
+  informationActionsView: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%"
+  },
+  categoriesChipsView: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 8
+  },
+  buyButtonWrapper: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+    padding: 8
+  },
+  commentInputView: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    gap: 16,
+    width: "100%",
+  }
+})
 
 const fetchPost = async (postId, customerId) => {
   const payload = {
@@ -63,15 +103,33 @@ const addPostComment = async (postId, customerId, text) => {
   )
 }
 
+const formatPublicationDate = (isoDateString) => {
+  const date = new Date(isoDateString)
+
+  const day = date.getDay() + 1
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+
+  const formatted = `${day} de ${month} ${year} a las ${hours}:${minutes}`
+
+  return formatted
+}
+
 const CommentInput = ({ postId, customerId }) => {
   const [text, setText] = useState("")
   const queryClient = useQueryClient()
   const addCommentMutation = useMutation(
-    (postId, customerId, text) => addPostComment(postId, customerId, text)
+    ({ postId, customerId, text }) => addPostComment(postId, customerId, text)
   )
 
   const handleCommentSubmit = async () => {
-    addCommentMutation.mutate(postId, customerId, text)
+    addCommentMutation.mutate({
+      postId,
+      customerId,
+      text
+    })
 
     await queryClient.refetchQueries({
       queryKey: ["postComments"]
@@ -79,7 +137,7 @@ const CommentInput = ({ postId, customerId }) => {
   }
 
   return (
-    <View>
+    <View style={styles.commentInputView}>
       <TextField
         value={text}
         onChangeText={setText}
@@ -101,10 +159,10 @@ const CommentInput = ({ postId, customerId }) => {
 const CommentsScrollView = ({ postId }) => {
   const [session, _] = useAtom(sessionAtom)
   const pageNumber = useCounter()
-  const commentsQuery = useQuery(
-    "postComments",
-    () => fetchPostComments(postId, pageNumber.value)
-  )
+  const commentsQuery = useQuery({
+    queryKey: ["postComments"],
+    queryFn: () => fetchPostComments(postId, pageNumber.value)
+  })
 
   if (commentsQuery.isLoading) {
     return (
@@ -122,7 +180,7 @@ const CommentsScrollView = ({ postId }) => {
       <ScrollView
         data={commentsQuery.data}
         keyExtractor={(comment) => comment.comment_id}
-        renderItem={(comment) => <CommentTile comment={comment} />}
+        renderItem={({ item }) => <CommentTile comment={item} />}
         onEndReached={pageNumber.increment}
       />
     </View>
@@ -136,6 +194,7 @@ const PostView = ({ post }) => {
   const categoriesChips = post.categories.map((category) => {
     return (
       <Chip
+        key={category}
         mode="flat"
         icon="shape"
       >
@@ -157,49 +216,56 @@ const PostView = ({ post }) => {
         autoPlay={false}
       />
 
-      <TouchableRipple
-        onPress={navigateToStoreView}
-      >
-        <Text variant="bodySmall">
-          {post.store_name}
+      <View style={styles.informationView}>
+        <TouchableRipple
+          onPress={navigateToStoreView}
+        >
+          <Text
+            variant="titleMedium"
+            style={{ color: "red" }}
+          >
+            {post.store_name}
+          </Text>
+        </TouchableRipple>
+
+        <Text variant="titleLarge">
+          {post.title}
         </Text>
-      </TouchableRipple>
 
-      <Text variant="bodySmall">
-        {post.store_name} ({post.publication_date})
-      </Text>
+        <Text variant="bodyMedium">
+          {formatPublicationDate(post.publication_date)}
+        </Text>
 
-      <Text variant="bodyLarge">
-        {post.title}
-      </Text>
+        <Text variant="bodyLarge">
+          {
+            post.amount > 1 ?
+            `${post.amount} unidades disponibles` :
+            "Solo una unidad disponible"
+          }
+        </Text>
 
-      <Text variant="bodySmall">
-        {
-          post.amount > 1 ?
-          `${post.amount} unidades disponibles` :
-          null
-        }
-      </Text>
+        <Text variant="bodyLarge">
+          {post.description}
+        </Text>
 
-      <Text variant="bodyMedium">
-        {post.description}
-      </Text>
+        <View style={styles.informationActionsView}>
+          <View style={styles.categoriesChipsView}>
+            {categoriesChips}
+          </View>
 
-      <View>
-        <View>
-          {categoriesChips}
+          <LikeButton />
         </View>
 
-        <LikeButton />
+        <View style={styles.buyButtonWrapper}>
+          <Button
+            mode="contained"
+            onPress={() => setIsBottomSheetVisible(true)}
+            style={{ width: "100%" }}
+          >
+            Comprar (₡{post.price})
+          </Button>
+        </View>
       </View>
-
-      <Button
-        mode="contained"
-        onPress={() => setIsBottomSheetVisible(true)}
-      >
-        Comprar (₡{post.price})
-      </Button>
-
 
       <BottomSheet
         visible={isBottomSheetVisible}
@@ -217,20 +283,24 @@ export default () => {
   const [session, _] = useAtom(sessionAtom)
 
   const { postId } = route.params
-  const postQuery = useQuery(
-    "post",
-    () => fetchPost(postId, session.customerId)
-  )
+  const postQuery = useQuery({
+    queryKey: ["post"],
+    queryFn: () => fetchPost(postId, session.customerId)
+  })
 
   return (
-    <SafeAreaView>
-      {
-        postQuery.isLoading ?
-        <LoadingSpinner inScreen /> :
-        <PostView post={postQuery.data} />
-      }
+    <ReactNativeScrollView>
+      <SafeAreaView>
+        {
+          postQuery.isLoading ?
+          <LoadingSpinner inScreen /> :
+          <PostView post={postQuery.data} />
+        }
 
-      <CommentsScrollView postId={postId} />
-    </SafeAreaView>
+        <Divider />
+
+        <CommentsScrollView postId={postId} />
+      </SafeAreaView>
+    </ReactNativeScrollView>
   )
 }

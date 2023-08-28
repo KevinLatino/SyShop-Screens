@@ -7,6 +7,7 @@ import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Slider } from '@miblanchard/react-native-slider'
 import {
@@ -40,6 +41,9 @@ const styles = StyleSheet.create({
       alignItems: "center",
       gap: 8,
       padding: 8
+    },
+    postsResultsContainer: {
+      flex: 1
     }
 })
 
@@ -89,7 +93,6 @@ const CategoryChip = ({ category }) => {
     return (
         <Chip
             icon="shape"
-            // style={{ width: "fit-content" }}
         >
             {category}
         </Chip>
@@ -115,6 +118,11 @@ const StoreTile = ({ store }) => {
 const SearchedTextDisplay = ({ searchedText }) => {
     return (
         <View style={styles.searchedTextDisplay}>
+            <MaterialCommunityIcons
+              icon="magnify"
+              size={32}
+            />
+
             <Text variant="bodyMedium">
                 {searchedText}
             </Text>
@@ -322,12 +330,14 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
     if (maximumPriceQuery.isLoading) {
         return (
+          <View style={styles.postsResultsContainer}>
             <LoadingSpinner inScreen />
+          </View>
         )
     }
 
     return (
-        <View>
+        <View style={styles.postsResultsContainer}>
             <PostsResultsFilters
                 filters={searchFilters}
                 onChangeFilters={handleChangeFilters}
@@ -340,7 +350,7 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
                 <LoadingSpinner inScreen /> :
                 <ScrollView
                     data={postsQuery.data}
-                    renderItem={(post) => <PostTile post={post} />}
+                    renderItem={({ item }) => <PostTile post={item} />}
                     onEndReached={pageNumber.increment}
                 />
             }
@@ -362,8 +372,6 @@ export default () => {
                 categoriesNames={categoriesNames}
             />
 
-            <Divider />
-
             <Text variant="titleMedium">
                 Tiendas
             </Text>
@@ -372,7 +380,7 @@ export default () => {
                 searchedText={text}
             />
 
-            <Divider />
+            <Divider style={{ width: "90%" }} />
 
             <Text variant="titleMedium">
                 Publicaciones

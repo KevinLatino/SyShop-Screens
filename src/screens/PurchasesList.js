@@ -41,7 +41,7 @@ export default () => {
         <ScrollView
             data={purchasesQuery.data}
             keyExtractor={(purchase) => purchase.sale_id}
-            renderItem={(purchase) => <SaleTile purchase={purchase} />}
+            renderItem={({ item }) => <SaleTile purchase={item} />}
             onEndReached={pageNumber.increment}
         />
       </SafeAreaView>

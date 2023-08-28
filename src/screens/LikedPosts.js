@@ -41,7 +41,7 @@ export default () => {
         <ScrollView
             data={likedPostsQuery.data}
             keyExtractor={(post) => post.post_id}
-            renderItem={(post) => <PostTile post={post} />}
+            renderItem={({ item }) => <PostTile post={item} />}
             onEndReached={pageNumber.increment}
         />
       </SafeAreaView>

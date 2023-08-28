@@ -31,23 +31,21 @@ export default () => {
     queryFn: () => fetchChats(session.customerId, pageNumber.value)
   })
 
-  if (chatsQuery.isLoading) {
-    return (
-      <LoadingSpinner inScreen />
-    )
-  }
-
   return (
     <SafeAreaView>
       <Text variant="titleLarge">
         Tus mensajes
       </Text>
 
-      <ScrollView
-        data={chatsQuery.data}
-        renderItem={({ item }) => <ChatTile chat={item} />}
-        onEndReached={pageNumber.increment}
-      />
+      {
+        chatsQuery.isLoading ?
+        <LoadingSpinner inScreen /> :
+        <ScrollView
+          data={chatsQuery.data}
+          renderItem={({ item }) => <ChatTile chat={item} />}
+          onEndReached={pageNumber.increment}
+        />
+      }
     </SafeAreaView>
   )
 }

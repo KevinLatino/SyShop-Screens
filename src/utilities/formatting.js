@@ -3,3 +3,10 @@ export const formatBase64String = (rawString) => {
 
   return string
 }
+
+export const formatLocation = (location) => {
+  const { place_name, street_address, city, state } = location
+  const string = `${place_name}, ${street_address}, ${city}, ${state}`
+
+  return string
+}

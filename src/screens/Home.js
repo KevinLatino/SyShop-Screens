@@ -5,18 +5,18 @@ import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { useNavigation } from '@react-navigation/native'
 import { useCounter } from '../utilities/hooks'
+import ScrollView from '../components/ScrollView'
+import PostTile from '../components/PostTile'
+import SearchBar from '../components/SearchBar'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   Portal,
   Modal,
   Surface,
   FAB
 } from 'react-native-paper'
-import ScrollView from '../components/ScrollView'
-import PostTile from '../components/PostTile'
-import SearchBar from '../components/SearchBar'
-import LoadingSpinner from '../components/LoadingSpinner'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { StyleSheet, Dimensions } from 'react-native'
+import { FlatList, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
   fab: {
@@ -29,6 +29,11 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     flex: 1
+  },
+  postsListContainer: {
+    justifyContent: "space-evenly",
+    gap: 16,
+    padding: 16
   }
 })
 
@@ -54,6 +59,8 @@ const PostsList = () => {
     queryFn: () => fetchPosts(session.customerId, pageNumber.value)
   })
 
+  console.log(postsQuery)
+
   if (postsQuery.isLoading) {
     return (
       <LoadingSpinner inScreen />
@@ -61,11 +68,11 @@ const PostsList = () => {
   }
 
   return (
-    <ScrollView
+    <FlatList
+      contentContainerStyle={styles.postsListContainer}
       data={postsQuery.data}
-      renderItem={(post) => <PostTile post={post} />}
-      onStartReached={postsQuery.refresh}
-      onEndReached={pageNumber.increment}
+      renderItem={({ item }) => <PostTile post={item} />}
+      keyExtractor={(post) => post.post_id}
     />
   )
 }

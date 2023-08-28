@@ -80,7 +80,7 @@ export default () => {
       queryFn: () => fetchPost(postId, session.customerId)
     })
     const createSaleIntentMutation = useMutation(
-      (postId, customerId, amount) => createSaleIntent(postId, customerId, amount)
+      ({ postId, customerId, amount }) => createSaleIntent(postId, customerId, amount)
     )
 
     if (createSaleIntentMutation.isSuccess) {
@@ -92,6 +92,14 @@ export default () => {
           stripeClientSecret
         }
       )
+    }
+
+    const handleBuy = () => {
+      createSaleIntentMutation.mutate({
+        postId,
+        customerId: session.customerId,
+        amount
+      })
     }
 
     if (postQuery.isLoading) {
@@ -113,9 +121,7 @@ export default () => {
 
             <Button
                 mode="outlined"
-                onPress={
-                  () => createSaleIntentMutation.mutate(postId, session.customerId, amount)
-                }
+                onPress={handleBuy}
             >
               {
                 createSaleIntentMutation.isLoading ?
