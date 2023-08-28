@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
+import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
 import { View, StyleSheet } from 'react-native'
@@ -50,7 +51,7 @@ const PostTile = ({ post }) => {
     return (
         <Card>
             <Card.Cover
-                source={{ uri: post.multimedia[0] }}
+                source={{ uri: formatBase64String(post.multimedia[0]) }}
             />
 
             <Card.Title
@@ -79,7 +80,7 @@ export default () => {
       queryFn: () => fetchPost(postId, session.customerId)
     })
     const createSaleIntentMutation = useMutation(
-      (postId, customerId, amount) => createSaleIntent(postId, customerId, amount)
+      ({ postId, customerId, amount }) => createSaleIntent(postId, customerId, amount)
     )
 
     if (createSaleIntentMutation.isSuccess) {
@@ -93,9 +94,17 @@ export default () => {
       )
     }
 
+    const handleBuy = () => {
+      createSaleIntentMutation.mutate({
+        postId,
+        customerId: session.customerId,
+        amount
+      })
+    }
+
     if (postQuery.isLoading) {
         return (
-          <LoadingSpinner />
+          <LoadingSpinner inScreen />
         )
     }
 
@@ -112,9 +121,7 @@ export default () => {
 
             <Button
                 mode="outlined"
-                onPress={
-                  () => createSaleIntentMutation.mutate(postId, session.customerId, amount)
-                }
+                onPress={handleBuy}
             >
               {
                 createSaleIntentMutation.isLoading ?

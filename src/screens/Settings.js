@@ -5,30 +5,67 @@ import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { checkEmail, makeNotEmptyChecker } from '../utilities/validators'
+import { requestServer } from '../utilities/requests'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   Text,
   List,
   Button,
   TouchableRipple,
   Divider,
-  Surface,
   Portal,
-  Modal
+  Dialog
 } from 'react-native-paper'
 
-const styles = StyleSheet.create({
-  modal: {
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 24,
-    padding: 8
+const changeEmail = async (customerId, email, password) => {
+  const payload = {
+    user_id: customerId,
+    email,
+    password
   }
-})
+  const _ = await requestServer(
+    "/users_service/change_user_email",
+    payload
+  )
+}
 
-const ChangeEmailModal = ({ onDismiss }) => {
+const changePassword = async (customerId, oldPassword, newPassword) => {
+  const payload = {
+    user_id: customerId,
+    old_password: oldPassword,
+    new_password: newPassword
+  }
+  const _ = await requestServer(
+    "/users_service/change_user_password",
+    payload
+  )
+}
+
+const fetchCustomer = async (customerId) => {
+  const payload = {
+    customer_id: customerId
+  }
+  const customer = await requestServer(
+    "/customers_service/get_customer_by_id",
+    payload
+  )
+
+  return customer
+}
+
+const deleteCustomer = async (customerId) => {
+  const payload = {
+    user_id: customerId
+  }
+  const _ = await requestServer(
+    "/users_service/delete_user",
+    payload
+  )
+}
+
+const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
   const [session, _] = useAtom(sessionAtom)
   const customerQuery = useQuery({
     queryKey: ["customerChangeEmail"],
@@ -39,7 +76,7 @@ const ChangeEmailModal = ({ onDismiss }) => {
   )
   const form = useForm(
     {
-      email: customerQuery.data.email,
+      email: customerQuery.data?.email,
       password: ""
     },
     {
@@ -52,9 +89,11 @@ const ChangeEmailModal = ({ onDismiss }) => {
     changeEmailMutation.mutate(form.fields)
   }
 
-  if (customerQuery.isLoading) {
+  if (customerQuery.isLoading || changeEmailMutation.isLoading) {
     return (
-      <LoadingSpinner />
+      <Portal>
+        <LoadingSpinner inScreen />
+      </Portal>
     )
   }
 
@@ -63,34 +102,48 @@ const ChangeEmailModal = ({ onDismiss }) => {
   }
 
   return (
-    <Surface elevation={5} style={styles.modal}>
-      <TextField
-        value={form.getField("email")}
-        onChange={form.setField("email")}
-        placeholder="Nuevo correo electrónico"
-      />
+    <Portal>
+      <Dialog visible={isVisible} onDismiss={onDismiss}>
+        <Dialog.Icon icon="email" />
 
-      <TextField
-        value={form.getField("password")}
-        onChange={form.setField("password")}
-        placeholder="Nuevo correo electrónico"
-        secureTextEntry
-      />
+        <Dialog.Title>
+          Cambia tu correo de electrónico
+        </Dialog.Title>
 
-      <Button
-        onPress={handleSubmit}
-      >
-        {
-          changeEmailMutation.isLoading ?
-          <LoadingSpinner /> :
-          "Cambiar correo electrónico"
-        }
-      </Button>
-    </Surface>
+        <Dialog.Content>
+          <TextField
+            value={form.getField("email")}
+            onChange={form.setField("email")}
+            placeholder="Nuevo correo electrónico"
+          />
+
+          <TextField
+            value={form.getField("password")}
+            onChange={form.setField("password")}
+            placeholder="Nuevo correo electrónico"
+            secureTextEntry
+          />
+        </Dialog.Content>
+
+        <Dialog.Actions>
+          <Button
+            onPress={onDismiss}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            onPress={handleSubmit}
+          >
+            Confirmar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
   )
 }
 
-const ChangePasswordModal = ({ onDismiss }) => {
+const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
   const [session, _] = useAtom(sessionAtom)
   const changePasswordMutation = useMutation(
     ({ oldPassword, newPassword }) => changePassword(session.customerId, oldPassword, newPassword)
@@ -110,36 +163,141 @@ const ChangePasswordModal = ({ onDismiss }) => {
     changePasswordMutation.mutate(form.fields)
   }
 
-  if (changeEmailMutation.isSuccess) {
+  if (changePasswordMutation.isSuccess) {
     onDismiss()
   }
 
+  if (changePasswordMutation.isLoading) {
+    return (
+      <Portal>
+        <LoadingSpinner />
+      </Portal>
+    )
+  }
+
   return (
-    <Surface elevation={5} style={styles.modal}>
-      <TextField
-        value={form.getField("newPassword")}
-        onChange={form.setField("newPassword")}
-        placeholder="Nueva contraseña"
-        secureTextEntry
-      />
+    <Portal>
+      <Dialog visible={isVisible} onDismiss={onDismiss}>
+        <Dialog.Icon icon="key" />
 
-      <TextField
-        value={form.getField("oldPassword")}
-        onChange={form.setField("oldPassword")}
-        placeholder="Vieja contraseña"
-        secureTextEntry
-      />
+        <Dialog.Title>
+          Cambia tu contraseña
+        </Dialog.Title>
 
-      <Button
-        onPress={handleSubmit}
-      >
-        {
-          changePasswordMutation.isLoading ?
-          <LoadingSpinner /> :
-          "Cambiar contraseña"
-        }
-      </Button>
-    </Surface>
+        <Dialog.Content>
+          <TextField
+            value={form.getField("newPassword")}
+            onChange={form.setField("newPassword")}
+            placeholder="Nueva contraseña"
+            secureTextEntry
+          />
+
+          <TextField
+            value={form.getField("oldPassword")}
+            onChange={form.setField("oldPassword")}
+            placeholder="Vieja contraseña"
+            secureTextEntry
+          />
+        </Dialog.Content>
+
+        <Dialog.Actions>
+          <Button
+            onPress={onDismiss}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            onPress={handleSubmit}
+          >
+            Confirmar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  )
+}
+
+const CloseSessionDialog = ({ isVisible, onDismiss }) => {
+  const [_, setSession] = useAtom(sessionAtom)
+
+  const handleCloseSession = () => {
+    setSession(null)
+  }
+
+  return (
+    <Portal>
+      <Dialog visible={isVisible} onDismiss={onDismiss}>
+        <Dialog.Icon icon="exit-run" />
+
+        <Dialog.Title>
+          ¿Estás seguro?
+        </Dialog.Title>
+
+        <Dialog.Content>
+          <Text variant="bodyLarge">
+            Estás apunto de cerrar sesión
+          </Text>
+        </Dialog.Content>
+
+        <Dialog.Actions>
+          <Button
+            onPress={onDismiss}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            onPress={handleCloseSession}
+          >
+            Confirmar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  )
+}
+
+const DeleteAccountDialog = ({ isVisible, onDismiss }) => {
+  const [session, _] = useAtom(sessionAtom)
+  const deleteCustomerMutation = useMutation(
+    ({ customerId }) => deleteCustomer(customerId)
+  )
+
+  const handleDeleteAccount = () => {
+    deleteCustomerMutation.mutate({ customerId: session.customerId })
+  }
+
+  return (
+    <Portal>
+      <Dialog visible={isVisible} onDismiss={onDismiss}>
+        <Dialog.Icon icon="delete" />
+
+        <Dialog.Title>
+          ¿Estás seguro?
+        </Dialog.Title>
+
+        <Dialog.Content>
+          <Text variant="bodyLarge">
+            No podrás recuperar tu cuenta después de eliminarla
+          </Text>
+        </Dialog.Content>
+
+        <Dialog.Actions>
+          <Button
+            onPress={onDismiss}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            onPress={handleDeleteAccount}
+          >
+            Confirmar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
   )
 }
 
@@ -159,22 +317,22 @@ const SettingEntry = ({ heading, icon, onPress, ...listItemProps }) => {
 
 export default () => {
   const navigation = useNavigation()
-  const [_, setSession] = useAtom(sessionAtom)
-  const [isChangeEmailModalVisible, setIsChangeEmailModalVisible] = useState(false)
-  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] = useState(false)
-
-  const handleCloseSession = () => {
-    setSession(null)
-  }
+  const [session, _] = useAtom(sessionAtom)
+  const [isChangeEmailDialogVisible, setIsChangeEmailDialogVisible] = useState(false)
+  const [isChangePasswordDialogVisible, setIsChangePasswordDialogVisible] = useState(false)
+  const [isCloseSessionDialogVisible, setIsCloseSessionDialogVisible] = useState(false)
+  const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false)
 
   return (
-    <View>
+    <SafeAreaView>
       <Text variant="titleLarge">
         Configuración
       </Text>
 
       <List.Section>
-        <List.Subheader title="Historial" />
+        <List.Subheader>
+          Historial
+        </List.Subheader>
 
         <SettingEntry
           title="Publicaciones que te gustan"
@@ -186,52 +344,61 @@ export default () => {
           onPress={() => navigation.navigate("PurchasesList")}
         />
 
-        <List.Subheader title="Tu cuenta" />
+        <List.Subheader>
+          Cuenta
+        </List.Subheader>
 
         <Divider />
 
         <SettingEntry
           heading="Cambiar correo electrónico"
-          onPress={() => setIsChangeEmailModalVisible(true)}
+          onPress={() => setIsChangeEmailDialogVisible(true)}
         />
 
         <SettingEntry
           heading="Cambiar contraseña"
-          onPress={() => setIsChangePasswordModalVisible(true)}
+          onPress={() => setIsChangePasswordDialogVisible(true)}
         />
 
         <SettingEntry
           heading="Cerrar sesión"
-          onPress={handleCloseSession}
+          onPress={() => setIsCloseSessionDialogVisible(true)}
         />
 
         <SettingEntry
           heading="Eliminar cuenta"
-          style={{ color: "red" }}
+          onPress={() => setIsDeleteAccountDialogVisible(true)}
+          titleStyle={{ color: "red" }}
         />
       </List.Section>
 
-      <Portal>
-        <Modal
-          visible={isChangeEmailModalVisible}
-          onDismiss={() => setIsChangeEmailModalVisible(false)}
-        >
-          <ChangeEmailModal
-            onDismiss={() => setIsChangeEmailModalVisible(false)}
-          />
-        </Modal>
-      </Portal>
+      {
+        isChangeEmailDialogVisible ?
+        <ChangeEmailDialog
+          isVisible={isChangeEmailDialogVisible}
+          onDismiss={() => setIsChangeEmailDialogVisible(false)}
+        /> :
+        null
+      }
 
-      <Portal>
-        <Modal
-          visible={isChangePasswordModalVisible}
-          onDismiss={() => setIsChangePasswordModalVisible(false)}
-        >
-          <ChangePasswordModal
-            onDismiss={() => setIsChangePasswordModalVisible(false)}
-          />
-        </Modal>
-      </Portal>
-    </View>
+      {
+        isChangePasswordDialogVisible ?
+        <ChangePasswordDialog
+          isVisible={isChangePasswordDialogVisible}
+          onDismiss={() => setIsChangePasswordDialogVisible(false)}
+        /> :
+        null
+      }
+
+      <CloseSessionDialog
+        isVisible={isCloseSessionDialogVisible}
+        onDismiss={() => setIsCloseSessionDialogVisible(false)}
+      />
+
+      <DeleteAccountDialog
+        isVisible={isDeleteAccountDialogVisible}
+        onDismiss={() => setIsDeleteAccountDialogVisible(false)}
+      />
+    </SafeAreaView>
   )
 }

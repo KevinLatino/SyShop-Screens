@@ -6,6 +6,7 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import SaleTile from '../components/SaleTile'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const fetchPurchases = async (customerId, pageNumber) => {
     const payload = {
@@ -31,16 +32,18 @@ export default () => {
 
     if (purchasesQuery.isLoading) {
         return (
-            <LoadingSpinner />
+            <LoadingSpinner inScreen />
         )
     }
 
     return (
+      <SafeAreaView>
         <ScrollView
             data={purchasesQuery.data}
             keyExtractor={(purchase) => purchase.sale_id}
-            renderItem={(purchase) => <SaleTile purchase={purchase} />}
+            renderItem={({ item }) => <SaleTile purchase={item} />}
             onEndReached={pageNumber.increment}
         />
+      </SafeAreaView>
     )
 }

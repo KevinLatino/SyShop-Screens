@@ -1,26 +1,17 @@
-import { launchImageLibrary } from 'react-native-image-picker'
-
-export class GalleryError extends Error {
-    constructor(errorCode) {
-        this.errorCode = errorCode
-    }
-}
+import * as ImagePicker from 'expo-image-picker'
 
 export const selectPictureFromGallery = async () => {
-    const chooseResponse = await launchImageLibrary({
-        includeBase64: true,
-        selectionLimit: 1
+    const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        base64: true,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images
     })
 
-    if (chooseResponse.didCancel) {
-        return null
+    if (result.canceled) {
+        throw Error("Image selection was cancelled")
     }
 
-    if (chooseResponse.errorCode !== null) {
-        throw GalleryError(chooseResponse.errorCode)
-    }
+    const picture = result.assets[0].base64
 
-    const [image] = chooseResponse.assets
-
-    return image.base64
+    return picture
 }

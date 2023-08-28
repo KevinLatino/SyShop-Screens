@@ -1,9 +1,10 @@
+import { formatBase64String } from '../utilities/formatting'
 import { Card } from 'react-native-paper'
 
 export default ({ sale }) => {
     return (
         <Card>
-            <Card.Cover source={{ uri: sale.post.multimedia[0] }}/>
+            <Card.Cover source={{ uri: formatBase64String(sale.post.multimedia[0]) }}/>
 
             <Card.Title
                 title={`${sale.post.title} (₡ ${sale.post.price})`}

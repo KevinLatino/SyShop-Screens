@@ -7,9 +7,11 @@ import { sessionAtom } from '../context'
 import { selectPictureFromGallery } from '../utilities/camera'
 import { showMessage } from '../components/AppSnackBar'
 import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
+import { formatBase64String } from '../utilities/formatting'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native'
 import { Button, TouchableRipple, Avatar } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -60,31 +62,27 @@ const PictureChooser = ({ picture, onChangePicture }) => {
     <TouchableRipple
       onPress={handlePictureChange}
     >
-      <Avatar.Image source={{ uri: picture }} />
+      <Avatar.Image source={{ uri: formatBase64String(picture) }} />
     </TouchableRipple>
   )
 }
 
 export default () => {
   const [session, _] = useAtom(sessionAtom)
-  const customerQuery = useQuery(
-    "customerToEdit",
-    () => fetchCustomer(session.customerId)
+  const customerQuery = useQuery({
+    queryKey: ["customerToEdit"],
+    queryFn: () => fetchCustomer(session.customerId)
+  })
+  const updateCustomerMutation = useMutation(
+    ({ customerId, fields }) => updateCustomer(customerId, fields)
   )
-
-  if (customerQuery.isLoading) {
-    return (
-      <LoadingSpinner />
-    )
-  }
-
-  const [picture, setPicture] = useState(customerQuery.data.picture)
+  const [picture, setPicture] = useState(customerQuery.data?.picture)
   const form = useForm(
     {
-      name: customerQuery.data.name,
-      first_surname: customerQuery.data.first_surname,
-      second_surname: customerQuery.data.second_surname,
-      phone_number: customerQuery.data.phone_number
+      name: customerQuery.data?.name,
+      first_surname: customerQuery.data?.first_surname,
+      second_surname: customerQuery.data?.second_surname,
+      phone_number: customerQuery.data?.phone_number
     },
     {
       name: makeNotEmptyChecker("Nombre vacío"),
@@ -93,12 +91,22 @@ export default () => {
       phone_number: checkPhoneNumber
     }
   )
-  const updateCustomerMutation = useMutation(
-    (customerId, fields) => updateCustomer(customerId, fields)
-  )
+
+  const handleUpdate = () => {
+    updateCustomerMutation.mutate({
+      customerId: session.customerId,
+      fields: form.fields
+    })
+  }
+
+  if (customerQuery.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <PictureChooser
         picture={picture}
         onChangePicture={setPicture}
@@ -134,9 +142,7 @@ export default () => {
 
       <Button
         mode="contained"
-        onPress={
-          () => updateCustomerMutation.mutate(session.customerId, form.fields)
-        }
+        onPress={handleUpdate}
         disabled={form.hasErrors()}
       >
         {
@@ -145,6 +151,6 @@ export default () => {
           "Confirmar"
         }
       </Button>
-    </View>
+    </SafeAreaView>
   )
 }

@@ -6,6 +6,7 @@ import { sessionAtom } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import { selectPictureFromGallery } from '../utilities/camera'
+import { formatBase64String } from '../utilities/formatting'
 import Images from 'react-native-chat-images'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -130,7 +131,7 @@ export default () => {
   })
 
   const addMessageMutation = useMutation(
-    (message, customerId, receiverId) => addMessage(
+    ({ message, customerId, receiverId }) => addMessage(
       message,
       customerId,
       receiverId
@@ -143,7 +144,11 @@ export default () => {
       content_type: "text"
     }
 
-    addMessageMutation.mutate(message, session.customerId, chat.user.user_id)
+    addMessageMutation.mutate({
+      message,
+      customerId: session.customerId,
+      receiverId: chat.user.user_id
+    })
   }
 
   const handlePictureMessageChoosen = async () => {
@@ -165,7 +170,7 @@ export default () => {
           return (
             <Avatar.Image
               {...props}
-              source={{ uri: chat.user.picture }}
+              source={{ uri: formatBase64String(chat.user.picture) }}
             />
         )}}
       />

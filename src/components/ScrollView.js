@@ -7,8 +7,6 @@ export default ({ data, ...flatListProps }) => {
       data={data}
       {...flatListProps}
       ItemSeparatorComponent={<Divider />}
-      onStartReachedThreshold={0.1}
-      onEndReachedThreshold={0.1}
     />
   )
 }

@@ -8,6 +8,7 @@ import { showMessage } from '../components/AppSnackBar'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import { Button, FAB } from 'react-native-paper'
 
@@ -56,7 +57,7 @@ const LocationsScrollView = () => {
     queryFn: () => fetchLocations(session.customerId)
   })
   const createDeliveryMutation = useMutation(
-    (saleId, locationId) => createDelivery(saleId, locationId)
+    ({ saleId, locationId }) => createDelivery(saleId, locationId)
   )
   const { saleId } = route.params
 
@@ -65,7 +66,10 @@ const LocationsScrollView = () => {
   }
 
   const handleSubmit = () => {
-    createDeliveryMutation.mutate(saleId, selectedLocation.location_id)
+    createDeliveryMutation.mutate({
+      saleId,
+      locationId: selectedLocation.location_id
+    })
   }
 
   if (createDeliveryMutation.isSuccess) {
@@ -76,7 +80,7 @@ const LocationsScrollView = () => {
 
   if (locationsQuery.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
@@ -86,12 +90,12 @@ const LocationsScrollView = () => {
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
         renderItem={
-          (location) => {
+          ({ item }) => {
             return (
               <LocationTile
-                location={location}
-                isSelected={location.location_id == selectedLocation.location_id}
-                onPress={() => handleSelect(location)}
+                location={item}
+                isSelected={item.location_id == selectedLocation.location_id}
+                onPress={() => handleSelect(item)}
               />
             )
           }
@@ -120,7 +124,7 @@ export default () => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <LocationsScrollView />
 
       <FAB
@@ -128,6 +132,6 @@ export default () => {
         style={styles.fab}
         onPress={navigateToAddLocation}
       />
-    </View>
+    </SafeAreaView>
   )
 }

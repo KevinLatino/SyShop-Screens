@@ -3,9 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { useCounter} from '../utilities/hooks'
 import { requestServer } from '../utilities/requests'
+import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Slider } from '@miblanchard/react-native-slider'
 import {
     View,
@@ -38,6 +41,9 @@ const styles = StyleSheet.create({
       alignItems: "center",
       gap: 8,
       padding: 8
+    },
+    postsResultsContainer: {
+      flex: 1
     }
 })
 
@@ -56,7 +62,6 @@ const fetchStores = async (searchedName, pageNumber) => {
 }
 
 const fetchPosts = async (text, categories, filters, pageNumber) => {
-  console.log(filters)
   const payload = {
     start: pageNumber * 20,
     amount: 20,
@@ -88,7 +93,6 @@ const CategoryChip = ({ category }) => {
     return (
         <Chip
             icon="shape"
-            // style={{ width: "fit-content" }}
         >
             {category}
         </Chip>
@@ -98,7 +102,7 @@ const CategoryChip = ({ category }) => {
 const StoreTile = ({ store }) => {
     return (
         <Card>
-            <Card.Cover source={{ uri: store.picture }} />
+            <Card.Cover source={{ uri: formatBase64String(store.picture) }} />
 
             <Card.Title title={store.name} />
 
@@ -114,6 +118,11 @@ const StoreTile = ({ store }) => {
 const SearchedTextDisplay = ({ searchedText }) => {
     return (
         <View style={styles.searchedTextDisplay}>
+            <MaterialCommunityIcons
+              icon="magnify"
+              size={32}
+            />
+
             <Text variant="bodyMedium">
                 {searchedText}
             </Text>
@@ -321,12 +330,14 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
     if (maximumPriceQuery.isLoading) {
         return (
-            <LoadingSpinner />
+          <View style={styles.postsResultsContainer}>
+            <LoadingSpinner inScreen />
+          </View>
         )
     }
 
     return (
-        <View>
+        <View style={styles.postsResultsContainer}>
             <PostsResultsFilters
                 filters={searchFilters}
                 onChangeFilters={handleChangeFilters}
@@ -336,10 +347,10 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
             {
                 postsQuery.isLoading ?
-                <LoadingSpinner /> :
+                <LoadingSpinner inScreen /> :
                 <ScrollView
                     data={postsQuery.data}
-                    renderItem={(post) => <PostTile post={post} />}
+                    renderItem={({ item }) => <PostTile post={item} />}
                     onEndReached={pageNumber.increment}
                 />
             }
@@ -352,7 +363,7 @@ export default () => {
     const { text, categoriesNames } = route.params
 
     return (
-        <View>
+        <SafeAreaView>
             <SearchedTextDisplay searchedText={text} />
 
             <Divider />
@@ -360,8 +371,6 @@ export default () => {
             <SearchedCategoriesScrollView
                 categoriesNames={categoriesNames}
             />
-
-            <Divider />
 
             <Text variant="titleMedium">
                 Tiendas
@@ -371,7 +380,7 @@ export default () => {
                 searchedText={text}
             />
 
-            <Divider />
+            <Divider style={{ width: "90%" }} />
 
             <Text variant="titleMedium">
                 Publicaciones
@@ -381,6 +390,6 @@ export default () => {
                 searchedText={text}
                 categoriesNames={categoriesNames}
             />
-        </View>
+        </SafeAreaView>
     )
 }

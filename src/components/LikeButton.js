@@ -22,11 +22,11 @@ export default ({ postId, doesCustomerLikePost }) => {
   const [session, _] = useAtom(sessionAtom)
   const [isLiked, setIsLiked] = useState(doesCustomerLikePost)
   const likePostMutation = useMutation(
-    (postId, customerId) => likePost(postId, customerId)
+    ({ postId, customerId }) => likePost(postId, customerId)
   )
 
   const handleLike = () => {
-    likePostMutation.mutate(postId, session.customerId)
+    likePostMutation.mutate({ postId, customerId: session.customerId })
 
     setIsLiked(!isLiked)
   }

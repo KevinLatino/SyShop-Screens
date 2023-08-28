@@ -1,13 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
+import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import {
     Text,
     Avatar,
-    IconButton
+    IconButton,
+    FAB
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -31,14 +35,14 @@ const styles = StyleSheet.create({
         // width: "fit-content",
         borderBottom: "1.5px solid darkgray"
     },
-    avatar: {
-      width: 175,
-      height: 175,
-      borderRadius: "50%"
-    },
     menuDrawer: {
       height: Dimensions.get("screen").height,
       width: "80%"
+    },
+    fab: {
+      position: "absolute",
+      top: Dimensions.get("screen").height * 0.75,
+      left: Dimensions.get("screen").width * 0.8
     }
 })
 
@@ -70,6 +74,7 @@ const InformationEntry = ({ icon, text }) => {
 
 export default () => {
     const [session, _] = useAtom(sessionAtom)
+    const navigation = useNavigation()
     const customerQuery = useQuery({
         queryKey: ["customer"],
         queryFn: () => fetchCustomer(session.customerId)
@@ -77,7 +82,7 @@ export default () => {
 
     if (customerQuery.isLoading) {
         return (
-            <LoadingSpinner />
+            <LoadingSpinner inScreen />
         )
     }
 
@@ -89,11 +94,15 @@ export default () => {
         phone_number
     } = customerQuery.data
 
+    const navigateToEditProfile = () => {
+      navigation.navigate("EditProfile")
+    }
+
     return (
-      <View style={styles.profileView}>
+      <SafeAreaView style={styles.profileView}>
         <Avatar.Image
-          style={styles.avatar}
-          source={{ uri: picture }}
+          size={175}
+          source={{ uri: formatBase64String(picture) }}
         />
 
         <View style={styles.profileViewData}>
@@ -107,6 +116,12 @@ export default () => {
               text={phone_number}
           />
         </View>
-      </View>
+
+        <FAB
+          icon="pencil"
+          onPress={navigateToEditProfile}
+          style={styles.fab}
+        />
+      </SafeAreaView>
     )
 }

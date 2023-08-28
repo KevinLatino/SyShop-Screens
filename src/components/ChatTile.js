@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
+import { formatBase64String } from '../utilities/formatting'
 import { List, TouchableRipple, Avatar } from 'react-native-paper'
 
 const formatLastMessage = (message) => {
@@ -16,7 +17,7 @@ const formatLastMessage = (message) => {
 const UserChatPicture = ({ user }) => {
   return (
     <Avatar.Image
-      source={{ uri: user.picture }}
+      source={{ uri: formatBase64String(user.picture) }}
     />
   )
 }

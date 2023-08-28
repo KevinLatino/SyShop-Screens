@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
 import SearchInput from '../components/SearchInput'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
 import { TouchableRipple, List } from 'react-native-paper'
 
@@ -84,22 +85,27 @@ export default () => {
   const [session, _] = useAtom(sessionAtom)
   const navigation = useNavigation()
   const addLocationMutation = useMutation(
-    (selectedAddress, customerId) => addLocation(selectedAddress, customerId)
+    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId)
   )
+
+  const handleAdd = () => {
+    addLocationMutation.mutate({
+      selectedAddress,
+      customerId: session.customerId
+    })
+  }
 
   if (addLocationMutation.isSuccess) {
     navigation.navigate("ChooseLocation")
   }
 
   return (
-    <View>
+    <SafeAreaView>
       <AddressAutocompleteInput onSelect={setSelectedAddress} />
 
       <Button
         mode="contained"
-        onPress={
-          () => addLocationMutation.mutate(selectedAddress, session.customerId)
-        }
+        onPress={handleAdd}
         disabled={
           selectedAddress === null || addLocationMutation.isLoading
         }
@@ -110,6 +116,6 @@ export default () => {
           "Añadir domicilio"
         }
       </Button>
-    </View>
+    </SafeAreaView>
   )
 }

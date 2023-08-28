@@ -6,6 +6,7 @@ import { requestServer } from '../utilities/requests'
 import LoadingSpinner from "../components/LoadingSpinner"
 import ScrollView from "../components/ScrollView"
 import PostTile from "../components/PostTile"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const fetchLikedPosts = async (customerId, pageNumber) => {
     const payload = {
@@ -31,16 +32,18 @@ export default () => {
 
     if (likedPostsQuery.isLoading) {
         return (
-            <LoadingSpinner />
+            <LoadingSpinner inScreen />
         )
     }
 
     return (
+      <SafeAreaView>
         <ScrollView
             data={likedPostsQuery.data}
             keyExtractor={(post) => post.post_id}
-            renderItem={(post) => <PostTile post={post} />}
+            renderItem={({ item }) => <PostTile post={item} />}
             onEndReached={pageNumber.increment}
         />
+      </SafeAreaView>
     )
 }

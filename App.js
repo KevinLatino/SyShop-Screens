@@ -69,7 +69,7 @@ const BottomTabNavigator = () => {
       <BottomTab.Screen
         name="Settings"
         options={{
-          tabBarLabel: "Configuración",
+          tabBarLabel: "Ajustes",
           tabBarIcon: "cog"
         }}
       >
@@ -92,123 +92,125 @@ const BottomTabNavigator = () => {
 const App = () => {
   const [session, _] = useAtom(sessionAtom)
 
+  console.log("SESSION", session)
+
   return (
     <StripeProvider
       publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}
     >
       <QueryClientProvider client={queryClient}>
-        <PaperProvider>
+        <PaperProvider theme={{ dark: true }}>
           <SafeAreaProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                initialRouteName={(session === null) ? "Welcome" : "Home"}
-                screenOptions={{
-                  headerShown: false
-                }}
-              >
-                <Stack.Screen
-                  name="Welcome"
+              <NavigationContainer>
+                <Stack.Navigator
+                  initialRouteName={(session === null) ? "Welcome" : "Home"}
+                  screenOptions={{
+                    headerShown: false
+                  }}
                 >
-                  {() => <Welcome />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="Welcome"
+                  >
+                    {() => <Welcome />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="SignIn"
-                >
-                  {() => <SignIn />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="SignIn"
+                  >
+                    {() => <SignIn />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="SignUp"
-                >
-                  {() => <SignUp />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="SignUp"
+                  >
+                    {() => <SignUp />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="Home"
-                >
-                  {() => <BottomTabNavigator />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="Home"
+                  >
+                    {() => <BottomTabNavigator />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="DeliveriesList"
-                >
-                  {() => <DeliveriesList />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="DeliveriesList"
+                  >
+                    {() => <DeliveriesList />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="ChatsList"
-                >
-                  {() => <ChatsList />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="ChatsList"
+                  >
+                    {() => <ChatsList />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="Chat"
-                >
-                  {() => <Chat />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="Chat"
+                  >
+                    {() => <Chat />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="ChooseLocation"
-                >
-                  {() => <ChooseLocation />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="ChooseLocation"
+                  >
+                    {() => <ChooseLocation />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="AddLocation"
-                >
-                  {() => <AddLocation />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="AddLocation"
+                  >
+                    {() => <AddLocation />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="SearchResults"
-                >
-                  {() => <SearchResults />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="SearchResults"
+                  >
+                    {() => <SearchResults />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="PostView"
-                >
-                  {() => <PostView />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="PostView"
+                  >
+                    {() => <PostView />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="EditProfile"
-                >
-                  {() => <EditProfile />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="EditProfile"
+                  >
+                    {() => <EditProfile />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="LikedPosts"
-                >
-                  {() => <LikedPosts />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="LikedPosts"
+                  >
+                    {() => <LikedPosts />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="PurchasesList"
-                >
-                  {() => <PurchasesList />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="PurchasesList"
+                  >
+                    {() => <PurchasesList />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="ProfileView"
-                >
-                  {() => <ProfileView />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="ProfileView"
+                  >
+                    {() => <ProfileView />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="StoreView"
-                >
-                  {() => <StoreView />}
-                </Stack.Screen>
+                  <Stack.Screen
+                    name="StoreView"
+                  >
+                    {() => <StoreView />}
+                  </Stack.Screen>
 
-                <Stack.Screen
-                  name="PaymentForm"
-                >
-                  {() => <PaymentForm />}
-                </Stack.Screen>
-              </Stack.Navigator>
-            </NavigationContainer>
+                  <Stack.Screen
+                    name="PaymentForm"
+                  >
+                    {() => <PaymentForm />}
+                  </Stack.Screen>
+                </Stack.Navigator>
+              </NavigationContainer>
           </SafeAreaProvider>
 
           <AppSnackBar />
