@@ -1,5 +1,4 @@
 # Ya
-+ [ ] Arreglar SearchResults
 + [ ] Arreglar Chat
 + [ ] Arreglar EditProfile
 + [ ] Terminar de implementar la funcionalidad de pago

@@ -48,6 +48,11 @@ export default () => {
     }
   }
 
+  const disabled =
+    (stripePaymentConfirmer.loading) ||
+    (cardDetails === null) ||
+    (!cardDetails.complete)
+
   return (
     <View style={styles.container}>
       <CardField
@@ -60,9 +65,7 @@ export default () => {
 
       <Button
         onPress={handlePay}
-        disabled={
-          stripePaymentConfirmer.loading || !cardDetails.complete
-        }
+        disabled={disabled}
       >
         {
           stripePaymentConfirmer.loading ?

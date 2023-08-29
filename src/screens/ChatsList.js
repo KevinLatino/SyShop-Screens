@@ -7,6 +7,7 @@ import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { View, Dimensions } from 'react-native'
 import { Text } from 'react-native-paper'
 
 const fetchChats = async (customerId, pageNumber) => {
@@ -39,7 +40,11 @@ export default () => {
 
       {
         chatsQuery.isLoading ?
-        <LoadingSpinner inScreen /> :
+        (
+          <View style={{ height: Dimensions.get("window").height }}>
+            <LoadingSpinner inScreen />
+          </View>
+        ) :
         <ScrollView
           data={chatsQuery.data}
           renderItem={({ item }) => <ChatTile chat={item} />}

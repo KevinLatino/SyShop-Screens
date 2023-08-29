@@ -7,16 +7,20 @@ import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
-import { View, StyleSheet } from 'react-native'
-import { Card, Text, Button } from 'react-native-paper'
+import { View, StyleSheet, Dimensions } from 'react-native'
+import { Surface, Card, Text, Button } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "space-between",
+    position: "absolute",
+    top: Dimensions.get("screen").height * 0.1,
+    left: Dimensions.get("screen").width * 0.1,
+    justifyContent: "center",
     alignItems: "center",
     gap: 24,
-    padding: 8
+    padding: 16,
+    borderRadius: 12,
+    width: Dimensions.get("screen").width * 0.8
   }
 })
 
@@ -49,7 +53,7 @@ const createSaleIntent = async (postId, customerId, amount) => {
 
 const PostTile = ({ post }) => {
     return (
-        <Card>
+        <Card style={{ width: "95%" }}>
             <Card.Cover
                 source={{ uri: formatBase64String(post.multimedia[0]) }}
             />
@@ -109,18 +113,18 @@ export default () => {
     }
 
     return (
-        <View style={styles.container}>
-            <PostTile post={postQuery.result} />
+        <Surface elevation={5} style={styles.container}>
+            <PostTile post={postQuery.data} />
 
             <NumericInput
                 minValue={1}
-                maxValue={postQuery.result.amount}
+                maxValue={postQuery.data.amount}
                 value={amount}
                 onChange={setAmount}
             />
 
             <Button
-                mode="outlined"
+                mode="contained"
                 onPress={handleBuy}
             >
               {
@@ -129,6 +133,6 @@ export default () => {
                 "Comprar"
               }
             </Button>
-        </View>
+        </Surface>
     )
 }

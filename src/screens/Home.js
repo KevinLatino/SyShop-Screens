@@ -16,7 +16,12 @@ import {
   Surface,
   FAB
 } from 'react-native-paper'
-import { FlatList, StyleSheet, Dimensions } from 'react-native'
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  Dimensions
+} from 'react-native'
 
 const styles = StyleSheet.create({
   fab: {
@@ -63,7 +68,9 @@ const PostsList = () => {
 
   if (postsQuery.isLoading) {
     return (
-      <LoadingSpinner inScreen />
+      <View style={{ height: Dimensions.get("screen").height }}>
+        <LoadingSpinner inScreen />
+      </View>
     )
   }
 

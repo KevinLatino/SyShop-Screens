@@ -7,7 +7,6 @@ import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Slider } from '@miblanchard/react-native-slider'
 import {
@@ -17,6 +16,7 @@ import {
 } from 'react-native'
 import {
     Card,
+    List,
     Chip,
     IconButton,
     Text,
@@ -26,21 +26,33 @@ import {
 } from 'react-native-paper'
 
 const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      rowGap: 16,
+    },
     horizontalScrollView: {
-        rowGap: 8,
-        padding: 5
+        padding: 16
     },
     searchedTextDisplay: {
         padding: 8,
-        backgroundColor: "lightgray",
-        borderRadius: 10
+        backgroundColor: "red"
+    },
+    searchedTextWrapper: {
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      rowGap: 8,
+      padding: 1,
+      backgroundColor: "white",
+      borderRadius: 12
     },
     postsResultsFiltersInnerView: {
       flexDirection: "row",
-      justifyContent: "space-between",
+      justifyContent: "flex-end",
       alignItems: "center",
       gap: 8,
-      padding: 8
+      padding: 20
+
     },
     postsResultsContainer: {
       flex: 1
@@ -101,7 +113,7 @@ const CategoryChip = ({ category }) => {
 
 const StoreTile = ({ store }) => {
     return (
-        <Card>
+        <Card style={{ width: 250 }} elevation={5}>
             <Card.Cover source={{ uri: formatBase64String(store.picture) }} />
 
             <Card.Title title={store.name} />
@@ -117,16 +129,18 @@ const StoreTile = ({ store }) => {
 
 const SearchedTextDisplay = ({ searchedText }) => {
     return (
-        <View style={styles.searchedTextDisplay}>
-            <MaterialCommunityIcons
+      <View style={styles.searchedTextDisplay}>
+        <View style={styles.searchedTextWrapper}>
+            <IconButton
               icon="magnify"
-              size={32}
+              disabled
             />
 
             <Text variant="bodyMedium">
                 {searchedText}
             </Text>
         </View>
+      </View>
     )
 }
 
@@ -141,7 +155,6 @@ const SortingPropertyFilterMenu = ({
       "Precio"
     const anchor = (
         <Button
-            mode="outlined"
             onPress={() => setIsVisible(true)}
         >
           {anchorText}
@@ -213,7 +226,11 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
     }
 
     return (
-        <View>
+        <View style={{ flex: 1, padding: 16 }}>
+            <Text variant="titleMedium">
+              Ordernar por
+            </Text>
+
             <View style={styles.postsResultsFiltersInnerView}>
                 <IconButton
                     mode="outlined"
@@ -229,7 +246,11 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
                 />
             </View>
 
-            <View>
+            <Text variant="titleMedium">
+              Rango de precio
+            </Text>
+
+            <View style={{ padding: 20 }}>
                 <Slider
                     minimumValue={0}
                     maximumValue={maximumPrice}
@@ -288,7 +309,6 @@ const StoresResultsScrollView = ({ searchedText }) => {
         <ReactNativeScrollView
             horizontal
             style={styles.horizontalScrollView}
-            onEndReached={pageNumber.increment}
         >
             {storesCards}
         </ReactNativeScrollView>
@@ -345,15 +365,17 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
             <Divider />
 
-            {
-                postsQuery.isLoading ?
-                <LoadingSpinner inScreen /> :
-                <ScrollView
-                    data={postsQuery.data}
-                    renderItem={({ item }) => <PostTile post={item} />}
-                    onEndReached={pageNumber.increment}
-                />
-            }
+            <View style={{ flex: 1 }}>
+              {
+                  postsQuery.isLoading ?
+                  <LoadingSpinner inScreen /> :
+                  <ScrollView
+                      data={postsQuery.data}
+                      renderItem={({ item }) => <PostTile post={item} />}
+                      onEndReached={pageNumber.increment}
+                  />
+              }
+            </View>
         </View>
     )
 }
@@ -363,33 +385,31 @@ export default () => {
     const { text, categoriesNames } = route.params
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.container}>
             <SearchedTextDisplay searchedText={text} />
 
-            <Divider />
+            <ReactNativeScrollView>
+              <SearchedCategoriesScrollView
+                  categoriesNames={categoriesNames}
+              />
 
-            <SearchedCategoriesScrollView
-                categoriesNames={categoriesNames}
-            />
+              <Text variant="titleLarge">
+                  Tiendas
+              </Text>
 
-            <Text variant="titleMedium">
-                Tiendas
-            </Text>
+              <StoresResultsScrollView
+                  searchedText={text}
+              />
 
-            <StoresResultsScrollView
-                searchedText={text}
-            />
+              <Text variant="titleLarge">
+                  Publicaciones
+              </Text>
 
-            <Divider style={{ width: "90%" }} />
-
-            <Text variant="titleMedium">
-                Publicaciones
-            </Text>
-
-            <PostsResults
-                searchedText={text}
-                categoriesNames={categoriesNames}
-            />
+              <PostsResults
+                  searchedText={text}
+                  categoriesNames={categoriesNames}
+              />
+            </ReactNativeScrollView>
         </SafeAreaView>
     )
 }
