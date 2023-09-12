@@ -41,8 +41,6 @@ const formatPostSubtitle = (post) => {
 export default ({ post }) => {
   const navigation = useNavigation()
 
-  console.log("POST", post)
-
   const categoriesChips = post
       .categories
       .map((category, index) => {

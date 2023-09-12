@@ -64,8 +64,6 @@ const PostsList = () => {
     queryFn: () => fetchPosts(session.customerId, pageNumber.value)
   })
 
-  console.log(postsQuery)
-
   if (postsQuery.isLoading) {
     return (
       <View style={{ height: Dimensions.get("screen").height }}>

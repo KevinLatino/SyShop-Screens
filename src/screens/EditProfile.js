@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { requestServer } from '../utilities/requests'
 import { useForm } from '../utilities/hooks'
@@ -69,20 +69,12 @@ const PictureChooser = ({ picture, onChangePicture }) => {
 
 export default () => {
   const [session, _] = useAtom(sessionAtom)
-  const customerQuery = useQuery({
-    queryKey: ["customerToEdit"],
-    queryFn: () => fetchCustomer(session.customerId)
-  })
-  const updateCustomerMutation = useMutation(
-    ({ customerId, fields }) => updateCustomer(customerId, fields)
-  )
-  const [picture, setPicture] = useState(customerQuery.data?.picture)
   const form = useForm(
     {
-      name: customerQuery.data?.name,
-      first_surname: customerQuery.data?.first_surname,
-      second_surname: customerQuery.data?.second_surname,
-      phone_number: customerQuery.data?.phone_number
+      name: null,
+      first_surname: null,
+      second_surname: null,
+      phone_number: null
     },
     {
       name: makeNotEmptyChecker("Nombre vacío"),
@@ -91,6 +83,23 @@ export default () => {
       phone_number: checkPhoneNumber
     }
   )
+
+  const fillFormFields = () => {
+    form.setField("name")(customerQuery.data.name)
+    form.setField("first_surname")(customerQuery.data.first_surname)
+    form.setField("second_surname")(customerQuery.data.second_surname)
+    form.setField("phone_number")(customerQuery.data.phone_number)
+  }
+
+  const customerQuery = useQuery({
+    queryKey: ["customerToEdit"],
+    queryFn: () => fetchCustomer(session.customerId),
+    onSuccess: () => fillFormFields()
+  })
+  const updateCustomerMutation = useMutation(
+    ({ customerId, fields }) => updateCustomer(customerId, fields)
+  )
+  const [picture, setPicture] = useState(customerQuery.data?.picture)
 
   const handleUpdate = () => {
     updateCustomerMutation.mutate({
