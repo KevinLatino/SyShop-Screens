@@ -72,7 +72,7 @@ const PostTile = ({ post }) => {
     )
 }
 
-export default () => {
+export default ({ onSuccess }) => {
     const [amount, setAmount] = useState(1)
     const [session, _] = useAtom(sessionAtom)
     const navigation = useNavigation()
@@ -83,12 +83,11 @@ export default () => {
       queryKey: ["postToBuy"],
       queryFn: () => fetchPost(postId, session.customerId)
     })
-    const createSaleIntentMutation = useMutation(
-      ({ postId, customerId, amount }) => createSaleIntent(postId, customerId, amount)
-    )
 
-    if (createSaleIntentMutation.isSuccess) {
-      const stripeClientSecret = createSaleIntentMutation.data.stripe_client_secret
+    const handleSuccess = (data) => {
+      const stripeClientSecret = data.stripe_client_secret
+
+      onSuccess()
 
       navigation.navigate(
         "PaymentForm",
@@ -97,6 +96,14 @@ export default () => {
         }
       )
     }
+
+    const createSaleIntentMutation = useMutation(
+      ({ postId, customerId, amount }) => createSaleIntent(postId, customerId, amount),
+      {
+        onSuccess: handleSuccess
+      }
+    )
+
 
     const handleBuy = () => {
       createSaleIntentMutation.mutate({

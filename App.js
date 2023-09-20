@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler'
 import { useAtom } from 'jotai'
 import { sessionAtom } from './src/context'
+import { Suspense } from 'react'
 import { PaperProvider } from 'react-native-paper'
 import { StripeProvider } from '@stripe/stripe-react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -89,12 +90,11 @@ const BottomTabNavigator = () => {
   )
 }
 
-const App = () => {
+const Main = () => {
   const [session, _] = useAtom(sessionAtom)
 
-  console.log("SESSION", session)
-
   return (
+
     <StripeProvider
       publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}
     >
@@ -220,4 +220,10 @@ const App = () => {
   )
 }
 
-export default App
+export default () => {
+  return (
+    <Suspense fallback={null}>
+      <Main />
+    </Suspense>
+  )
+}

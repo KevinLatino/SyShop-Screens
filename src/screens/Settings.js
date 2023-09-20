@@ -9,6 +9,7 @@ import { requestServer } from '../utilities/requests'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { View } from 'react-native'
 import {
   Text,
   List,
@@ -67,16 +68,22 @@ const deleteCustomer = async (customerId) => {
 
 const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
   const [session, _] = useAtom(sessionAtom)
+
+  const fillFormFields = (data) => {
+    form.setField("email")(data.email)
+  }
+
   const customerQuery = useQuery({
     queryKey: ["customerChangeEmail"],
-    queryFn: () => fetchCustomer(session.customerId)
+    queryFn: () => fetchCustomer(session.customerId),
+    onSuccess: fillFormFields
   })
   const changeEmailMutation = useMutation(
     ({ email, password }) => changeEmail(session.customerId, email, password)
   )
   const form = useForm(
     {
-      email: customerQuery.data?.email,
+      email: "",
       password: ""
     },
     {
@@ -120,7 +127,7 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
           <TextField
             value={form.getField("password")}
             onChange={form.setField("password")}
-            placeholder="Nuevo correo electrónico"
+            placeholder="Contraseña"
             secureTextEntry
           />
         </Dialog.Content>
@@ -220,9 +227,12 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
 
 const CloseSessionDialog = ({ isVisible, onDismiss }) => {
   const [_, setSession] = useAtom(sessionAtom)
+  const navigation = useNavigation()
 
   const handleCloseSession = () => {
     setSession(null)
+
+    navigation.navigate("Welcome")
   }
 
   return (
@@ -260,12 +270,15 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
 
 const DeleteAccountDialog = ({ isVisible, onDismiss }) => {
   const [session, _] = useAtom(sessionAtom)
+  const navigation = useNavigation()
   const deleteCustomerMutation = useMutation(
     ({ customerId }) => deleteCustomer(customerId)
   )
 
   const handleDeleteAccount = () => {
     deleteCustomerMutation.mutate({ customerId: session.customerId })
+
+    navigation.navigate("Welcome")
   }
 
   return (
@@ -322,6 +335,16 @@ export default () => {
   const [isChangePasswordDialogVisible, setIsChangePasswordDialogVisible] = useState(false)
   const [isCloseSessionDialogVisible, setIsCloseSessionDialogVisible] = useState(false)
   const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false)
+  const customerQuery = useQuery({
+    queryKey: ["customerSettings"],
+    queryFn: () => fetchCustomer(session.customerId)
+  })
+
+  if (customerQuery.isLoading) {
+    return (
+      <LoadingSpinner />
+    )
+  }
 
   return (
     <SafeAreaView>
@@ -350,15 +373,23 @@ export default () => {
 
         <Divider />
 
-        <SettingEntry
-          heading="Cambiar correo electrónico"
-          onPress={() => setIsChangeEmailDialogVisible(true)}
-        />
+        {
+          customerQuery.data.account_type === "PlainAccount" ?
+          (
+            <View>
+              <SettingEntry
+                heading="Cambiar correo electrónico"
+                onPress={() => setIsChangeEmailDialogVisible(true)}
+              />
 
-        <SettingEntry
-          heading="Cambiar contraseña"
-          onPress={() => setIsChangePasswordDialogVisible(true)}
-        />
+              <SettingEntry
+                heading="Cambiar contraseña"
+                onPress={() => setIsChangePasswordDialogVisible(true)}
+              />
+            </View>
+          ) :
+          null
+        }
 
         <SettingEntry
           heading="Cerrar sesión"

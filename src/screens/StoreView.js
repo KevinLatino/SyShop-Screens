@@ -79,7 +79,7 @@ const StoreView = ({ storeId, customerId }) => {
   const storeQuery = useQuery({
     queryKey: ["store"],
     queryFn: () => fetchStore(storeId, session.customerId),
-    onSuccess: () => setIsFollowing(storeQuery.data.does_customer_follow_store)
+    onSuccess: (data) => setIsFollowing(data.does_customer_follow_store)
   })
   const followStoreMutation = useMutation(
     ({ storeId, customerId }) => followStore(storeId, customerId)
@@ -100,11 +100,13 @@ const StoreView = ({ storeId, customerId }) => {
     const chatId = optionalChat?.chat_id
 
     navigation.navigate("Chat", {
-      chat_id: chatId,
-      user: {
-        user_id: storeId,
-        name: storeQuery.data.name,
-        picture: storeQuery.data.picture
+      chat: {
+        chat_id: chatId,
+        user: {
+          user_id: storeId,
+          name: storeQuery.data.name,
+          picture: storeQuery.data.picture
+        }
       }
     })
   }

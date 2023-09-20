@@ -94,7 +94,7 @@ const fetchPostComments = async (postId, pageNumber) => {
 const addPostComment = async (postId, customerId, text) => {
   const payload = {
     post_id: postId,
-    customer_id: customerId,
+    user_id: customerId,
     text
   }
   const _ = await requestServer(
@@ -253,7 +253,10 @@ const PostView = ({ post }) => {
             {categoriesChips}
           </View>
 
-          <LikeButton />
+          <LikeButton
+            postId={post.post_id}
+            doesCustomerLikePost={post.does_customer_like_post}
+          />
         </View>
 
         <View style={styles.buyButtonWrapper}>
@@ -272,7 +275,7 @@ const PostView = ({ post }) => {
         onBackButtonPress={() => setIsBottomSheetVisible(false)}
         onBackdropPress={() => setIsBottomSheetVisible(false)}
       >
-        <OrderForm />
+        <OrderForm onSuccess={() => setIsBottomSheetVisible(false)} />
       </BottomSheet>
     </View>
   )
