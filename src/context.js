@@ -1,4 +1,5 @@
-import { atomWithStorage } from 'jotai/utils'
-// import AsyncStorage from '@react-native-async-storage/async-storage'
+import { atomWithStorage, createJSONStorage } from 'jotai/utils'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const sessionAtom = atomWithStorage("session", null)
+const storage = createJSONStorage(() => AsyncStorage)
+export const sessionAtom = atomWithStorage("session", null, storage)

@@ -8,7 +8,7 @@ import { Button } from 'react-native-paper'
 
 const styles = {
   container: {
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     gap: 24,
     padding: 8,
@@ -31,6 +31,7 @@ export default () => {
   const stripePaymentConfirmer = useConfirmPayment()
 
   const { stripeClientSecret } = route.params
+  console.log(stripeClientSecret)
   const cardPlaceholders = {
     number: '4242 4242 4242 4242',
   }
@@ -39,17 +40,29 @@ export default () => {
     const response = await stripePaymentConfirmer.confirmPayment(
       stripeClientSecret,
       {
-        paymentMethodType: "Card"
+        paymentMethodType: "Card",
+        paymentMethodData: {
+          billingDetails: {
+            email: "gabrielcoronel0303@gmail.com"
+          }
+        }
       }
     )
+
+    console.log(response.error)
 
     if (response.error !== null) {
       showMessage("No se pudo procesar tu pago, inténtalo más tarde")
     }
   }
 
+  const disabled =
+    (stripePaymentConfirmer.loading) ||
+    (cardDetails === null) ||
+    (!cardDetails.complete)
+
   return (
-    <View style={styles.container}>
+    <View>
       <CardField
         postalCodeEnabled={true}
         placeholders={cardPlaceholders}
@@ -59,10 +72,9 @@ export default () => {
       />
 
       <Button
+        mode="contained"
         onPress={handlePay}
-        disabled={
-          stripePaymentConfirmer.loading || !cardDetails.complete
-        }
+        disabled={disabled}
       >
         {
           stripePaymentConfirmer.loading ?

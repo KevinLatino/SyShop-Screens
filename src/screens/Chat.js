@@ -127,7 +127,8 @@ export default () => {
       const allMessages = GiftedChat.append(messages, fetchedMessages)
 
       setMessages(allMessages)
-    }
+    },
+    enabled: chat.chat_id !== undefined
   })
 
   const addMessageMutation = useMutation(
@@ -138,7 +139,7 @@ export default () => {
     )
   )
 
-  const handleTextMessageSend = ({ text }) => {
+  const handleTextMessageSend = ([{ text }]) => {
     const message = {
       content: text,
       content_type: "text"
@@ -163,24 +164,12 @@ export default () => {
   }
 
   return (
-    <View>
-      <List.Item
-        title={chat.user.name}
-        left={(props) => {
-          return (
-            <Avatar.Image
-              {...props}
-              source={{ uri: formatBase64String(chat.user.picture) }}
-            />
-        )}}
-      />
-
       <GiftedChat
         placeholder='Mensaje...'
         renderBubble={(props) => <MessageBubble {...props} />}
         renderSend={(props) => <SendTextMessageButton {...props} />}
         renderActions={(props) => <SendImageMessageButton {...props} />}
-        scrollToBottomComponent={<ScrollDownButton />}
+        scrollToBottomComponent={(props) => <ScrollDownButton {...props} />}
 
         messages={messages}
         onSend={handleTextMessageSend}
@@ -188,12 +177,11 @@ export default () => {
         user={{
           user_id: session.customerId
         }}
-        onLoadEarlier={pageNumber.increment}
+        onLoadEarlier={chat.chat_id !== undefined ? pageNumber.increment : undefined}
 
         infiniteScroll
         loadEarlier={false}
         scrollToBottom
       />
-    </View>
   )
 }
