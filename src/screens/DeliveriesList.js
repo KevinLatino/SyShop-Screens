@@ -3,10 +3,10 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { List, Text } from 'react-native-paper'
 import DeliveryTile from '../components/DeliveryTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import Screen from '../components/Screen'
 
 const fetchActiveDeliveries = async (customerId) => {
   const payload = {
@@ -61,7 +61,7 @@ export default () => {
   })
 
   return (
-    <SafeAreaView>
+    <Screen>
       <Text variant="titleLarge">
         Entregas que esperas
       </Text>
@@ -87,6 +87,6 @@ export default () => {
           <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
         }
       </List.Section>
-    </SafeAreaView>
+    </Screen>
   )
 }

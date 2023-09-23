@@ -121,7 +121,12 @@ const CommentInput = ({ postId, customerId }) => {
   const [text, setText] = useState("")
   const queryClient = useQueryClient()
   const addCommentMutation = useMutation(
-    ({ postId, customerId, text }) => addPostComment(postId, customerId, text)
+    ({ postId, customerId, text }) => addPostComment(postId, customerId, text),
+    {
+      onSuccess: () => queryClient.refetchQueries({
+        queryKey: ["postComments"]
+      })
+    }
   )
 
   const handleCommentSubmit = async () => {
@@ -129,10 +134,6 @@ const CommentInput = ({ postId, customerId }) => {
       postId,
       customerId,
       text
-    })
-
-    await queryClient.refetchQueries({
-      queryKey: ["postComments"]
     })
   }
 
@@ -189,7 +190,6 @@ const CommentsScrollView = ({ postId }) => {
 
 const PostView = ({ post }) => {
   const navigation = useNavigation()
-  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false)
 
   const categoriesChips = post.categories.map((category) => {
     return (
@@ -206,6 +206,12 @@ const PostView = ({ post }) => {
   const navigateToStoreView = () => {
     navigation.navigate("StoreView", {
       storeId: post.store_id
+    })
+  }
+
+  const navigateToOrder = () => {
+    navigation.navigate("Order", {
+      postId: post.post_id
     })
   }
 
@@ -262,21 +268,13 @@ const PostView = ({ post }) => {
         <View style={styles.buyButtonWrapper}>
           <Button
             mode="contained"
-            onPress={() => setIsBottomSheetVisible(true)}
+            onPress={navigateToOrder}
             style={{ width: "100%" }}
           >
             Comprar (₡{post.price})
           </Button>
         </View>
       </View>
-
-      <BottomSheet
-        visible={isBottomSheetVisible}
-        onBackButtonPress={() => setIsBottomSheetVisible(false)}
-        onBackdropPress={() => setIsBottomSheetVisible(false)}
-      >
-        <OrderForm onSuccess={() => setIsBottomSheetVisible(false)} />
-      </BottomSheet>
     </View>
   )
 }

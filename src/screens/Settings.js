@@ -8,7 +8,7 @@ import { checkEmail, makeNotEmptyChecker } from '../utilities/validators'
 import { requestServer } from '../utilities/requests'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
 import { View } from 'react-native'
 import {
   Text,
@@ -347,7 +347,7 @@ export default () => {
   }
 
   return (
-    <SafeAreaView>
+    <Screen>
       <Text variant="titleLarge">
         Configuración
       </Text>
@@ -430,6 +430,6 @@ export default () => {
         isVisible={isDeleteAccountDialogVisible}
         onDismiss={() => setIsDeleteAccountDialogVisible(false)}
       />
-    </SafeAreaView>
+    </Screen>
   )
 }

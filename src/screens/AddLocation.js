@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
 import SearchInput from '../components/SearchInput'
@@ -84,8 +84,14 @@ export default () => {
   const [selectedAddress, setSelectedAddress] = useState(null)
   const [session, _] = useAtom(sessionAtom)
   const navigation = useNavigation()
+  const queryClient = useQueryClient()
   const addLocationMutation = useMutation(
-    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId)
+    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId),
+    {
+      onSuccess: () => queryClient.refetchQueries({
+        queryKey: ["customerLocations"]
+      })
+    }
   )
 
   const handleAdd = () => {
