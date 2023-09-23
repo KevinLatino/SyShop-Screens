@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
+import { useStripe } from '@stripe/stripe-react-native'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -72,11 +73,11 @@ const PostTile = ({ post }) => {
     )
 }
 
-export default ({ onSuccess }) => {
+export default () => {
     const [amount, setAmount] = useState(1)
     const [session, _] = useAtom(sessionAtom)
-    const navigation = useNavigation()
     const route = useRoute()
+    const { initPaymentSheet, presentPaymentSheet } = useStripe()
 
     const { postId } = route.params
     const postQuery = useQuery({
@@ -84,17 +85,25 @@ export default ({ onSuccess }) => {
       queryFn: () => fetchPost(postId, session.customerId)
     })
 
-    const handleSuccess = (data) => {
+    const handleSuccess = async (data) => {
       const stripeClientSecret = data.stripe_client_secret
 
-      onSuccess()
+      console.log(stripeClientSecret)
 
-      navigation.navigate(
-        "PaymentForm",
-        {
-          stripeClientSecret
-        }
-      )
+      console.log(postQuery.data.store_name)
+
+      const paymentSheet = await initPaymentSheet({
+        merchantDisplayName: postQuery.data.store_name,
+        paymentIntentClientSecret: stripeClientSecret,
+        style: "automatic",
+        customFlow: false
+      })
+
+      console.log("INIT ERROR", paymentSheet.error)
+
+      const response = await presentPaymentSheet()
+
+      console.log("PRESENT", response)
     }
 
     const createSaleIntentMutation = useMutation(
@@ -120,6 +129,7 @@ export default ({ onSuccess }) => {
     }
 
     return (
+      <View>
         <Surface elevation={5} style={styles.container}>
             <PostTile post={postQuery.data} />
 
@@ -141,5 +151,6 @@ export default ({ onSuccess }) => {
               }
             </Button>
         </Surface>
+      </View>
     )
 }

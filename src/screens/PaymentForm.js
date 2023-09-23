@@ -40,12 +40,7 @@ export default () => {
     const response = await stripePaymentConfirmer.confirmPayment(
       stripeClientSecret,
       {
-        paymentMethodType: "Card",
-        paymentMethodData: {
-          billingDetails: {
-            email: "gabrielcoronel0303@gmail.com"
-          }
-        }
+        paymentMethodType: "Card"
       }
     )
 
@@ -62,7 +57,7 @@ export default () => {
     (!cardDetails.complete)
 
   return (
-    <View>
+    <View style={styles.container}>
       <CardField
         postalCodeEnabled={true}
         placeholders={cardPlaceholders}

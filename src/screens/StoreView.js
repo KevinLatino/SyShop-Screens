@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
@@ -76,13 +76,19 @@ const StoreView = ({ storeId, customerId }) => {
   const navigation = useNavigation()
   const [session, _] = useAtom(sessionAtom)
   const [isFollowing, setIsFollowing] = useState(null)
+  const queryClient = useQueryClient()
   const storeQuery = useQuery({
     queryKey: ["store"],
     queryFn: () => fetchStore(storeId, session.customerId),
     onSuccess: (data) => setIsFollowing(data.does_customer_follow_store)
   })
   const followStoreMutation = useMutation(
-    ({ storeId, customerId }) => followStore(storeId, customerId)
+    ({ storeId, customerId }) => followStore(storeId, customerId),
+    {
+      onSuccess: () => queryClient.refetchQueries({
+        queryKey: ["feedPosts"]
+      })
+    }
   )
 
   const handleFollow = () => {

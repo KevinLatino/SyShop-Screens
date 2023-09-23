@@ -11,17 +11,16 @@ import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
 import { formatBase64String } from '../utilities/formatting'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
 import { StyleSheet } from 'react-native'
 import { Button, TouchableRipple, Avatar } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    columnGap: 16,
-    padding: 20
+    gap: 32
   }
 })
 
@@ -132,7 +131,7 @@ export default () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Screen style={styles.container}>
       <PictureChooser
         picture={picture}
         onChangePicture={setPicture}
@@ -177,6 +176,6 @@ export default () => {
           "Confirmar"
         }
       </Button>
-    </SafeAreaView>
+    </Screen>
   )
 }

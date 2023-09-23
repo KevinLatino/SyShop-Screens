@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -52,12 +52,18 @@ const LocationsScrollView = () => {
   const route = useRoute()
   const [selectedLocation, setSelectedLocation] = useState()
   const [session, _] = useAtom(sessionAtom)
+  const queryClient = useQueryClient()
   const locationsQuery = useQuery({
     queryKey: ["customerLocations"],
     queryFn: () => fetchLocations(session.customerId)
   })
   const createDeliveryMutation = useMutation(
-    ({ saleId, locationId }) => createDelivery(saleId, locationId)
+    ({ saleId, locationId }) => createDelivery(saleId, locationId),
+    {
+      onSuccess: () => queryClient.refetchQueries({
+        queryKey: ["activeDeliveries"]
+      })
+    }
   )
   const { saleId } = route.params
 

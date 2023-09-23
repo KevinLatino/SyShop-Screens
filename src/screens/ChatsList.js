@@ -6,6 +6,7 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import Screen from '../components/Screen'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, Dimensions } from 'react-native'
 import { Text } from 'react-native-paper'
@@ -33,7 +34,7 @@ export default () => {
   })
 
   return (
-    <SafeAreaView>
+    <Screen>
       <Text variant="titleLarge">
         Tus mensajes
       </Text>
@@ -51,6 +52,6 @@ export default () => {
           onEndReached={pageNumber.increment}
         />
       }
-    </SafeAreaView>
+    </Screen>
   )
 }
