@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -77,11 +76,9 @@ const fetchPost = async (postId, customerId) => {
   return post
 }
 
-const fetchPostComments = async (postId, pageNumber) => {
+const fetchPostComments = async (postId) => {
   const payload = {
-    post_id: postId,
-    start: pageNumber * 20,
-    amount: 20
+    post_id: postId
   }
   const comments = await requestServer(
     "/comments_service/get_post_comments",
@@ -159,10 +156,9 @@ const CommentInput = ({ postId, customerId }) => {
 
 const CommentsScrollView = ({ postId }) => {
   const [session, _] = useAtom(sessionAtom)
-  const pageNumber = useCounter()
   const commentsQuery = useQuery({
     queryKey: ["postComments"],
-    queryFn: () => fetchPostComments(postId, pageNumber.value)
+    queryFn: () => fetchPostComments(postId)
   })
 
   if (commentsQuery.isLoading) {
@@ -182,7 +178,6 @@ const CommentsScrollView = ({ postId }) => {
         data={commentsQuery.data}
         keyExtractor={(comment) => comment.comment_id}
         renderItem={({ item }) => <CommentTile comment={item} />}
-        onEndReached={pageNumber.increment}
       />
     </View>
   )

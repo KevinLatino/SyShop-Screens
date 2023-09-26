@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -33,10 +32,8 @@ const fetchStore = async (storeId, customerId) => {
   return store
 }
 
-const fetchStorePosts = async (storeId, customerId, pageNumber) => {
+const fetchStorePosts = async (storeId, customerId) => {
   const payload = {
-    start: pageNumber * 10,
-    amount: 10,
     store_id: storeId,
     customer_id: customerId
   }
@@ -171,10 +168,9 @@ const StoreView = ({ storeId, customerId }) => {
 }
 
 const PostsList = ({ storeId, customerId }) => {
-  const pageNumber = useCounter()
   const storePostsQuery = useQuery({
     queryKey: ["storePosts"],
-    queryFn: () => fetchStorePosts(storeId, customerId, pageNumber.value)
+    queryFn: () => fetchStorePosts(storeId, customerId)
   })
 
   if (storePostsQuery.isLoading) {
@@ -188,7 +184,6 @@ const PostsList = ({ storeId, customerId }) => {
       data={storePostsQuery.data}
       keyExtractor={(post) => post.post_id}
       renderItem={({ item }) => <PostTile post={item} />}
-      onEndReached={pageNumber.increment}
     />
   )
 }

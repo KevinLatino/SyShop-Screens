@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { useRoute } from '@react-navigation/native'
@@ -21,10 +20,8 @@ const parseRawTextMessage = (rawTextMessage) => {
   }
 }
 
-const fetchMessages = async (chatId, pageNumber) => {
+const fetchMessages = async (chatId) => {
   const payload = {
-    start: pageNumber * 20,
-    amount: 20,
     chat_id: chatId
   }
   const messages = await requestServer(
@@ -116,14 +113,13 @@ const ScrollDownButton = () => {
 export default () => {
   const route = useRoute()
   const [session, _] = useAtom(sessionAtom)
-  const pageNumber = useCounter()
   const [messages, setMessages] = useState([])
 
   const { chat } = route.params
   const messagesQuery = useQuery({
     queryKey: ["chatMessages"],
     queryFn: async () => {
-      const fetchedMessages = await fetchMessages(chat.chat_id, pageNumber.value)
+      const fetchedMessages = await fetchMessages(chat.chat_id)
       const allMessages = GiftedChat.append(messages, fetchedMessages)
 
       setMessages(allMessages)
@@ -177,10 +173,7 @@ export default () => {
         user={{
           user_id: session.customerId
         }}
-        onLoadEarlier={chat.chat_id !== undefined ? pageNumber.increment : undefined}
 
-        infiniteScroll
-        loadEarlier={false}
         scrollToBottom
       />
   )

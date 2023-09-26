@@ -4,7 +4,6 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { useNavigation } from '@react-navigation/native'
-import { useCounter } from '../utilities/hooks'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
@@ -42,11 +41,9 @@ const styles = StyleSheet.create({
   }
 })
 
-const fetchPosts = async (customerId, pageNumber) => {
+const fetchPosts = async (customerId) => {
   const payload = {
-    customer_id: customerId,
-    start: pageNumber * 20,
-    amount: (pageNumber + 1) * 20
+    customer_id: customerId
   }
   const posts = await requestServer(
     "/posts_service/get_posts_from_customer_following_stores",
@@ -57,11 +54,10 @@ const fetchPosts = async (customerId, pageNumber) => {
 }
 
 const PostsList = () => {
-  const pageNumber = useCounter()
   const [session, _] = useAtom(sessionAtom)
   const postsQuery = useQuery({
     queryKey: ["feedPosts"],
-    queryFn: () => fetchPosts(session.customerId, pageNumber.value)
+    queryFn: () => fetchPosts(session.customerId)
   })
 
   if (postsQuery.isLoading) {

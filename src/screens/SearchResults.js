@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
-import { useCounter} from '../utilities/hooks'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
@@ -59,10 +58,8 @@ const styles = StyleSheet.create({
     }
 })
 
-const fetchStores = async (searchedName, pageNumber) => {
+const fetchStores = async (searchedName) => {
     const payload = {
-        start: pageNumber * 5,
-        amount: 5,
         search: searchedName
     }
     const stores = await requestServer(
@@ -73,10 +70,8 @@ const fetchStores = async (searchedName, pageNumber) => {
     return stores
 }
 
-const fetchPosts = async (text, categories, filters, pageNumber) => {
+const fetchPosts = async (text, categories, filters) => {
   const payload = {
-    start: pageNumber * 20,
-    amount: 20,
     searched_text: text,
     categories,
     sorting_property: filters.sortingProperty,
@@ -284,10 +279,9 @@ const SearchedCategoriesScrollView = ({ categoriesNames }) => {
 }
 
 const StoresResultsScrollView = ({ searchedText }) => {
-    const pageNumber = useCounter()
     const storesQuery = useQuery({
       queryKey: ["storesResults"],
-      queryFn: () => fetchStores(searchedText, pageNumber.value)
+      queryFn: () => fetchStores(searchedText)
     })
 
     if (storesQuery.isLoading) {
@@ -316,7 +310,6 @@ const StoresResultsScrollView = ({ searchedText }) => {
 }
 
 const PostsResults = ({ searchedText, categoriesNames }) => {
-    const pageNumber = useCounter()
     const [searchFilters, setSearchFilters] = useState({
         minimumPrice: 0,
         maximumPrice: null,
@@ -336,8 +329,7 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
       queryFn: () => fetchPosts(
         searchedText,
         categoriesNames,
-        searchFilters,
-        pageNumber.value
+        searchFilters
       ),
       enabled: maximumPriceQuery.isSuccess
     })
@@ -372,7 +364,6 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
                   <ScrollView
                       data={postsQuery.data}
                       renderItem={({ item }) => <PostTile post={item} />}
-                      onEndReached={pageNumber.increment}
                   />
               }
             </View>

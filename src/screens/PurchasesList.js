@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -8,11 +7,9 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import SaleTile from '../components/SaleTile'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-const fetchPurchases = async (customerId, pageNumber) => {
+const fetchPurchases = async (customerId) => {
     const payload = {
-        customer_id: customerId,
-        start: pageNumber * 20,
-        amount: 20
+        customer_id: customerId
     }
     const purchases = await requestServer(
         "/sales_service/get_customer_purchases",
@@ -23,11 +20,10 @@ const fetchPurchases = async (customerId, pageNumber) => {
 }
 
 export default () => {
-    const pageNumber = useCounter()
     const [session, _] = useAtom(sessionAtom)
     const purchasesQuery = useQuery({
         queryKey: ["customerPurchases"],
-        queryFn: () => fetchPurchases(session.customerId, pageNumber.value)
+        queryFn: () => fetchPurchases(session.customerId)
     })
 
     if (purchasesQuery.isLoading) {
@@ -42,7 +38,6 @@ export default () => {
             data={purchasesQuery.data}
             keyExtractor={(purchase) => purchase.sale_id}
             renderItem={({ item }) => <SaleTile purchase={item} />}
-            onEndReached={pageNumber.increment}
         />
       </SafeAreaView>
     )

@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useCounter } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -11,10 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, Dimensions } from 'react-native'
 import { Text } from 'react-native-paper'
 
-const fetchChats = async (customerId, pageNumber) => {
+const fetchChats = async (customerId) => {
   const payload = {
-    start: pageNumber * 10,
-    amount: 10,
     user_id: customerId
   }
   const chats = await requestServer(
@@ -27,10 +24,9 @@ const fetchChats = async (customerId, pageNumber) => {
 
 export default () => {
   const [session, _] = useAtom(sessionAtom)
-  const pageNumber = useCounter()
   const chatsQuery = useQuery({
     queryKey: ["listOfChats"],
-    queryFn: () => fetchChats(session.customerId, pageNumber.value)
+    queryFn: () => fetchChats(session.customerId)
   })
 
   return (
@@ -49,7 +45,6 @@ export default () => {
         <ScrollView
           data={chatsQuery.data}
           renderItem={({ item }) => <ChatTile chat={item} />}
-          onEndReached={pageNumber.increment}
         />
       }
     </Screen>
