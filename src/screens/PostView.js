@@ -10,10 +10,8 @@ import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
-import OrderForm from '../components/OrderForm'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ImageSlider } from 'react-native-image-slider-banner'
-import { BottomSheet } from 'react-native-btr'
 import {
   View,
   StyleSheet,

@@ -26,9 +26,8 @@ import LikedPosts from './src/screens/LikedPosts'
 import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
-import PaymentForm from './src/screens/PaymentForm'
 import AppSnackBar from './src/components/AppSnackBar'
-import OrderForm from './src/components/OrderForm'
+import Order from './src/screens/Order'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 const queryClient = new QueryClient()
@@ -206,15 +205,9 @@ const Main = () => {
                   </Stack.Screen>
 
                   <Stack.Screen
-                    name="PaymentForm"
-                  >
-                    {() => <PaymentForm />}
-                  </Stack.Screen>
-
-                  <Stack.Screen
                     name="Order"
                   >
-                    {() => <OrderForm />}
+                    {() => <Order />}
                   </Stack.Screen>
                 </Stack.Navigator>
               </NavigationContainer>
