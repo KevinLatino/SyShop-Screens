@@ -345,10 +345,8 @@ export default () => {
   })
 
   if (customerQuery.isLoading) {
-    console.log("SETTINGS ESTÁ CARGANDO")
-
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 

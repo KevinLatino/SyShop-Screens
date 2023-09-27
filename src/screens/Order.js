@@ -6,6 +6,7 @@ import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
+import { showMessage } from '../components/AppSnackBar'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
 import Screen from '../components/Screen'
@@ -103,12 +104,16 @@ export default () => {
       })
 
       if (paymentSheet.error) {
+        showMessage("Hubo un error al intentar conectarse a Stripe, inténtale de nuevo más tarde")
+
         return
       }
 
       const presentation = await presentPaymentSheet()
 
       if (presentation.error) {
+        showMessage("Hubo un error al intentar conectarse a Stripe, inténtale de nuevo más tarde")
+
         return
       }
 

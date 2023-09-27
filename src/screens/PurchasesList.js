@@ -38,7 +38,7 @@ export default () => {
         <ScrollView
             data={purchasesQuery.data}
             keyExtractor={(purchase) => purchase.sale_id}
-            renderItem={({ item }) => <SaleTile purchase={item} />}
+            renderItem={({ item }) => <SaleTile sale={item} />}
         />
       </Screen>
     )

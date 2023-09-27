@@ -4,18 +4,13 @@ import { HelperText } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   textInput: {
+    padding: 20,
+    width: 275,
+    borderColor: "silver",
     borderWidth: 1,
-    paddingStart: 20,
-    borderColor: "gray",
-    padding: 10,
-    width: 250,
-    height: 65,
-    marginTop: 20,
     borderRadius: 30,
-    backgroundColor: "#fff",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
+    backgroundColor: "#ffffff",
+    color: "black"
   }
 })
 

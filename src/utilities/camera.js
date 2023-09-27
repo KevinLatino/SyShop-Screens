@@ -1,4 +1,5 @@
 import * as ImagePicker from 'expo-image-picker'
+import { showMessage } from '../components/AppSnackBar'
 
 export const selectPictureFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -8,7 +9,9 @@ export const selectPictureFromGallery = async () => {
     })
 
     if (result.canceled) {
-        throw Error("Image selection was cancelled")
+      showMessage("Cancelaste la selección de la foto")
+
+      return
     }
 
     const picture = result.assets[0].base64

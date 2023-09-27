@@ -61,7 +61,7 @@ export default ({ text, onSignIn, ...touchableOpacityProps }) => {
       getUserInformation(accessToken)
         .then((userInformation) => onSignIn(userInformation))
         .catch((_) => {
-          showMessage("No se pudo acceder mediante Google")
+          showMessage("No se pudo acceder mediante Google, inténtalo más tarde")
         })
     }
   }, [response])

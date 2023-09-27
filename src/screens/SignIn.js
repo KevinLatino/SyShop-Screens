@@ -60,9 +60,21 @@ const signInWithPlainAccount = async (credentials) => {
   const payload = {
     ...credentials
   }
+
+  const handleError = (data) => {
+    if (data.message === "INCORRECT_CREDENTIALS") {
+      showMessage("Las credenciales que ingresaste son incorrectas")
+
+      return true
+    }
+
+    return false
+  }
+
   const session = await requestServer(
     "/users_service/sign_in_user_with_plain_account",
-    payload
+    payload,
+    handleError
   )
 
   return session
@@ -72,9 +84,23 @@ const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
   const payload = {
     google_unique_identifier: googleUniqueIdentifier
   }
+
+  const handleError = (data) => {
+    if (data.message === "GOOGLE_ACCOUNT_NOT_FOUND") {
+      showMessage(
+        "No hay ninguna cuenta registrada con la cuenta de Google que escogiste"
+      )
+
+      return true
+    }
+
+    return false
+  }
+
   const session = await requestServer(
     "/users_service/sign_in_user_with_google_account",
-    payload
+    payload,
+    handleError
   )
 
   return session
@@ -87,7 +113,7 @@ export default () => {
   const handleSignInWithPlainAccount = () => {
     if (form.hasErrors()) {
       showMessage(
-        "Por favor provee la información necesaria para iniciar sesión"
+        "Ingresa la información necesaria para iniciar sesión"
       )
 
       return
@@ -113,7 +139,7 @@ export default () => {
     }
   )
   const signInWithPlainAccountMutation = useMutation(
-    ({ ...credentials }) => signInWithPlainAccount(credentials)
+    ({ credentials }) => signInWithPlainAccount(credentials)
   )
   const signInWithGoogleAccountMutation = useMutation(
     ({ googleUniqueIdentifier }) => signInWithGoogleAccount(googleUniqueIdentifier)

@@ -74,9 +74,21 @@ const signUpWithPlainAccount = async (userInformation) => {
   const payload = {
     ...userInformation
   }
+
+  const handleError = (data) => {
+    if (data.message === "UNAVAILABLE_EMAIL") {
+      showMessage("El correo electrónico que ingresaste ya está en uso")
+
+      return true
+    }
+
+    return false
+  }
+
   const session = await requestServer(
     "/customers_service/sign_up_customer_with_plain_account",
-    payload
+    payload,
+    handleError
   )
 
   return session
@@ -90,9 +102,21 @@ const signUpWithGoogleAccount = async (userInformation, googleUniqueIdentifier) 
     ...userInformation,
     google_unique_identifier: googleUniqueIdentifier
   }
+
+  const handleError = (data) => {
+    if (data.message === "GOOGLE_ACCOUNT_ALREADY_EXISTS") {
+      showMessage("Alguien ya se registró con esta cuenta de Google")
+
+      return true
+    }
+
+    return false
+  }
+
   const session = await requestServer(
     "/customers_service/sign_up_customer_with_google_account",
-    payload
+    payload,
+    handleError
   )
 
   return session
@@ -105,11 +129,11 @@ export default () => {
   const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
   const [useUrlPicture, setUseUrlPicture] = useState(false)
   const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
-  const [picture, setPicture] = useState(null)
+  const [picture, setPicture] = useState("")
 
   const handleSignUp = () => {
     if (form.hasErrors()) {
-      showMessage("Por favor provee la información necesaria para registrarte")
+      showMessage("Ingresa información necesaria para registrarte")
 
       return
     }
@@ -188,6 +212,7 @@ export default () => {
 
   useEffect(() => {
     if (signUpData !== null) {
+      console.log(signUpData)
       setSession({
         token: signUpData.token,
         customerId: signUpData.user_id
@@ -196,6 +221,8 @@ export default () => {
       navigation.navigate("Home")
     }
   }, [signUpData])
+
+  console.log(form.getField("email"))
 
   return (
     <Screen>
@@ -271,6 +298,7 @@ export default () => {
         style={styles.button}
         mode="contained"
         onPress={handleSignUp}
+        disabled={form.hasErrors()}
       >
         {
           isSignUpLoading ?

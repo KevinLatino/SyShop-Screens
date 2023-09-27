@@ -5,10 +5,13 @@ import { sessionAtom } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import { selectPictureFromGallery } from '../utilities/camera'
+import { formatBase64String } from '../utilities/formatting'
 import Images from 'react-native-chat-images'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
+import { List, Avatar } from 'react-native-paper'
 import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat'
 
 const parseRawTextMessage = (rawTextMessage) => {
@@ -161,6 +164,21 @@ export default () => {
   )
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <List.Item
+        title={chat.user.name}
+        left={(props) => {
+          return (
+            <Avatar.Image
+              {...props}
+              source={{
+                uri: formatBase64String(chat.user.picture)
+              }}
+            />
+          )
+        }}
+      />
+
       <GiftedChat
         placeholder='Mensaje...'
         renderBubble={(props) => <MessageBubble {...props} />}
@@ -177,5 +195,6 @@ export default () => {
 
         scrollToBottom
       />
+    </SafeAreaView>
   )
 }

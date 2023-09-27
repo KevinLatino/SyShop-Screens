@@ -34,11 +34,16 @@ export const useForm = (initialValues, errorHandlers) => {
     return Object.values(errorsState).some((v) => v !== null)
   }
 
+  const isFilled = () => {
+    return Object.values(fieldsState).every((v) => v !== "")
+  }
+
   return {
     getField,
     setField,
     getError,
     hasErrors,
+    isFilled,
     fields: fieldsState
   }
 }
