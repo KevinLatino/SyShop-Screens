@@ -5,7 +5,7 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import SaleTile from '../components/SaleTile'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
 
 const fetchPurchases = async (customerId) => {
     const payload = {
@@ -21,6 +21,7 @@ const fetchPurchases = async (customerId) => {
 
 export default () => {
     const [session, _] = useAtom(sessionAtom)
+
     const purchasesQuery = useQuery({
         queryKey: ["customerPurchases"],
         queryFn: () => fetchPurchases(session.customerId)
@@ -33,12 +34,12 @@ export default () => {
     }
 
     return (
-      <SafeAreaView>
+      <Screen>
         <ScrollView
             data={purchasesQuery.data}
             keyExtractor={(purchase) => purchase.sale_id}
             renderItem={({ item }) => <SaleTile purchase={item} />}
         />
-      </SafeAreaView>
+      </Screen>
     )
 }

@@ -10,13 +10,9 @@ import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
 import { ImageSlider } from 'react-native-image-slider-banner'
-import {
-  View,
-  StyleSheet,
-  ScrollView as ReactNativeScrollView
-} from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import {
   Text,
   Divider,
@@ -113,16 +109,9 @@ const formatPublicationDate = (isoDateString) => {
 }
 
 const CommentInput = ({ postId, customerId }) => {
-  const [text, setText] = useState("")
   const queryClient = useQueryClient()
-  const addCommentMutation = useMutation(
-    ({ postId, customerId, text }) => addPostComment(postId, customerId, text),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["postComments"]
-      })
-    }
-  )
+
+  const [text, setText] = useState("")
 
   const handleCommentSubmit = async () => {
     addCommentMutation.mutate({
@@ -131,6 +120,15 @@ const CommentInput = ({ postId, customerId }) => {
       text
     })
   }
+
+  const addCommentMutation = useMutation(
+    ({ postId, customerId, text }) => addPostComment(postId, customerId, text),
+    {
+      onSuccess: () => queryClient.refetchQueries({
+        queryKey: ["postComments"]
+      })
+    }
+  )
 
   return (
     <View style={styles.commentInputView}>
@@ -142,18 +140,23 @@ const CommentInput = ({ postId, customerId }) => {
         placeholder="Escribe un comentario"
       />
 
-      <IconButton
-        icon="send"
-        mode="contained"
-        disabled={text === ""}
-        onPress={handleCommentSubmit}
-      />
+      {
+        addCommentMutation.isLoading ?
+        <LoadingSpinner /> :
+        <IconButton
+          icon="send"
+          mode="contained"
+          disabled={text === ""}
+          onPress={handleCommentSubmit}
+        />
+      }
     </View>
   )
 }
 
 const CommentsScrollView = ({ postId }) => {
   const [session, _] = useAtom(sessionAtom)
+
   const commentsQuery = useQuery({
     queryKey: ["postComments"],
     queryFn: () => fetchPostComments(postId)
@@ -184,18 +187,6 @@ const CommentsScrollView = ({ postId }) => {
 const PostView = ({ post }) => {
   const navigation = useNavigation()
 
-  const categoriesChips = post.categories.map((category) => {
-    return (
-      <Chip
-        key={category}
-        mode="flat"
-        icon="shape"
-      >
-        {category}
-      </Chip>
-    )
-  })
-
   const navigateToStoreView = () => {
     navigation.navigate("StoreView", {
       storeId: post.store_id
@@ -207,6 +198,18 @@ const PostView = ({ post }) => {
       postId: post.post_id
     })
   }
+
+  const categoriesChips = post.categories.map((category) => {
+    return (
+      <Chip
+        key={category}
+        mode="flat"
+        icon="shape"
+      >
+        {category}
+      </Chip>
+    )
+  })
 
   return (
     <View>
@@ -277,24 +280,23 @@ export default () => {
   const [session, _] = useAtom(sessionAtom)
 
   const { postId } = route.params
+
   const postQuery = useQuery({
     queryKey: ["post"],
     queryFn: () => fetchPost(postId, session.customerId)
   })
 
   return (
-    <ReactNativeScrollView>
-      <SafeAreaView>
-        {
-          postQuery.isLoading ?
-          <LoadingSpinner inScreen /> :
-          <PostView post={postQuery.data} />
-        }
+    <Screen>
+      {
+        postQuery.isLoading ?
+        <LoadingSpinner inScreen /> :
+        <PostView post={postQuery.data} />
+      }
 
-        <Divider />
+      <Divider />
 
-        <CommentsScrollView postId={postId} />
-      </SafeAreaView>
-    </ReactNativeScrollView>
+      <CommentsScrollView postId={postId} />
+    </Screen>
   )
 }

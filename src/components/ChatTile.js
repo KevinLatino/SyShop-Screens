@@ -24,7 +24,6 @@ const UserChatPicture = ({ user }) => {
 
 export default ({ chat }) => {
   const navigation = useNavigation()
-  console.log("CHAT", chat)
 
   const navigateToChat = () => {
     navigation.navigate("Chat", {

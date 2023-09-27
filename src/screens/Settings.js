@@ -73,6 +73,10 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
     form.setField("email")(data.email)
   }
 
+  const handleSubmit = () => {
+    changeEmailMutation.mutate(form.fields)
+  }
+
   const customerQuery = useQuery({
     queryKey: ["customerChangeEmail"],
     queryFn: () => fetchCustomer(session.customerId),
@@ -92,8 +96,8 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
     }
   )
 
-  const handleSubmit = () => {
-    changeEmailMutation.mutate(form.fields)
+  if (changeEmailMutation.isSuccess) {
+    onDismiss()
   }
 
   if (customerQuery.isLoading || changeEmailMutation.isLoading) {
@@ -102,10 +106,6 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
         <LoadingSpinner inScreen />
       </Portal>
     )
-  }
-
-  if (changeEmailMutation.isSuccess) {
-    onDismiss()
   }
 
   return (
@@ -152,6 +152,11 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
 
 const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
   const [session, _] = useAtom(sessionAtom)
+
+  const handleSubmit = () => {
+    changePasswordMutation.mutate(form.fields)
+  }
+
   const changePasswordMutation = useMutation(
     ({ oldPassword, newPassword }) => changePassword(session.customerId, oldPassword, newPassword)
   )
@@ -165,10 +170,6 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
       newPassword: makeNotEmptyChecker("Contraseña vacía")
     }
   )
-
-  const handleSubmit = () => {
-    changePasswordMutation.mutate(form.fields)
-  }
 
   if (changePasswordMutation.isSuccess) {
     onDismiss()
@@ -226,8 +227,8 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
 }
 
 const CloseSessionDialog = ({ isVisible, onDismiss }) => {
-  const [_, setSession] = useAtom(sessionAtom)
   const navigation = useNavigation()
+  const [_, setSession] = useAtom(sessionAtom)
 
   const handleCloseSession = () => {
     setSession(null)
@@ -269,17 +270,18 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
 }
 
 const DeleteAccountDialog = ({ isVisible, onDismiss }) => {
-  const [session, _] = useAtom(sessionAtom)
   const navigation = useNavigation()
-  const deleteCustomerMutation = useMutation(
-    ({ customerId }) => deleteCustomer(customerId)
-  )
+  const [session, _] = useAtom(sessionAtom)
 
   const handleDeleteAccount = () => {
     deleteCustomerMutation.mutate({ customerId: session.customerId })
 
     navigation.navigate("Welcome")
   }
+
+  const deleteCustomerMutation = useMutation(
+    ({ customerId }) => deleteCustomer(customerId)
+  )
 
   return (
     <Portal>
@@ -331,16 +333,20 @@ const SettingEntry = ({ heading, icon, onPress, ...listItemProps }) => {
 export default () => {
   const navigation = useNavigation()
   const [session, _] = useAtom(sessionAtom)
+
   const [isChangeEmailDialogVisible, setIsChangeEmailDialogVisible] = useState(false)
   const [isChangePasswordDialogVisible, setIsChangePasswordDialogVisible] = useState(false)
   const [isCloseSessionDialogVisible, setIsCloseSessionDialogVisible] = useState(false)
   const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false)
+
   const customerQuery = useQuery({
     queryKey: ["customerSettings"],
     queryFn: () => fetchCustomer(session.customerId)
   })
 
   if (customerQuery.isLoading) {
+    console.log("SETTINGS ESTÁ CARGANDO")
+
     return (
       <LoadingSpinner />
     )

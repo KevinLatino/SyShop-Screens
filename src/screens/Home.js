@@ -8,19 +8,14 @@ import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
 import {
   Portal,
   Modal,
   Surface,
   FAB
 } from 'react-native-paper'
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  Dimensions
-} from 'react-native'
+import { View, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
   fab: {
@@ -55,6 +50,7 @@ const fetchPosts = async (customerId) => {
 
 const PostsList = () => {
   const [session, _] = useAtom(sessionAtom)
+
   const postsQuery = useQuery({
     queryKey: ["feedPosts"],
     queryFn: () => fetchPosts(session.customerId)
@@ -69,18 +65,18 @@ const PostsList = () => {
   }
 
   return (
-    <FlatList
-      contentContainerStyle={styles.postsListContainer}
+    <ScrollView
       data={postsQuery.data}
-      renderItem={({ item }) => <PostTile post={item} />}
       keyExtractor={(post) => post.post_id}
+      renderItem={({ item }) => <PostTile post={item} />}
     />
   )
 }
 
 export default () => {
-  const [isModalVisible, setIsModalVisible] = useState(false)
   const navigation = useNavigation()
+
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const handleSearchSubmit = (text, categoriesNames, storesNames) => {
     setIsModalVisible(false)
@@ -93,7 +89,7 @@ export default () => {
   }
 
   return (
-    <SafeAreaView>
+    <Screen>
       <PostsList />
 
       <Portal>
@@ -113,6 +109,6 @@ export default () => {
         onPress={() => setIsModalVisible(true)}
         style={styles.fab}
       />
-    </SafeAreaView>
+    </Screen>
   )
 }

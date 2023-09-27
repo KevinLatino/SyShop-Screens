@@ -51,6 +51,7 @@ const DeliveriesListItems = ({ deliveries }) => {
 
 export default () => {
   const [session, _] = useAtom(sessionAtom)
+
   const activeDeliveriesQuery = useQuery({
     queryKey: ["activeDeliveries"],
     queryFn: () => fetchActiveDeliveries(session.customerId)

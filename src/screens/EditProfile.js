@@ -5,15 +5,14 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
-import { selectPictureFromGallery } from '../utilities/camera'
 import { showMessage } from '../components/AppSnackBar'
 import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
-import { formatBase64String } from '../utilities/formatting'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
+import PictureInput from '../components/PictureInput'
 import Screen from '../components/Screen'
 import { StyleSheet } from 'react-native'
-import { Button, TouchableRipple, Avatar } from 'react-native-paper'
+import { Button } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -48,31 +47,38 @@ const updateCustomer = async (customerId, newCustomer, picture) => {
   )
 }
 
-const PictureChooser = ({ picture, onChangePicture }) => {
-  const handlePictureChange = async () => {
-    try {
-      const picture = await selectPictureFromGallery()
+export default () => {
+  const navigation = useNavigation()
+  const queryClient = useQueryClient()
+  const [session, _] = useAtom(sessionAtom)
 
-      onChangePicture(picture)
-    } catch (error) {
-      showMessage("Hubo un error al intentar seleccionar la imagen")
-    }
+  const [picture, setPicture] = useState(null)
+
+  const handleSuccess = () => {
+    queryClient.refetchQueries({ queryKey: ["customer"] })
+
+    showMessage("Información actualizada con éxito")
+
+    navigation.goBack()
   }
 
-  return (
-    <TouchableRipple
-      onPress={handlePictureChange}
-    >
-      <Avatar.Image source={{ uri: formatBase64String(picture) }} />
-    </TouchableRipple>
-  )
-}
+  const fillFormFields = (data) => {
+    form.setField("name")(data.name)
+    form.setField("first_surname")(data.first_surname)
+    form.setField("second_surname")(data.second_surname)
+    form.setField("phone_number")(data.phone_number)
 
-export default () => {
-  const [session, _] = useAtom(sessionAtom)
-  const navigation = useNavigation()
-  const [picture, setPicture] = useState(null)
-  const queryClient = useQueryClient()
+    setPicture(data.picture)
+  }
+
+  const handleUpdate = () => {
+    updateCustomerMutation.mutate({
+      customerId: session.customerId,
+      fields: form.fields,
+      picture
+    })
+  }
+
   const form = useForm(
     {
       name: null,
@@ -92,13 +98,6 @@ export default () => {
     queryFn: () => fetchCustomer(session.customerId),
     onSuccess: (data) => fillFormFields(data)
   })
-
-  const handleSuccess = () => {
-    queryClient.refetchQueries({ queryKey: ["customer"] })
-
-    showMessage("Información actualizada con éxito")
-  }
-
   const updateCustomerMutation = useMutation(
     ({ customerId, fields, picture }) => updateCustomer(
       customerId, fields, picture
@@ -106,23 +105,6 @@ export default () => {
       onSuccess: handleSuccess
     }
   )
-
-  const fillFormFields = (data) => {
-    form.setField("name")(data.name)
-    form.setField("first_surname")(data.first_surname)
-    form.setField("second_surname")(data.second_surname)
-    form.setField("phone_number")(data.phone_number)
-
-    setPicture(data.picture)
-  }
-
-  const handleUpdate = () => {
-    updateCustomerMutation.mutate({
-      customerId: session.customerId,
-      fields: form.fields,
-      picture
-    })
-  }
 
   if (customerQuery.isLoading) {
     return (
@@ -132,7 +114,7 @@ export default () => {
 
   return (
     <Screen style={styles.container}>
-      <PictureChooser
+      <PictureInput
         picture={picture}
         onChangePicture={setPicture}
       />

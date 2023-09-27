@@ -6,7 +6,6 @@ import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Screen from '../components/Screen'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, Dimensions } from 'react-native'
 import { Text } from 'react-native-paper'
 
@@ -24,6 +23,7 @@ const fetchChats = async (customerId) => {
 
 export default () => {
   const [session, _] = useAtom(sessionAtom)
+
   const chatsQuery = useQuery({
     queryKey: ["listOfChats"],
     queryFn: () => fetchChats(session.customerId)

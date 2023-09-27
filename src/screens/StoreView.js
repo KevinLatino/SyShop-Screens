@@ -8,16 +8,10 @@ import { formatLocation } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { View, StyleSheet } from 'react-native'
+import Screen from '../components/Screen'
+import { View } from 'react-native'
 import { Appbar, Text, Divider } from 'react-native-paper'
 import { ImageSlider } from 'react-native-image-slider-banner'
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 16
-  }
-})
 
 const fetchStore = async (storeId, customerId) => {
   const payload = {
@@ -71,22 +65,14 @@ const followStore = async (storeId, customerId) => {
 
 const StoreView = ({ storeId, customerId }) => {
   const navigation = useNavigation()
-  const [session, _] = useAtom(sessionAtom)
-  const [isFollowing, setIsFollowing] = useState(null)
   const queryClient = useQueryClient()
-  const storeQuery = useQuery({
-    queryKey: ["store"],
-    queryFn: () => fetchStore(storeId, session.customerId),
-    onSuccess: (data) => setIsFollowing(data.does_customer_follow_store)
-  })
-  const followStoreMutation = useMutation(
-    ({ storeId, customerId }) => followStore(storeId, customerId),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["feedPosts"]
-      })
-    }
-  )
+  const [session, _] = useAtom(sessionAtom)
+
+  const [isFollowing, setIsFollowing] = useState(null)
+
+  const handleQuerySuccess = (data) => {
+    setIsFollowing(data.does_customer_follow_store)
+  }
 
   const handleFollow = () => {
     followStoreMutation.mutate({
@@ -95,6 +81,12 @@ const StoreView = ({ storeId, customerId }) => {
     })
 
     setIsFollowing(!isFollowing)
+  }
+
+  const handleFollowSuccess = (_) => {
+    queryClient.refetchQueries({
+      queryKey: ["feedPosts"]
+    })
   }
 
   const navigateToChat = async () => {
@@ -113,6 +105,18 @@ const StoreView = ({ storeId, customerId }) => {
       }
     })
   }
+
+  const storeQuery = useQuery({
+    queryKey: ["store"],
+    queryFn: () => fetchStore(storeId, session.customerId),
+    onSuccess: handleQuerySuccess
+  })
+  const followStoreMutation = useMutation(
+    ({ storeId, customerId }) => followStore(storeId, customerId),
+    {
+      onSuccess: handleFollowSuccess
+    }
+  )
 
   if (storeQuery.isLoading) {
     return (
@@ -195,7 +199,7 @@ export default () => {
   const { storeId } = route.params
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Screen>
       <StoreView
         storeId={storeId}
         customerId={session.customerId}
@@ -207,6 +211,6 @@ export default () => {
         storeId={storeId}
         customerId={session.customerId}
       />
-    </SafeAreaView>
+    </Screen>
   )
 }

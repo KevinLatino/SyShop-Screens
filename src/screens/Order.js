@@ -8,8 +8,9 @@ import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
-import { View, StyleSheet, Dimensions } from 'react-native'
-import { Surface, Card, Text, Button } from 'react-native-paper'
+import Screen from '../components/Screen'
+import { StyleSheet, Dimensions } from 'react-native'
+import { Card, Text, Button } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -74,45 +75,14 @@ const PostTile = ({ post }) => {
 }
 
 export default () => {
-    const [amount, setAmount] = useState(1)
-    const [session, _] = useAtom(sessionAtom)
+    const navigation = useNavigation()
     const route = useRoute()
+    const [session, _] = useAtom(sessionAtom)
     const { initPaymentSheet, presentPaymentSheet } = useStripe()
 
     const { postId } = route.params
-    const postQuery = useQuery({
-      queryKey: ["postToBuy"],
-      queryFn: () => fetchPost(postId, session.customerId)
-    })
 
-    const handleSuccess = async (data) => {
-      const stripeClientSecret = data.stripe_client_secret
-
-      console.log(stripeClientSecret)
-
-      console.log(postQuery.data.store_name)
-
-      const paymentSheet = await initPaymentSheet({
-        merchantDisplayName: postQuery.data.store_name,
-        paymentIntentClientSecret: stripeClientSecret,
-        style: "automatic",
-        customFlow: false
-      })
-
-      console.log("INIT ERROR", paymentSheet.error)
-
-      const response = await presentPaymentSheet()
-
-      console.log("PRESENT", response)
-    }
-
-    const createSaleIntentMutation = useMutation(
-      ({ postId, customerId, amount }) => createSaleIntent(postId, customerId, amount),
-      {
-        onSuccess: handleSuccess
-      }
-    )
-
+    const [amount, setAmount] = useState(1)
 
     const handleBuy = () => {
       createSaleIntentMutation.mutate({
@@ -122,6 +92,42 @@ export default () => {
       })
     }
 
+    const handleSuccess = async (data) => {
+      const stripeClientSecret = data.stripe_client_secret
+
+      const paymentSheet = await initPaymentSheet({
+        merchantDisplayName: postQuery.data.store_name,
+        paymentIntentClientSecret: stripeClientSecret,
+        style: "automatic",
+        customFlow: false
+      })
+
+      if (paymentSheet.error) {
+        return
+      }
+
+      const presentation = await presentPaymentSheet()
+
+      if (presentation.error) {
+        return
+      }
+
+      navigation.navigate("ChooseLocation", {
+        saleId: data.sale_id
+      })
+    }
+
+    const postQuery = useQuery({
+      queryKey: ["postToBuy"],
+      queryFn: () => fetchPost(postId, session.customerId)
+    })
+    const createSaleIntentMutation = useMutation(
+      ({ postId, customerId, amount }) => createSaleIntent(postId, customerId, amount),
+      {
+        onSuccess: handleSuccess
+      }
+    )
+
     if (postQuery.isLoading) {
         return (
           <LoadingSpinner inScreen />
@@ -129,28 +135,26 @@ export default () => {
     }
 
     return (
-      <View>
-        <Surface elevation={5} style={styles.container}>
-            <PostTile post={postQuery.data} />
+      <Screen style={styles.container}>
+        <PostTile post={postQuery.data} />
 
-            <NumericInput
-                minValue={1}
-                maxValue={postQuery.data.amount}
-                value={amount}
-                onChange={setAmount}
-            />
+        <NumericInput
+            minValue={1}
+            maxValue={postQuery.data.amount}
+            value={amount}
+            onChange={setAmount}
+        />
 
-            <Button
-                mode="contained"
-                onPress={handleBuy}
-            >
-              {
-                createSaleIntentMutation.isLoading ?
-                <LoadingSpinner /> :
-                "Comprar"
-              }
-            </Button>
-        </Surface>
-      </View>
+        <Button
+            mode="contained"
+            onPress={handleBuy}
+        >
+          {
+            createSaleIntentMutation.isLoading ?
+            <LoadingSpinner /> :
+            "Comprar"
+          }
+        </Button>
+      </Screen>
     )
 }

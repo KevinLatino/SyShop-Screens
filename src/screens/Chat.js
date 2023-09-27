@@ -5,12 +5,10 @@ import { sessionAtom } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import { selectPictureFromGallery } from '../utilities/camera'
-import { formatBase64String } from '../utilities/formatting'
 import Images from 'react-native-chat-images'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { View } from 'react-native'
-import { List, Avatar } from 'react-native-paper'
 import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat'
 
 const parseRawTextMessage = (rawTextMessage) => {
@@ -113,27 +111,10 @@ const ScrollDownButton = () => {
 export default () => {
   const route = useRoute()
   const [session, _] = useAtom(sessionAtom)
-  const [messages, setMessages] = useState([])
 
   const { chat } = route.params
-  const messagesQuery = useQuery({
-    queryKey: ["chatMessages"],
-    queryFn: async () => {
-      const fetchedMessages = await fetchMessages(chat.chat_id)
-      const allMessages = GiftedChat.append(messages, fetchedMessages)
 
-      setMessages(allMessages)
-    },
-    enabled: chat.chat_id !== undefined
-  })
-
-  const addMessageMutation = useMutation(
-    ({ message, customerId, receiverId }) => addMessage(
-      message,
-      customerId,
-      receiverId
-    )
-  )
+  const [messages, setMessages] = useState([])
 
   const handleTextMessageSend = ([{ text }]) => {
     const message = {
@@ -158,6 +139,26 @@ export default () => {
 
     addMessageMutation.mutate(message, session.customerId, chat.user.user_id)
   }
+
+  const handleLoadMessages = (fetchedMessages) => {
+    const allMessages = GiftedChat.append(messages, fetchedMessages)
+
+    setMessages(allMessages)
+  }
+
+  const messagesQuery = useQuery({
+    queryKey: ["chatMessages"],
+    queryFn: () => fetchMessages(chat.chat_id),
+    onSuccess: handleLoadMessages,
+    enabled: chat.chat_id !== undefined
+  })
+  const addMessageMutation = useMutation(
+    ({ message, customerId, receiverId }) => addMessage(
+      message,
+      customerId,
+      receiverId
+    )
+  )
 
   return (
       <GiftedChat

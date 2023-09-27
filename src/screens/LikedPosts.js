@@ -21,6 +21,7 @@ const fetchLikedPosts = async (customerId) => {
 
 export default () => {
     const [session, _] = useAtom(sessionAtom)
+
     const likedPostsQuery = useQuery({
         queryKey: ["likedPosts"],
         queryFn: () => fetchLikedPosts(session.customerId)

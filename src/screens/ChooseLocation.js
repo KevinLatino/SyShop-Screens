@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: Dimensions.get("screen").height * 0.85,
+    top: Dimensions.get("screen").height * 0.85,
     left: Dimensions.get("screen").width * 0.8
   }
 })
@@ -47,25 +47,12 @@ const createDelivery = async (saleId, locationId) => {
   )
 }
 
-const LocationsScrollView = () => {
+const LocationsScrollView = ({ saleId }) => {
   const navigation = useNavigation()
-  const route = useRoute()
-  const [selectedLocation, setSelectedLocation] = useState()
-  const [session, _] = useAtom(sessionAtom)
   const queryClient = useQueryClient()
-  const locationsQuery = useQuery({
-    queryKey: ["customerLocations"],
-    queryFn: () => fetchLocations(session.customerId)
-  })
-  const createDeliveryMutation = useMutation(
-    ({ saleId, locationId }) => createDelivery(saleId, locationId),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["activeDeliveries"]
-      })
-    }
-  )
-  const { saleId } = route.params
+  const [session, _] = useAtom(sessionAtom)
+
+  const [selectedLocation, setSelectedLocation] = useState(null)
 
   const handleSelect = (location) => {
     setSelectedLocation(location)
@@ -78,11 +65,24 @@ const LocationsScrollView = () => {
     })
   }
 
-  if (createDeliveryMutation.isSuccess) {
+  const handleSuccess = (_) => {
+    queryClient.refetchQueries({ queryKey: ["activeDeliveries"] })
+
     showMessage("Tu entrega ahora está pendiente")
 
-    navigation.navigate("Home")
+    navigation.goBack()
   }
+
+  const locationsQuery = useQuery({
+    queryKey: ["customerLocations"],
+    queryFn: () => fetchLocations(session.customerId)
+  })
+  const createDeliveryMutation = useMutation(
+    ({ saleId, locationId }) => createDelivery(saleId, locationId),
+    {
+      onSuccess: handleSuccess
+    }
+  )
 
   if (locationsQuery.isLoading) {
     return (
@@ -100,16 +100,19 @@ const LocationsScrollView = () => {
             return (
               <LocationTile
                 location={item}
-                isSelected={item.location_id == selectedLocation.location_id}
+                isSelected={
+                  (selectedLocation !== null) &&
+                  (item.location_id == selectedLocation.location_id)
+                }
                 onPress={() => handleSelect(item)}
               />
             )
           }
         }
-        onStartReached={locationsQuery.refetch}
       />
 
       <Button
+        mode="contained"
         onPress={handleSubmit}
       >
         {
@@ -124,6 +127,9 @@ const LocationsScrollView = () => {
 
 export default () => {
   const navigation = useNavigation()
+  const route = useRoute()
+
+  const { saleId } = route.params
 
   const navigateToAddLocation = () => {
     navigation.navigate("AddLocation")
@@ -131,7 +137,7 @@ export default () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LocationsScrollView />
+      <LocationsScrollView saleId={saleId} />
 
       <FAB
         icon="plus"

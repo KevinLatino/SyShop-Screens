@@ -16,6 +16,7 @@ const TrackLocationIcon = ({ delivery, ...props }) => {
   return (
     <TouchableRipple
       onPress={openLink}
+      disabled={uberTrackingUrl === null}
     >
       <List.Icon
         {...props}

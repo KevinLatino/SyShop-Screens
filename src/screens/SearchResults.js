@@ -6,7 +6,7 @@ import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
 import { Slider } from '@miblanchard/react-native-slider'
 import {
     View,
@@ -15,7 +15,6 @@ import {
 } from 'react-native'
 import {
     Card,
-    List,
     Chip,
     IconButton,
     Text,
@@ -145,9 +144,16 @@ const SortingPropertyFilterMenu = ({
     isVisible,
     setIsVisible
 }) => {
+    const handleSelect = (selectedSortingProperty) => {
+      onSelect(selectedSortingProperty)
+
+      setIsVisible(() => false)
+    }
+
     const anchorText = sortingProperty === "publication_date" ?
       "Fecha de publicación" :
       "Precio"
+
     const anchor = (
         <Button
             onPress={() => setIsVisible(true)}
@@ -155,12 +161,6 @@ const SortingPropertyFilterMenu = ({
           {anchorText}
         </Button>
     )
-
-    const handleSelect = (selectedSortingProperty) => {
-      onSelect(selectedSortingProperty)
-
-      setIsVisible(() => false)
-    }
 
     return (
         <Menu
@@ -190,10 +190,6 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
     } = filters
     const [isMenuVisible, setIsMenuVisible] = useState(false)
 
-    const sortingIcon = sortingSchema === "ascending" ?
-      "arrow-up-drop-circle-outline" :
-      "arrow-down-drop-circle-outline"
-
     const handleToggleSortingSchema = () => {
       const newSortingSchema = sortingSchema === "ascending" ?
         "descending" :
@@ -205,13 +201,6 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
       })
     }
 
-    const handleSelectSortingProperty = (selectedSortingProperty) => {
-      onChangeFilters(f => ({
-        ...f,
-        sortingProperty: selectedSortingProperty
-      }))
-    }
-
     const handleChangePriceRange = ([newMinimumPrice, newMaximumPrice]) => {
       onChangeFilters({
         ...filters,
@@ -219,6 +208,17 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
         maximumPrice: newMaximumPrice
       })
     }
+
+    const handleSelectSortingProperty = (selectedSortingProperty) => {
+      onChangeFilters(f => ({
+        ...f,
+        sortingProperty: selectedSortingProperty
+      }))
+    }
+
+    const sortingIcon = sortingSchema === "ascending" ?
+      "arrow-up-drop-circle-outline" :
+      "arrow-down-drop-circle-outline"
 
     return (
         <View style={{ flex: 1, padding: 16 }}>
@@ -316,6 +316,13 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
         sortingProperty: "publication_date",
         sortingSchema: "descending"
     })
+
+    const handleChangeFilters = (newSearchFilters) => {
+        setSearchFilters(newSearchFilters)
+
+        postsQuery.refetch()
+    }
+
     const maximumPriceQuery = useQuery({
       queryKey: ["maximumPrice"],
       queryFn: () => fetchMaximumPrice(),
@@ -333,12 +340,6 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
       ),
       enabled: maximumPriceQuery.isSuccess
     })
-
-    const handleChangeFilters = (newSearchFilters) => {
-        setSearchFilters(newSearchFilters)
-
-        postsQuery.refetch()
-    }
 
     if (maximumPriceQuery.isLoading) {
         return (
@@ -363,6 +364,7 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
                   <LoadingSpinner inScreen /> :
                   <ScrollView
                       data={postsQuery.data}
+                      keyExtractor={(post) => post.post_id}
                       renderItem={({ item }) => <PostTile post={item} />}
                   />
               }
@@ -373,34 +375,35 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
 export default () => {
     const route = useRoute()
+
     const { text, categoriesNames } = route.params
 
     return (
-        <SafeAreaView style={styles.container}>
-            <SearchedTextDisplay searchedText={text} />
+      <Screen>
+        <SearchedTextDisplay searchedText={text} />
 
-            <ReactNativeScrollView>
-              <SearchedCategoriesScrollView
-                  categoriesNames={categoriesNames}
-              />
+        <ReactNativeScrollView>
+          <SearchedCategoriesScrollView
+              categoriesNames={categoriesNames}
+          />
 
-              <Text variant="titleLarge">
-                  Tiendas
-              </Text>
+          <Text variant="titleLarge">
+              Tiendas
+          </Text>
 
-              <StoresResultsScrollView
-                  searchedText={text}
-              />
+          <StoresResultsScrollView
+              searchedText={text}
+          />
 
-              <Text variant="titleLarge">
-                  Publicaciones
-              </Text>
+          <Text variant="titleLarge">
+              Publicaciones
+          </Text>
 
-              <PostsResults
-                  searchedText={text}
-                  categoriesNames={categoriesNames}
-              />
-            </ReactNativeScrollView>
-        </SafeAreaView>
+          <PostsResults
+              searchedText={text}
+              categoriesNames={categoriesNames}
+          />
+        </ReactNativeScrollView>
+      </Screen>
     )
 }

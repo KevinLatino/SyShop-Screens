@@ -10,7 +10,8 @@ import { showMessage } from '../components/AppSnackBar'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
+import Screen from '../components/Screen'
+import { StyleSheet } from 'react-native'
 import { Text, Button, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -21,11 +22,6 @@ const styles = StyleSheet.create({
     gap: 22,
     paddingTop: 16,
     paddingBottom: 16
-  },
-  Image:{
-    width: 300, //grasa
-    height: 300, //grasa
-    alignItems: "center"
   },
   title: {
     fontSize: 50,
@@ -87,22 +83,6 @@ const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
 export default () => {
   const navigation = useNavigation()
   const [_, setSession] = useAtom(sessionAtom)
-  const form = useForm(
-    {
-      email: "",
-      password: ""
-    },
-    {
-      email: checkEmail,
-      password: makeNotEmptyChecker("Contraseña vacía")
-    }
-  )
-  const signInWithPlainAccountMutation = useMutation(
-    ({ ...credentials }) => signInWithPlainAccount(credentials)
-  )
-  const signInWithGoogleAccountMutation = useMutation(
-    ({ googleUniqueIdentifier }) => signInWithGoogleAccount(googleUniqueIdentifier)
-  )
 
   const handleSignInWithPlainAccount = () => {
     if (form.hasErrors()) {
@@ -122,9 +102,21 @@ export default () => {
     signInWithGoogleAccountMutation.mutate({ googleUniqueIdentifier })
   }
 
-  const isSignInLoading = (
-    (signInWithPlainAccountMutation.isLoading) ||
-    (signInWithGoogleAccountMutation.isLoading)
+  const form = useForm(
+    {
+      email: "",
+      password: ""
+    },
+    {
+      email: checkEmail,
+      password: makeNotEmptyChecker("Contraseña vacía")
+    }
+  )
+  const signInWithPlainAccountMutation = useMutation(
+    ({ ...credentials }) => signInWithPlainAccount(credentials)
+  )
+  const signInWithGoogleAccountMutation = useMutation(
+    ({ googleUniqueIdentifier }) => signInWithGoogleAccount(googleUniqueIdentifier)
   )
 
   const signInData =
@@ -135,6 +127,10 @@ export default () => {
       signInWithGoogleAccountMutation.data :
       null
     )
+  const isSignInLoading = (
+    (signInWithPlainAccountMutation.isLoading) ||
+    (signInWithGoogleAccountMutation.isLoading)
+  )
 
   useEffect(() => {
     if (signInData !== null) {
@@ -148,7 +144,7 @@ export default () => {
   }, [signInData])
 
   return (
-    <View style={styles.container}>
+    <Screen>
       <Text style={styles.title}>
         Bienvenido
       </Text>
@@ -202,6 +198,6 @@ export default () => {
           disabled={isSignInLoading}
         />
       }
-    </View>
+    </Screen>
   )
 }

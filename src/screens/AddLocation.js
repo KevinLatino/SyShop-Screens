@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAtom } from 'jotai'
+import { sessionAtom } from '../context'
 import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
 import SearchInput from '../components/SearchInput'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
-import { TouchableRipple, List } from 'react-native-paper'
+import { Button, TouchableRipple, List } from 'react-native-paper'
 
 const addLocation = async (geoapifyAddress, customerId) => {
   const location = {
@@ -46,34 +49,47 @@ const AddressAutocompleteTile = ({ address, onSelect }) => {
 
 const AddressAutocompleteInput = ({ onSelect }) => {
   const [searchedText, setSearchedText] = useState("")
-  const addressesQuery = useQuery({
-    queryKey: ["autocompletedAddresses"],
-    queryFn: () => autocompleteAddress(searchedText)
-  })
+
+  const handleSearch = () => {
+    getAddressesMutation.mutate({ searchedText })
+  }
+
+  const getAddressesMutation = useMutation(
+    ({ searchedText }) => autocompleteAddress(searchedText)
+  )
+
+  if (getAddressesMutation.isLoading) {
+    return (
+      <LoadingSpinner />
+    )
+  }
+
+  const tiles = !getAddressesMutation.data
+      ? null
+      : (
+        getAddressesMutation.data.map((address) => {
+          return (
+            <AddressAutocompleteTile
+              key={address.place_id}
+              address={address}
+              onSelect={onSelect}
+            />
+          )
+        })
+      )
 
   return (
     <View>
       <SearchInput
         value={searchedText}
         onChangeText={setSearchedText}
+        onSubmitEditing={handleSearch}
         placeholder="Ubicación"
       />
 
       <View>
         <List.Section>
-          {
-            addressesQuery.isLoading ?
-            <LoadingSpinner /> :
-            addressesQuery.data.map((address) => {
-              return (
-                <AddressAutocompleteTile
-                  key={address.place_id}
-                  result={address}
-                  onSelect={onSelect}
-                />
-              )
-            })
-          }
+          {tiles}
         </List.Section>
       </View>
     </View>
@@ -81,18 +97,11 @@ const AddressAutocompleteInput = ({ onSelect }) => {
 }
 
 export default () => {
-  const [selectedAddress, setSelectedAddress] = useState(null)
-  const [session, _] = useAtom(sessionAtom)
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const addLocationMutation = useMutation(
-    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["customerLocations"]
-      })
-    }
-  )
+  const [session, _] = useAtom(sessionAtom)
+
+  const [selectedAddress, setSelectedAddress] = useState(null)
 
   const handleAdd = () => {
     addLocationMutation.mutate({
@@ -101,9 +110,20 @@ export default () => {
     })
   }
 
-  if (addLocationMutation.isSuccess) {
-    navigation.navigate("ChooseLocation")
+  const handleSuccess = (_) => {
+    queryClient.refetchQueries({
+      queryKey: ["customerLocations"]
+    })
+
+    navigation.goBack()
   }
+
+  const addLocationMutation = useMutation(
+    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId),
+    {
+      onSuccess: handleSuccess
+    }
+  )
 
   return (
     <SafeAreaView>

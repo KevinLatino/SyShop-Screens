@@ -15,12 +15,8 @@ import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
-import {
-  View,
-  StyleSheet,
-  ScrollView as ReactNativeScrollView
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
+import { View, StyleSheet } from 'react-native'
 import { Button, Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -105,10 +101,51 @@ const signUpWithGoogleAccount = async (userInformation, googleUniqueIdentifier) 
 export default () => {
   const navigation = useNavigation()
   const [_, setSession] = useAtom(sessionAtom)
+
   const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
   const [useUrlPicture, setUseUrlPicture] = useState(false)
   const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
   const [picture, setPicture] = useState(null)
+
+  const handleSignUp = () => {
+    if (form.hasErrors()) {
+      showMessage("Por favor provee la información necesaria para registrarte")
+
+      return
+    }
+
+    if (signingUpWithPlainAccount) {
+      signUpWithPlainAccountMutation.mutate({
+        picture,
+        ...form.fields
+      })
+    } else {
+      signUpWithGoogleAccountMutation.mutate({
+        googleUniqueIdentifier,
+        picture,
+        ...form.fields
+      })
+    }
+  }
+
+  const handleChangePicture = (newPicture) => {
+    setUseUrlPicture(false)
+    setPicture(newPicture)
+  }
+
+  const fillUpFormWithGoogleData = (userInformation) => {
+    const [firstSurname, secondSurname] = userInformation.family_name.split(" ", 2)
+
+    form.setField("second_surname")(secondSurname)
+    form.setField("first_surname")(firstSurname)
+    form.setField("name")(userInformation.given_name)
+
+    setPicture(_ => userInformation.picture)
+    setSigninUpWithPlainAccount(_ => false)
+    setUseUrlPicture(_ => true)
+    setGoogleUniqueIdentifier(_ => userInformation.id)
+  }
+
   const form = useForm(
     {
       name: "",
@@ -144,6 +181,10 @@ export default () => {
       signUpWithGoogleAccountMutation.data :
       null
     )
+  const isSignUpLoading = (
+    (signUpWithPlainAccountMutation.isLoading) ||
+    (signUpWithGoogleAccountMutation.isLoading)
+  )
 
   useEffect(() => {
     if (signUpData !== null) {
@@ -156,144 +197,98 @@ export default () => {
     }
   }, [signUpData])
 
-  const isSignUpLoading = (
-    (signUpWithPlainAccountMutation.isLoading) ||
-    (signUpWithGoogleAccountMutation.isLoading)
-  )
-
-  const handleSignUp = () => {
-    if (form.hasErrors()) {
-      showMessage("Por favor provee la información necesaria para registrarte")
-
-      return
-    }
-
-    if (signingUpWithPlainAccount) {
-      signUpWithPlainAccountMutation.mutate({
-        picture,
-        ...form.fields
-      })
-    } else {
-      signUpWithGoogleAccountMutation.mutate({
-        googleUniqueIdentifier,
-        picture,
-        ...form.fields
-      })
-    }
-  }
-
-  const handleChangePicture = (newPicture) => {
-    setUseUrlPicture(false)
-    setPicture(newPicture)
-  }
-
-  const fillUpFormWithGoogleData = (userInformation) => {
-    const [firstSurname, secondSurname] = userInformation.family_name.split(" ", 2)
-
-    form.setField("second_surname") (secondSurname)
-    form.setField("first_surname") (firstSurname)
-    form.setField("name") (userInformation.given_name)
-
-    setPicture(_ => userInformation.picture)
-    setSigninUpWithPlainAccount(_ => false)
-    setUseUrlPicture(_ => true)
-    setGoogleUniqueIdentifier(_ => userInformation.id)
-  }
-
   return (
-    <ReactNativeScrollView>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>
-          Registrarse
-        </Text>
+    <Screen>
+      <Text style={styles.title}>
+        Registrarse
+      </Text>
 
-        <Text style={styles.subtitle}>
-          Ingresa tus datos personales
-        </Text>
+      <Text style={styles.subtitle}>
+        Ingresa tus datos personales
+      </Text>
 
-        <PictureInput
-          picture={picture}
-          onChangePicture={handleChangePicture}
-          useUrl={useUrlPicture}
+      <PictureInput
+        picture={picture}
+        onChangePicture={handleChangePicture}
+        useUrl={useUrlPicture}
+      />
+
+      <View style={styles.inputsContainer}>
+        <TextField
+          value={form.getField("name")}
+          onChangeText={form.setField("name")}
+          error={form.getError("name")}
+          placeholder="Nombre"
         />
 
-        <View style={styles.inputsContainer}>
-          <TextField
-            value={form.getField("name")}
-            onChangeText={form.setField("name")}
-            error={form.getError("name")}
-            placeholder="Nombre"
-          />
-
-          <TextField
-            value={form.getField("first_surname")}
-            onChangeText={form.setField("first_surname")}
-            error={form.getError("first_surname")}
-            placeholder="Primer apellido"
-          />
-
-          <TextField
-            value={form.getField("second_surname")}
-            onChangeText={form.setField("second_surname")}
-            error={form.getError("second_surname")}
-            placeholder="Segundo apellido"
-          />
-
-          <TextField
-            value={form.getField("phone_number")}
-            onChangeText={form.setField("phone_number")}
-            error={form.getError("phone_number")}
-            placeholder="Número telefónico"
-            keyboardType="numeric"
-          />
-
-          {
-            signingUpWithPlainAccount ?
-            (
-              <View style={styles.inputsContainer}>
-                <TextField
-                  value={form.getField("email")}
-                  onChangeText={form.setField("email")}
-                  error={form.getError("email")}
-                  placeholder="Correo electrónico"
-                />
-
-                <TextField
-                  value={form.getField("password")}
-                  onChangeText={form.setField("password")}
-                  error={form.getError("password")}
-                  placeholder="Contraseña"
-                  secureTextEntry
-                />
-              </View>
-            ) :
-            null
-          }
-        </View>
-
-        <Button
-          style={styles.button}
-          mode="contained"
-          onPress={handleSignUp}
-        >
-          {
-            isSignUpLoading ?
-            <LoadingSpinner /> :
-            "Registrarse"
-          }
-        </Button>
-
-        <Divider style={{ width: "90%" }} />
-
-        <Text style={styles.thirdText}>
-          También puedes registrarte con
-        </Text>
-
-        <GoogleSignInButton
-          text="Registrate con Google"
-          onSignIn={fillUpFormWithGoogleData}
+        <TextField
+          value={form.getField("first_surname")}
+          onChangeText={form.setField("first_surname")}
+          error={form.getError("first_surname")}
+          placeholder="Primer apellido"
         />
-      </SafeAreaView>
-    </ReactNativeScrollView>
+
+        <TextField
+          value={form.getField("second_surname")}
+          onChangeText={form.setField("second_surname")}
+          error={form.getError("second_surname")}
+          placeholder="Segundo apellido"
+        />
+
+        <TextField
+          value={form.getField("phone_number")}
+          onChangeText={form.setField("phone_number")}
+          error={form.getError("phone_number")}
+          placeholder="Número telefónico"
+          keyboardType="numeric"
+        />
+
+        {
+          signingUpWithPlainAccount ?
+          (
+            <View style={styles.inputsContainer}>
+              <TextField
+                value={form.getField("email")}
+                onChangeText={form.setField("email")}
+                error={form.getError("email")}
+                placeholder="Correo electrónico"
+              />
+
+              <TextField
+                value={form.getField("password")}
+                onChangeText={form.setField("password")}
+                error={form.getError("password")}
+                placeholder="Contraseña"
+                secureTextEntry
+              />
+            </View>
+          ) :
+          null
+        }
+      </View>
+
+      <Button
+        style={styles.button}
+        mode="contained"
+        onPress={handleSignUp}
+      >
+        {
+          isSignUpLoading ?
+          <LoadingSpinner /> :
+          "Registrarse"
+        }
+      </Button>
+
+      <Divider style={{ width: "90%" }} />
+
+      <Text style={styles.thirdText}>
+        También puedes registrarte con
+      </Text>
+
+      <GoogleSignInButton
+        text="Registrate con Google"
+        onSignIn={fillUpFormWithGoogleData}
+      />
+    </Screen>
   )
 }

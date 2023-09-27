@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         gap: 8,
-        // width: "fit-content",
         borderBottom: "1.5px solid darkgray"
     },
     menuDrawer: {
@@ -73,8 +72,13 @@ const InformationEntry = ({ icon, text }) => {
 }
 
 export default () => {
-    const [session, _] = useAtom(sessionAtom)
     const navigation = useNavigation()
+    const [session, _] = useAtom(sessionAtom)
+
+    const navigateToEditProfile = () => {
+      navigation.navigate("EditProfile")
+    }
+
     const customerQuery = useQuery({
         queryKey: ["customer"],
         queryFn: () => fetchCustomer(session.customerId)
@@ -93,10 +97,6 @@ export default () => {
         picture,
         phone_number
     } = customerQuery.data
-
-    const navigateToEditProfile = () => {
-      navigation.navigate("EditProfile")
-    }
 
     return (
       <SafeAreaView style={styles.profileView}>
