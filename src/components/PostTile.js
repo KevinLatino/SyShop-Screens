@@ -45,7 +45,11 @@ export default ({ post }) => {
       .categories
       .map((category, index) => {
         return (
-          <Chip mode="flat" key={index}>
+          <Chip
+            key={index}
+            mode="flat"
+            icon="shape"
+          >
             {category}
           </Chip>
         )

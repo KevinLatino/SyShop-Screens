@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
 const VirtualizedView = ({ children })  => {
   return (
     <FlatList
+      style={{ flex: 1 }}
       data={[]}
       ListEmptyComponent={null}
       keyExtractor={() => "dummy"}
@@ -31,8 +32,8 @@ const VirtualizedView = ({ children })  => {
 
 export default ({ children, ...safeAreaViewProps }) => {
   return (
-    <VirtualizedView>
-      <KeyboardAwareScrollView>
+    <VirtualizedView >
+      <KeyboardAwareScrollView style={{ flex: 1 }}>
         <SafeAreaView
           style={styles.container}
           {...safeAreaViewProps}

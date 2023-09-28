@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { sessionAtom } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -19,17 +19,29 @@ const likePost = async (postId, customerId) => {
 }
 
 export default ({ postId, doesCustomerLikePost }) => {
+  const queryClient = useQueryClient()
   const [session, _] = useAtom(sessionAtom)
+
   const [isLiked, setIsLiked] = useState(doesCustomerLikePost)
-  const likePostMutation = useMutation(
-    ({ postId, customerId }) => likePost(postId, customerId)
-  )
 
   const handleLike = () => {
     likePostMutation.mutate({ postId, customerId: session.customerId })
 
     setIsLiked(!isLiked)
   }
+
+  const handleSuccess = () => {
+    queryClient.refetchQueries({
+      queryKey: ["likedPosts"]
+    })
+  }
+
+  const likePostMutation = useMutation(
+    ({ postId, customerId }) => likePost(postId, customerId),
+    {
+      onSuccess: handleSuccess
+    }
+  )
 
   return (
     <View>

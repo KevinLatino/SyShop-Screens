@@ -1,5 +1,4 @@
-import { View, StyleSheet } from 'react-native'
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, View, StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
@@ -18,7 +17,7 @@ export default ({ inScreen }) => {
     <View style={containerStyle}>
       <ActivityIndicator
         animating
-        size={inScreen ? 96 : "small"}
+        size={inScreen ? "large" : "small"}
       />
     </View>
   )

@@ -39,6 +39,8 @@ export default () => {
             data={likedPostsQuery.data}
             keyExtractor={(post) => post.post_id}
             renderItem={({ item }) => <PostTile post={item} />}
+            emptyIcon="heart"
+            emptyMessage="No te gusta ninguna publicación"
         />
       </SafeAreaView>
     )

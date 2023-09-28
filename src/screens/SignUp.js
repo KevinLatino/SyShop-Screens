@@ -212,7 +212,6 @@ export default () => {
 
   useEffect(() => {
     if (signUpData !== null) {
-      console.log(signUpData)
       setSession({
         token: signUpData.token,
         customerId: signUpData.user_id
@@ -221,8 +220,6 @@ export default () => {
       navigation.navigate("Home")
     }
   }, [signUpData])
-
-  console.log(form.getField("email"))
 
   return (
     <Screen>

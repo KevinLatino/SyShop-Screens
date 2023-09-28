@@ -1,14 +1,9 @@
-# Mañana
-+ [ ] Aplicar estilos
-+ [ ] Arreglar los LoadingSpinners
-
-# YA
+# Viernes
 + [ ] Desactivar cuando no se puede usar
-+ [ ] Cambiar color y fuente del tema
-+ [ ] Añadir componente para listas vacías
-
-# Después
-+ [ ] Implementar reutilización de sesiones
++ [ ] Acomodar los layouts
++ [ ] Entender flex: 1
++ [ ] Arreglar los LoadingSpinners
++ [ ] Implementar emptyIcon y emptyMessage en todos los ScrollView (FlatList)
 
 # Después del cliente para vendedores
 + [ ] Implementar verificación de correo electrónico y número telefónico

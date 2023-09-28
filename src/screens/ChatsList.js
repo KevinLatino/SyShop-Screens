@@ -6,7 +6,7 @@ import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Screen from '../components/Screen'
-import { View, Dimensions } from 'react-native'
+import { View } from 'react-native'
 import { Text } from 'react-native-paper'
 
 const fetchChats = async (customerId) => {
@@ -29,24 +29,22 @@ export default () => {
     queryFn: () => fetchChats(session.customerId)
   })
 
+  if (chatsQuery.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
+
   return (
     <Screen>
       <Text variant="titleLarge">
         Tus mensajes
       </Text>
 
-      {
-        chatsQuery.isLoading ?
-        (
-          <View style={{ height: Dimensions.get("window").height }}>
-            <LoadingSpinner inScreen />
-          </View>
-        ) :
-        <ScrollView
-          data={chatsQuery.data}
-          renderItem={({ item }) => <ChatTile chat={item} />}
-        />
-      }
+      <ScrollView
+        data={chatsQuery.data}
+        renderItem={({ item }) => <ChatTile chat={item} />}
+      />
     </Screen>
   )
 }

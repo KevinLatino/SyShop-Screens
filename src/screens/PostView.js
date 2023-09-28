@@ -184,8 +184,9 @@ const CommentsScrollView = ({ postId }) => {
   )
 }
 
-const PostView = ({ post }) => {
+const PostView = ({ postId }) => {
   const navigation = useNavigation()
+  const [session, _] = useAtom(sessionAtom)
 
   const navigateToStoreView = () => {
     navigation.navigate("StoreView", {
@@ -199,7 +200,18 @@ const PostView = ({ post }) => {
     })
   }
 
-  const categoriesChips = post.categories.map((category) => {
+  const postQuery = useQuery({
+    queryKey: ["post"],
+    queryFn: () => fetchPost(postId, session.customerId)
+  })
+
+  if (postQuery.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
+
+  const categoriesChips = postQuery.data.categories.map((category) => {
     return (
       <Chip
         key={category}
@@ -210,6 +222,8 @@ const PostView = ({ post }) => {
       </Chip>
     )
   })
+
+  const post = postQuery.data
 
   return (
     <View>
@@ -277,22 +291,15 @@ const PostView = ({ post }) => {
 
 export default () => {
   const route = useRoute()
-  const [session, _] = useAtom(sessionAtom)
 
   const { postId } = route.params
 
-  const postQuery = useQuery({
-    queryKey: ["post"],
-    queryFn: () => fetchPost(postId, session.customerId)
-  })
 
   return (
     <Screen>
-      {
-        postQuery.isLoading ?
-        <LoadingSpinner inScreen /> :
-        <PostView post={postQuery.data} />
-      }
+      <View style={{ flex: 1 }}>
+        <PostView postId={postId} />
+      </View>
 
       <Divider />
 

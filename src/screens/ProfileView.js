@@ -16,6 +16,7 @@ import {
 
 const styles = StyleSheet.create({
     profileView: {
+      flex: 1,
       justifyContent: "space-between",
       alignItems: "center",
       gap: 32,
@@ -33,10 +34,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 8,
         borderBottom: "1.5px solid darkgray"
-    },
-    menuDrawer: {
-      height: Dimensions.get("screen").height,
-      width: "80%"
     },
     fab: {
       position: "absolute",

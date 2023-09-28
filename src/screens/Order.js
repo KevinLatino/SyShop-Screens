@@ -10,20 +10,16 @@ import { showMessage } from '../components/AppSnackBar'
 import LoadingSpinner from '../components/LoadingSpinner'
 import NumericInput from 'react-native-numeric-input'
 import Screen from '../components/Screen'
-import { StyleSheet, Dimensions } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { Card, Text, Button } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    top: Dimensions.get("screen").height * 0.1,
-    left: Dimensions.get("screen").width * 0.1,
     justifyContent: "center",
     alignItems: "center",
     gap: 24,
     padding: 16,
     borderRadius: 12,
-    width: Dimensions.get("screen").width * 0.8
   }
 })
 

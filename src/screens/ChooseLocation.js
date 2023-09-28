@@ -8,7 +8,7 @@ import { showMessage } from '../components/AppSnackBar'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import { Button, FAB } from 'react-native-paper'
 
@@ -136,7 +136,7 @@ export default () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Screen>
       <LocationsScrollView saleId={saleId} />
 
       <FAB
@@ -144,6 +144,6 @@ export default () => {
         style={styles.fab}
         onPress={navigateToAddLocation}
       />
-    </SafeAreaView>
+    </Screen>
   )
 }

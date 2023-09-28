@@ -58,7 +58,7 @@ const PostsList = () => {
 
   if (postsQuery.isLoading) {
     return (
-      <View style={{ height: Dimensions.get("screen").height }}>
+      <View style={{ height: "100%" }}>
         <LoadingSpinner inScreen />
       </View>
     )
