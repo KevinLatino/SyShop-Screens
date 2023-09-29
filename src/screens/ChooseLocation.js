@@ -114,6 +114,7 @@ const LocationsScrollView = ({ saleId }) => {
       <Button
         mode="contained"
         onPress={handleSubmit}
+        disabled={selectedLocation === null || createDeliveryMutation.isLoading}
       >
         {
           createDeliveryMutation.isLoading ?

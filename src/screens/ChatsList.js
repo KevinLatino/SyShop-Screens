@@ -6,7 +6,6 @@ import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Screen from '../components/Screen'
-import { View } from 'react-native'
 import { Text } from 'react-native-paper'
 
 const fetchChats = async (customerId) => {
