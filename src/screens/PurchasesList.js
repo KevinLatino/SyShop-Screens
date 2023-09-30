@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -20,14 +19,15 @@ const fetchPurchases = async (customerId) => {
 }
 
 export default () => {
-    const [session, _] = useAtom(sessionAtom)
+    const [session, _] = useSession()
 
     const purchasesQuery = useQuery({
-        queryKey: ["customerPurchases"],
-        queryFn: () => fetchPurchases(session.customerId)
+      queryKey: ["customerPurchases"],
+      queryFn: () => fetchPurchases(session.data.customerId),
+      disabled: session.isLoading
     })
 
-    if (purchasesQuery.isLoading) {
+    if (purchasesQuery.isLoading || session.isLoading) {
         return (
             <LoadingSpinner inScreen />
         )
@@ -39,6 +39,8 @@ export default () => {
             data={purchasesQuery.data}
             keyExtractor={(purchase) => purchase.sale_id}
             renderItem={({ item }) => <SaleTile sale={item} />}
+            emptyIcon="basket"
+            emptyMessage="No has comprado nada"
         />
       </Screen>
     )

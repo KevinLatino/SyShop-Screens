@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
 import SearchInput from '../components/SearchInput'
@@ -99,14 +98,14 @@ const AddressAutocompleteInput = ({ onSelect }) => {
 export default () => {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const [selectedAddress, setSelectedAddress] = useState(null)
 
   const handleAdd = () => {
     addLocationMutation.mutate({
       selectedAddress,
-      customerId: session.customerId
+      customerId: session.data.customerId
     })
   }
 

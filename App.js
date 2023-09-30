@@ -1,19 +1,16 @@
 import 'react-native-gesture-handler'
-import { useState, useEffect } from 'react'
-import { useNavigation } from '@react-navigation/native'
-import { useAtom } from 'jotai'
-import { sessionAtom } from './src/context'
-import { Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { PaperProvider } from 'react-native-paper'
+import { ThemeProvider as IosKitProvider } from 'react-native-ios-kit'
 import { StripeProvider } from '@stripe/stripe-react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { useSession } from './src/context'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import configuration from './src/configuration'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ActivityIndicator } from 'react-native'
+import LoadingSpinner from './src/components/LoadingSpinner'
 import Home from './src/screens/Home'
 import DeliveriesList from './src/screens/DeliveriesList'
 import ChatsList from './src/screens/ChatsList'
@@ -33,6 +30,7 @@ import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
 import AppSnackBar from './src/components/AppSnackBar'
 import Order from './src/screens/Order'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
@@ -139,168 +137,140 @@ const BottomTabNavigator = () => {
   )
 }
 
-const Loader = () => {
-  const navigation = useNavigation()
-
-  const [loading, setLoading] = useState(true)
-  const [session, setSession] = useState(null)
-  const [_, setAtomSession] = useAtom(sessionAtom)
-
-  useEffect(() => {
-    AsyncStorage.getItem("session")
-      .then((item) => {
-        setSession(_ => item ?? null)
-        setLoading(_ => false)
-      })
-  }, [])
-
-  if (loading) {
-    return (
-      <ActivityIndicator />
-    )
-  }
-
-  if (session === null) {
-    navigation.navigate("Welcome")
-  } else {
-    setAtomSession(session).then((_) => {
-      navigation.navigate("Home")
-    })
-  }
-}
-
 const Main = () => {
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   console.log(session)
+
+  if (session.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
 
   return (
     <StripeProvider
       publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}
     >
       <QueryClientProvider client={queryClient}>
-        <PaperProvider theme={theme}>
-          <SafeAreaProvider>
-              <NavigationContainer>
-                <Stack.Navigator
-                  initialRouteName={"Loader"}
-                  screenOptions={{
-                    headerShown: false
-                  }}
-                >
-                  <Stack.Screen
-                    name="Loader"
+        <IosKitProvider>
+          <PaperProvider theme={theme}>
+            <SafeAreaProvider>
+                <NavigationContainer>
+                  <Stack.Navigator
+                    initialRouteName={session.data === null ? "Welcome" : "Home"}
+                    screenOptions={{
+                      headerShown: false
+                    }}
                   >
-                    {() => <Loader />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="Welcome"
+                    >
+                      {() => <Welcome />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="Welcome"
-                  >
-                    {() => <Welcome />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="SignIn"
+                    >
+                      {() => <SignIn />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="SignIn"
-                  >
-                    {() => <SignIn />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="SignUp"
+                    >
+                      {() => <SignUp />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="SignUp"
-                  >
-                    {() => <SignUp />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="Home"
+                    >
+                      {() => <BottomTabNavigator />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="Home"
-                  >
-                    {() => <BottomTabNavigator />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="DeliveriesList"
+                    >
+                      {() => <DeliveriesList />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="DeliveriesList"
-                  >
-                    {() => <DeliveriesList />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="ChatsList"
+                    >
+                      {() => <ChatsList />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="ChatsList"
-                  >
-                    {() => <ChatsList />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="Chat"
+                    >
+                      {() => <Chat />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="Chat"
-                  >
-                    {() => <Chat />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="ChooseLocation"
+                    >
+                      {() => <ChooseLocation />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="ChooseLocation"
-                  >
-                    {() => <ChooseLocation />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="AddLocation"
+                    >
+                      {() => <AddLocation />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="AddLocation"
-                  >
-                    {() => <AddLocation />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="SearchResults"
+                    >
+                      {() => <SearchResults />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="SearchResults"
-                  >
-                    {() => <SearchResults />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="PostView"
+                    >
+                      {() => <PostView />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="PostView"
-                  >
-                    {() => <PostView />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="EditProfile"
+                    >
+                      {() => <EditProfile />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="EditProfile"
-                  >
-                    {() => <EditProfile />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="LikedPosts"
+                    >
+                      {() => <LikedPosts />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="LikedPosts"
-                  >
-                    {() => <LikedPosts />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="PurchasesList"
+                    >
+                      {() => <PurchasesList />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="PurchasesList"
-                  >
-                    {() => <PurchasesList />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="ProfileView"
+                    >
+                      {() => <ProfileView />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="ProfileView"
-                  >
-                    {() => <ProfileView />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="StoreView"
+                    >
+                      {() => <StoreView />}
+                    </Stack.Screen>
 
-                  <Stack.Screen
-                    name="StoreView"
-                  >
-                    {() => <StoreView />}
-                  </Stack.Screen>
+                    <Stack.Screen
+                      name="Order"
+                    >
+                      {() => <Order />}
+                    </Stack.Screen>
+                  </Stack.Navigator>
+                </NavigationContainer>
+            </SafeAreaProvider>
 
-                  <Stack.Screen
-                    name="Order"
-                  >
-                    {() => <Order />}
-                  </Stack.Screen>
-                </Stack.Navigator>
-              </NavigationContainer>
-          </SafeAreaProvider>
-
-          <AppSnackBar />
-        </PaperProvider>
+            <AppSnackBar />
+          </PaperProvider>
+        </IosKitProvider>
       </QueryClientProvider>
     </StripeProvider>
   )

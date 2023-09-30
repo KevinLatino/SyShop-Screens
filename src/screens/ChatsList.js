@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
@@ -21,14 +20,15 @@ const fetchChats = async (customerId) => {
 }
 
 export default () => {
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const chatsQuery = useQuery({
     queryKey: ["listOfChats"],
-    queryFn: () => fetchChats(session.customerId)
+    queryFn: () => fetchChats(session.data.customerId),
+    disabled: session.isLoading
   })
 
-  if (chatsQuery.isLoading) {
+  if (chatsQuery.isLoading || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -42,7 +42,10 @@ export default () => {
 
       <ScrollView
         data={chatsQuery.data}
+        keyExtractor={(chat) => chat.chat_id}
         renderItem={({ item }) => <ChatTile chat={item} />}
+        emptyIcon="chat"
+        emptyMessage="No has hablado con nadie"
       />
     </Screen>
   )

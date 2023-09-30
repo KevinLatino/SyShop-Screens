@@ -3,23 +3,24 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { requestServer } from '../utilities/requests'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { showMessage } from '../components/AppSnackBar'
 import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
+import Button from '../components/Button'
 import Screen from '../components/Screen'
 import { StyleSheet } from 'react-native'
-import { Button } from 'react-native-paper'
+import { Text } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    gap: 32
+    gap: 20
   }
 })
 
@@ -50,7 +51,7 @@ const updateCustomer = async (customerId, newCustomer, picture) => {
 export default () => {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const [picture, setPicture] = useState(null)
 
@@ -73,7 +74,7 @@ export default () => {
 
   const handleUpdate = () => {
     updateCustomerMutation.mutate({
-      customerId: session.customerId,
+      customerId: session.data.customerId,
       fields: form.fields,
       picture
     })
@@ -95,8 +96,9 @@ export default () => {
   )
   const customerQuery = useQuery({
     queryKey: ["customerToEdit"],
-    queryFn: () => fetchCustomer(session.customerId),
-    onSuccess: (data) => fillFormFields(data)
+    queryFn: () => fetchCustomer(session.data.customerId),
+    onSuccess: (data) => fillFormFields(data),
+    disabled: session.isLoading
   })
   const updateCustomerMutation = useMutation(
     ({ customerId, fields, picture }) => updateCustomer(
@@ -106,7 +108,7 @@ export default () => {
     }
   )
 
-  if (customerQuery.isLoading) {
+  if (customerQuery.isLoading || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -114,6 +116,10 @@ export default () => {
 
   return (
     <Screen style={styles.container}>
+      <Text variant="titleLarge">
+        Configuración
+      </Text>
+
       <PictureInput
         picture={picture}
         onChangePicture={setPicture}
@@ -148,7 +154,6 @@ export default () => {
       />
 
       <Button
-        mode="contained"
         onPress={handleUpdate}
         disabled={form.hasErrors()}
       >

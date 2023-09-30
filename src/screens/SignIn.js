@@ -1,25 +1,25 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { makeNotEmptyChecker, checkEmail } from '../utilities/validators'
 import { showMessage } from '../components/AppSnackBar'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
+import Button from '../components/Button'
 import Screen from '../components/Screen'
 import { StyleSheet } from 'react-native'
-import { Text, Button, Divider } from 'react-native-paper'
+import { Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 22,
+    gap: 20,
     paddingTop: 16,
     paddingBottom: 16
   },
@@ -28,31 +28,17 @@ const styles = StyleSheet.create({
     color: "#344340",
     fontWeight: "bold",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 16,
   },
   subtitle: {
     fontSize: 20,
     color: "gray",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  button: {
-    width: 225,
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#c20000"
   },
   thirdText: {
     fontSize: 18,
     color: "#344340",
     fontWeight: "bold",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
   }
 })
 
@@ -108,7 +94,7 @@ const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
 
 export default () => {
   const navigation = useNavigation()
-  const [_, setSession] = useAtom(sessionAtom)
+  const [_, setSession] = useSession()
 
   const handleSignInWithPlainAccount = () => {
     if (form.hasErrors()) {
@@ -170,7 +156,7 @@ export default () => {
   }, [signInData])
 
   return (
-    <Screen>
+    <Screen style={styles.container}>
       <Text style={styles.title}>
         Bienvenido
       </Text>
@@ -195,17 +181,14 @@ export default () => {
       />
 
       <Button
-        style={styles.button}
-        mode="contained"
+        style={{ width: "70%" }}
         onPress={handleSignInWithPlainAccount}
         disabled={form.hasErrors() || isSignInLoading}
       >
         {
-          signInWithPlainAccountMutation.isLoading
-          ? (
-            <LoadingSpinner />
-          )
-          : "Iniciar sesión"
+          signInWithPlainAccountMutation.isLoading ?
+          <LoadingSpinner /> :
+          "Iniciar sesión"
         }
       </Button>
 

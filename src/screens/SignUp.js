@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { showMessage } from '../components/AppSnackBar'
 import { requestServer } from '../utilities/requests'
 import {
@@ -15,14 +14,15 @@ import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
+import Button from '../components/Button'
 import Screen from '../components/Screen'
 import { View, StyleSheet } from 'react-native'
-import { Button, Text, Divider } from 'react-native-paper'
+import { Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 16,
+    gap: 20,
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 16,
@@ -40,24 +40,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     display: "flex",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
   },
   subtitle: {
     fontSize: 20,
     color: "gray",
     display: "flex",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  button: {
-    display: "flex",
-    width: 225,
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#c20000"
   },
   thirdText: {
     fontSize: 18,
@@ -65,8 +53,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     display: "flex",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
   }
 })
 
@@ -124,7 +110,7 @@ const signUpWithGoogleAccount = async (userInformation, googleUniqueIdentifier) 
 
 export default () => {
   const navigation = useNavigation()
-  const [_, setSession] = useAtom(sessionAtom)
+  const [_, setSession] = useSession()
 
   const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
   const [useUrlPicture, setUseUrlPicture] = useState(false)
@@ -222,7 +208,7 @@ export default () => {
   }, [signUpData])
 
   return (
-    <Screen>
+    <Screen style={styles.container}>
       <Text style={styles.title}>
         Registrarse
       </Text>
@@ -292,10 +278,9 @@ export default () => {
       </View>
 
       <Button
-        style={styles.button}
-        mode="contained"
         onPress={handleSignUp}
         disabled={form.hasErrors()}
+        style={{ width: "70%" }}
       >
         {
           isSignUpLoading ?

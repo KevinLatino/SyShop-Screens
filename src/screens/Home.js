@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { useNavigation } from '@react-navigation/native'
 import ScrollView from '../components/ScrollView'
@@ -9,6 +8,7 @@ import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Screen from '../components/Screen'
+import { Fragment } from 'react'
 import {
   Portal,
   Modal,
@@ -49,27 +49,30 @@ const fetchPosts = async (customerId) => {
 }
 
 const PostsList = () => {
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const postsQuery = useQuery({
     queryKey: ["feedPosts"],
-    queryFn: () => fetchPosts(session.customerId)
+    queryFn: () => fetchPosts(session.data.customerId),
+    disabled: session.isLoading
   })
 
-  if (postsQuery.isLoading) {
+  if (postsQuery.isLoading || session.isLoading) {
     return (
-      <View style={{ height: "100%" }}>
-        <LoadingSpinner inScreen />
-      </View>
+      <LoadingSpinner inScreen />
     )
   }
 
   return (
-    <ScrollView
-      data={postsQuery.data}
-      keyExtractor={(post) => post.post_id}
-      renderItem={({ item }) => <PostTile post={item} />}
-    />
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        data={postsQuery.data}
+        keyExtractor={(post) => post.post_id}
+        renderItem={({ item }) => <PostTile post={item} />}
+        emptyIcon="basket-plus"
+        emptyMessage="Sigue a algunas tiendas para ver contenido que te pueda interesar"
+      />
+    </View>
   )
 }
 
@@ -89,26 +92,28 @@ export default () => {
   }
 
   return (
-    <Screen>
-      <PostsList />
+    <Fragment>
+      <Screen>
+        <PostsList />
 
-      <Portal>
-        <Modal
-          visible={isModalVisible}
-          onDismiss={() => setIsModalVisible(false)}
-          contentContainerStyle={styles.searchBarModal}
-        >
-          <Surface elevation={5}>
-            <SearchBar onSearchSubmit={handleSearchSubmit} />
-          </Surface>
-        </Modal>
-      </Portal>
+        <Portal>
+          <Modal
+            visible={isModalVisible}
+            onDismiss={() => setIsModalVisible(false)}
+            contentContainerStyle={styles.searchBarModal}
+          >
+            <Surface elevation={5}>
+              <SearchBar onSearchSubmit={handleSearchSubmit} />
+            </Surface>
+          </Modal>
+        </Portal>
+      </Screen>
 
       <FAB
         icon="magnify"
         onPress={() => setIsModalVisible(true)}
         style={styles.fab}
       />
-    </Screen>
+    </Fragment>
   )
 }

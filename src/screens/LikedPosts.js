@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useAtom } from "jotai"
-import { sessionAtom } from "../context"
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import LoadingSpinner from "../components/LoadingSpinner"
 import ScrollView from "../components/ScrollView"
@@ -20,14 +19,15 @@ const fetchLikedPosts = async (customerId) => {
 }
 
 export default () => {
-    const [session, _] = useAtom(sessionAtom)
+    const [session, _] = useSession()
 
     const likedPostsQuery = useQuery({
-        queryKey: ["likedPosts"],
-        queryFn: () => fetchLikedPosts(session.customerId)
+      queryKey: ["likedPosts"],
+      queryFn: () => fetchLikedPosts(session.data.customerId),
+      disabled: session.isLoading
     })
 
-    if (likedPostsQuery.isLoading) {
+    if (likedPostsQuery.isLoading || session.isLoading) {
         return (
             <LoadingSpinner inScreen />
         )

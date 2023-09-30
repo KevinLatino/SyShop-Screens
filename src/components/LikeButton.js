@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { IconButton } from 'react-native-paper'
 import LoadingSpinner from './LoadingSpinner'
-import { View } from 'react-native'
 
 const likePost = async (postId, customerId) => {
   const payload = {
@@ -20,12 +18,12 @@ const likePost = async (postId, customerId) => {
 
 export default ({ postId, doesCustomerLikePost }) => {
   const queryClient = useQueryClient()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const [isLiked, setIsLiked] = useState(doesCustomerLikePost)
 
   const handleLike = () => {
-    likePostMutation.mutate({ postId, customerId: session.customerId })
+    likePostMutation.mutate({ postId, customerId: session.data.customerId })
 
     setIsLiked(!isLiked)
   }
@@ -43,17 +41,17 @@ export default ({ postId, doesCustomerLikePost }) => {
     }
   )
 
+  if (likePostMutation.isLoading || session.isLoading) {
+    return (
+      <LoadingSpinner />
+    )
+  }
+
   return (
-    <View>
-      {
-        likePostMutation.isLoading ?
-        <LoadingSpinner /> :
-        <IconButton
-          mode="contained"
-          icon={isLiked ? "heart" : "heart-outline"}
-          onPress={handleLike}
-        />
-      }
-    </View>
+    <IconButton
+      mode="contained"
+      icon={isLiked ? "heart" : "heart-outline"}
+      onPress={handleLike}
+    />
   )
 }

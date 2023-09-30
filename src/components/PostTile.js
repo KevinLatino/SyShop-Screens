@@ -70,6 +70,7 @@ export default ({ post }) => {
 
   return (
     <Card elevation={5}
+      mode="elevated"
       onPress={navigateToPostView}
     >
       <Card.Cover src={post.multimedia[0]} />

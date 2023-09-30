@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useStripe } from '@stripe/stripe-react-native'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
 import { showMessage } from '../components/AppSnackBar'
@@ -74,7 +73,7 @@ const PostTile = ({ post }) => {
 export default () => {
     const navigation = useNavigation()
     const route = useRoute()
-    const [session, _] = useAtom(sessionAtom)
+    const [session, _] = useSession()
     const { initPaymentSheet, presentPaymentSheet } = useStripe()
 
     const { postId } = route.params
@@ -84,7 +83,7 @@ export default () => {
     const handleBuy = () => {
       createSaleIntentMutation.mutate({
         postId,
-        customerId: session.customerId,
+        customerId: session.data.customerId,
         amount
       })
     }
@@ -120,7 +119,8 @@ export default () => {
 
     const postQuery = useQuery({
       queryKey: ["postToBuy"],
-      queryFn: () => fetchPost(postId, session.customerId)
+      queryFn: () => fetchPost(postId, session.data.customerId),
+      disabled: session.isLoading
     })
     const createSaleIntentMutation = useMutation(
       ({ postId, customerId, amount }) => createSaleIntent(postId, customerId, amount),
@@ -129,7 +129,7 @@ export default () => {
       }
     )
 
-    if (postQuery.isLoading) {
+    if (postQuery.isLoading || session.isLoading) {
         return (
           <LoadingSpinner inScreen />
         )

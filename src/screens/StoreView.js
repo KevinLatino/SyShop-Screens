@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatLocation } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
@@ -66,7 +65,7 @@ const followStore = async (storeId, customerId) => {
 const StoreView = ({ storeId, customerId }) => {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const [isFollowing, setIsFollowing] = useState(null)
 
@@ -90,7 +89,7 @@ const StoreView = ({ storeId, customerId }) => {
   }
 
   const navigateToChat = async () => {
-    const optionalChat = await fetchChat(session.customerId, storeId)
+    const optionalChat = await fetchChat(session.data.customerId, storeId)
 
     const chatId = optionalChat?.chat_id
 
@@ -108,8 +107,9 @@ const StoreView = ({ storeId, customerId }) => {
 
   const storeQuery = useQuery({
     queryKey: ["store"],
-    queryFn: () => fetchStore(storeId, session.customerId),
-    onSuccess: handleQuerySuccess
+    queryFn: () => fetchStore(storeId, session.data.customerId),
+    onSuccess: handleQuerySuccess,
+    disabled: session.isLoading
   })
   const followStoreMutation = useMutation(
     ({ storeId, customerId }) => followStore(storeId, customerId),
@@ -188,28 +188,36 @@ const PostsList = ({ storeId, customerId }) => {
       data={storePostsQuery.data}
       keyExtractor={(post) => post.post_id}
       renderItem={({ item }) => <PostTile post={item} />}
+      emptyIcon="basket"
+      emptyMessage="Esta tienda no ha hecho ninguna publicación"
     />
   )
 }
 
 export default () => {
   const route = useRoute()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const { storeId } = route.params
+
+  if (session.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
 
   return (
     <Screen>
       <StoreView
         storeId={storeId}
-        customerId={session.customerId}
+        customerId={session.data.customerId}
       />
 
       <Divider />
 
       <PostsList
         storeId={storeId}
-        customerId={session.customerId}
+        customerId={session.data.customerId}
       />
     </Screen>
   )

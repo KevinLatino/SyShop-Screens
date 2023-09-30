@@ -1,8 +1,9 @@
-# Viernes
-+ [ ] Rediseñar todos los tiles
-+ [ ] Migrar la interfaz de usuario a iOS
-+ [ ] Implementar emptyIcon y emptyMessage en todos los ScrollView (FlatList)
-+ [ ] Acomodar los layouts (prerequisito: entender flex) (arreglar los LoadingSpinners)
+Quitar el padding en Settings
+
+# Jueves
++ [ ] Acomodar los layouts (arreglar los LoadingSpinners)
++ [ ] Rediseñar todos los tiles, views
++ [ ] Rediseñar SearchResults por completo
 + [ ] Pensar en como desactivar los submits de SignUp y SigIn correctamente
 
 # Después del cliente para vendedores

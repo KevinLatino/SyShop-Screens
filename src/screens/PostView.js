@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import TextField from '../components/TextField'
+import TextArea from '../components/TextArea'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
@@ -132,11 +131,9 @@ const CommentInput = ({ postId, customerId }) => {
 
   return (
     <View style={styles.commentInputView}>
-      <TextField
+      <TextArea
         value={text}
         onChangeText={setText}
-        multiline
-        numberOflines={4}
         placeholder="Escribe un comentario"
       />
 
@@ -155,14 +152,14 @@ const CommentInput = ({ postId, customerId }) => {
 }
 
 const CommentsScrollView = ({ postId }) => {
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const commentsQuery = useQuery({
     queryKey: ["postComments"],
     queryFn: () => fetchPostComments(postId)
   })
 
-  if (commentsQuery.isLoading) {
+  if (commentsQuery.isLoading || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -171,7 +168,7 @@ const CommentsScrollView = ({ postId }) => {
   return (
     <View>
       <CommentInput
-        customerId={session.customerId}
+        customerId={session.data.customerId}
         postId={postId}
       />
 
@@ -179,6 +176,8 @@ const CommentsScrollView = ({ postId }) => {
         data={commentsQuery.data}
         keyExtractor={(comment) => comment.comment_id}
         renderItem={({ item }) => <CommentTile comment={item} />}
+        emptyIcon="comment"
+        emptyMessage="No hay comentarios por aquí"
       />
     </View>
   )
@@ -186,7 +185,7 @@ const CommentsScrollView = ({ postId }) => {
 
 const PostView = ({ postId }) => {
   const navigation = useNavigation()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const navigateToStoreView = () => {
     navigation.navigate("StoreView", {
@@ -202,10 +201,11 @@ const PostView = ({ postId }) => {
 
   const postQuery = useQuery({
     queryKey: ["post"],
-    queryFn: () => fetchPost(postId, session.customerId)
+    queryFn: () => fetchPost(postId, session.data.customerId),
+    disabled: session.isLoading
   })
 
-  if (postQuery.isLoading) {
+  if (postQuery.isLoading || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )

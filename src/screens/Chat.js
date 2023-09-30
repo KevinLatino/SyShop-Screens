@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import { selectPictureFromGallery } from '../utilities/camera'
@@ -9,6 +8,7 @@ import { formatBase64String } from '../utilities/formatting'
 import Images from 'react-native-chat-images'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
 import { List, Avatar } from 'react-native-paper'
@@ -16,6 +16,7 @@ import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat'
 
 const parseRawTextMessage = (rawTextMessage) => {
   return {
+    _id: rawTextMessage.message_id,
     text: rawTextMessage.content,
     createdAt: new Date(rawTextMessage.sent_datetime)
   }
@@ -113,7 +114,7 @@ const ScrollDownButton = () => {
 
 export default () => {
   const route = useRoute()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const { chat } = route.params
 
@@ -127,7 +128,7 @@ export default () => {
 
     addMessageMutation.mutate({
       message,
-      customerId: session.customerId,
+      customerId: session.data.customerId,
       receiverId: chat.user.user_id
     })
   }
@@ -140,7 +141,7 @@ export default () => {
       content_type: "image"
     }
 
-    addMessageMutation.mutate(message, session.customerId, chat.user.user_id)
+    addMessageMutation.mutate(message, session.data.customerId, chat.user.user_id)
   }
 
   const handleLoadMessages = (fetchedMessages) => {
@@ -162,6 +163,12 @@ export default () => {
       receiverId
     )
   )
+
+  if (session.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -190,7 +197,7 @@ export default () => {
         onSend={handleTextMessageSend}
         onPressActionButton={handlePictureMessageChoosen}
         user={{
-          user_id: session.customerId
+          user_id: session.data.customerId
         }}
 
         scrollToBottom

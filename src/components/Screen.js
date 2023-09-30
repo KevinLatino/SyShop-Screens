@@ -1,11 +1,11 @@
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { FlatList, StyleSheet } from 'react-native'
+import { FlatList, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingTop: 16,
     paddingBottom: 16,
     paddingLeft: 16,
@@ -16,7 +16,6 @@ const styles = StyleSheet.create({
 const VirtualizedView = ({ children })  => {
   return (
     <FlatList
-      style={{ flex: 1 }}
       data={[]}
       ListEmptyComponent={null}
       keyExtractor={() => "dummy"}
@@ -32,8 +31,8 @@ const VirtualizedView = ({ children })  => {
 
 export default ({ children, ...safeAreaViewProps }) => {
   return (
-    <VirtualizedView >
-      <KeyboardAwareScrollView style={{ flex: 1 }}>
+    <VirtualizedView>
+      <KeyboardAwareScrollView>
         <SafeAreaView
           style={styles.container}
           {...safeAreaViewProps}

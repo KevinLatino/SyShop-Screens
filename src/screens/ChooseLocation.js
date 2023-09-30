@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { showMessage } from '../components/AppSnackBar'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
 import Screen from '../components/Screen'
+import { Fragment } from 'react'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import { Button, FAB } from 'react-native-paper'
 
@@ -50,7 +50,7 @@ const createDelivery = async (saleId, locationId) => {
 const LocationsScrollView = ({ saleId }) => {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const [selectedLocation, setSelectedLocation] = useState(null)
 
@@ -75,7 +75,8 @@ const LocationsScrollView = ({ saleId }) => {
 
   const locationsQuery = useQuery({
     queryKey: ["customerLocations"],
-    queryFn: () => fetchLocations(session.customerId)
+    queryFn: () => fetchLocations(session.data.customerId),
+    disabled: session.isLoading
   })
   const createDeliveryMutation = useMutation(
     ({ saleId, locationId }) => createDelivery(saleId, locationId),
@@ -84,7 +85,7 @@ const LocationsScrollView = ({ saleId }) => {
     }
   )
 
-  if (locationsQuery.isLoading) {
+  if (locationsQuery.isLoading || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -109,6 +110,8 @@ const LocationsScrollView = ({ saleId }) => {
             )
           }
         }
+        emptyIcon="map-marker"
+        emptyMessage="No has añadido ningún domicilio"
       />
 
       <Button
@@ -137,14 +140,16 @@ export default () => {
   }
 
   return (
-    <Screen>
-      <LocationsScrollView saleId={saleId} />
+    <Fragment>
+      <Screen>
+        <LocationsScrollView saleId={saleId} />
+      </Screen>
 
       <FAB
         icon="plus"
         style={styles.fab}
         onPress={navigateToAddLocation}
       />
-    </Screen>
+    </Fragment>
   )
 }
