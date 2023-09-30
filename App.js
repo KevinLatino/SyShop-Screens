@@ -28,7 +28,6 @@ import LikedPosts from './src/screens/LikedPosts'
 import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
-import AppSnackBar from './src/components/AppSnackBar'
 import Order from './src/screens/Order'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -267,8 +266,6 @@ const Main = () => {
                   </Stack.Navigator>
                 </NavigationContainer>
             </SafeAreaProvider>
-
-            <AppSnackBar />
           </PaperProvider>
         </IosKitProvider>
       </QueryClientProvider>

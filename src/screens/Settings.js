@@ -216,7 +216,7 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
       </Dialog.Description>
 
       <Dialog.Button
-        label="Confirmar"
+        label="Cancelar"
         onPress={onDismiss}
       />
 

@@ -103,7 +103,10 @@ export default () => {
             contentContainerStyle={styles.searchBarModal}
           >
             <Surface elevation={5}>
-              <SearchBar onSearchSubmit={handleSearchSubmit} />
+              <SearchBar
+                onSearchSubmit={handleSearchSubmit}
+                onCancel={() => setIsModalVisible(false)}
+              />
             </Surface>
           </Modal>
         </Portal>

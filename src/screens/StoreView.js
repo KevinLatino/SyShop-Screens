@@ -9,7 +9,8 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
 import Screen from '../components/Screen'
 import { View } from 'react-native'
-import { Appbar, Text, Divider } from 'react-native-paper'
+import { Body, Caption1, Title2 } from 'react-native-ios-kit'
+import { Appbar, Divider } from 'react-native-paper'
 import { ImageSlider } from 'react-native-image-slider-banner'
 
 const fetchStore = async (storeId, customerId) => {
@@ -70,6 +71,8 @@ const StoreView = ({ storeId, customerId }) => {
   const [isFollowing, setIsFollowing] = useState(null)
 
   const handleQuerySuccess = (data) => {
+    console.log(data.does_customer_follow_store)
+
     setIsFollowing(data.does_customer_follow_store)
   }
 
@@ -134,7 +137,10 @@ const StoreView = ({ storeId, customerId }) => {
 
   return (
     <View>
-      <Appbar.Header>
+      <Appbar.Header
+        mode="center-aligned"
+        statusBarHeight={0}
+      >
         <Appbar.Content title={name} />
 
         <Appbar.Action
@@ -149,23 +155,27 @@ const StoreView = ({ storeId, customerId }) => {
         />
       </Appbar.Header>
 
-      <View>
-        <ImageSlider
-          data={multimedia}
-          autoPlay={false}
-        />
+      <ImageSlider
+        data={multimedia}
+        autoPlay={false}
+      />
 
-        <Text variant="titleMedium">
-          {formatLocation(location)}
-        </Text>
-
-        <Text variant="bodySmall">
+      <View style={{ padding: 15 }}>
+        <Caption1
+          style={{ color: "gray" }}
+        >
           {`${follower_count} ${follower_count > 1 ? 'followers' : 'follower'}`}
-        </Text>
+        </Caption1>
 
-        <Text variant="bodyLarge">
+        <Caption1
+          style={{ color: "gray" }}
+        >
+          {formatLocation(location)}
+        </Caption1>
+
+        <Body>
           {description}
-        </Text>
+        </Body>
       </View>
     </View>
   )
@@ -184,13 +194,21 @@ const PostsList = ({ storeId, customerId }) => {
   }
 
   return (
-    <ScrollView
-      data={storePostsQuery.data}
-      keyExtractor={(post) => post.post_id}
-      renderItem={({ item }) => <PostTile post={item} />}
-      emptyIcon="basket"
-      emptyMessage="Esta tienda no ha hecho ninguna publicación"
-    />
+    <View style={{ flex: 1, paddingTop: 20, paddingLeft: 15, paddingRight: 15 }}>
+      <View style={{ paddingBottom: 15 }}>
+        <Title2>
+          Publicaciones
+        </Title2>
+      </View>
+
+      <ScrollView
+        data={storePostsQuery.data}
+        keyExtractor={(post) => post.post_id}
+        renderItem={({ item }) => <PostTile post={item} />}
+        emptyIcon="basket"
+        emptyMessage="Esta tienda no ha hecho ninguna publicación"
+      />
+    </View>
   )
 }
 
@@ -207,7 +225,7 @@ export default () => {
   }
 
   return (
-    <Screen>
+    <Screen style={{ padding: 0 }}>
       <StoreView
         storeId={storeId}
         customerId={session.data.customerId}

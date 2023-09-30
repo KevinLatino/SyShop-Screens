@@ -9,13 +9,13 @@ import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
+import Button from '../components/Button'
 import Screen from '../components/Screen'
 import { ImageSlider } from 'react-native-image-slider-banner'
+import { withTheme, Title2, Title3, Body, Caption1 } from 'react-native-ios-kit'
 import { View, StyleSheet } from 'react-native'
 import {
-  Text,
   Divider,
-  Button,
   IconButton,
   Chip,
   TouchableRipple
@@ -26,14 +26,15 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-evenly",
     alignItems: "flex-start",
-    gap: 16,
+    gap: 8,
     padding: 16
   },
   informationActionsView: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%"
+    width: "100%",
+    padding: 8
   },
   categoriesChipsView: {
     flexDirection: "row",
@@ -93,16 +94,29 @@ const addPostComment = async (postId, customerId, text) => {
   )
 }
 
-const formatPublicationDate = (isoDateString) => {
+const formatPostDate = (isoDateString) => {
   const date = new Date(isoDateString)
 
-  const day = date.getDay() + 1
-  const month = date.getMonth() + 1
+  const day = date.getDate() + 1
+  const month = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "noviembre", "diciembre"
+  ][date.getMonth()]
   const year = date.getFullYear()
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
+  const hours = (date.getHours() % 12).toString().padStart(2, "0")
+  const minutes = date.getMinutes().toString().padStart(2, "0")
 
-  const formatted = `${day} de ${month} ${year} a las ${hours}:${minutes}`
+  const formatted = `Publicado en ${day} de ${month} de ${year} a las ${hours}:${minutes}`
+
+  return formatted
+}
+
+const formatPostAmount = (amount) => {
+  if (amount === 1) {
+    return ""
+  }
+
+  const formatted = `${amount} unidades disponibles`
 
   return formatted
 }
@@ -183,7 +197,7 @@ const CommentsScrollView = ({ postId }) => {
   )
 }
 
-const PostView = ({ postId }) => {
+const PostView = ({ postId, theme }) => {
   const navigation = useNavigation()
   const [session, _] = useSession()
 
@@ -236,33 +250,34 @@ const PostView = ({ postId }) => {
         <TouchableRipple
           onPress={navigateToStoreView}
         >
-          <Text
-            variant="titleMedium"
-            style={{ color: "red" }}
+          <Title3
+            style={{ color: theme.primaryColor }}
           >
             {post.store_name}
-          </Text>
+          </Title3>
         </TouchableRipple>
 
-        <Text variant="titleLarge">
+        <Title2>
           {post.title}
-        </Text>
+        </Title2>
 
-        <Text variant="bodyMedium">
-          {formatPublicationDate(post.publication_date)}
-        </Text>
+        <Caption1
+          style={{ color: "gray" }}
+        >
+          {formatPostDate(post.publication_date)}
+        </Caption1>
 
-        <Text variant="bodyLarge">
+        <Caption1
+          style={{ color: "gray" }}
+        >
           {
-            post.amount > 1 ?
-            `${post.amount} unidades disponibles` :
-            "Solo una unidad disponible"
+            formatPostAmount(post.amount)
           }
-        </Text>
+        </Caption1>
 
-        <Text variant="bodyLarge">
+        <Body>
           {post.description}
-        </Text>
+        </Body>
 
         <View style={styles.informationActionsView}>
           <View style={styles.categoriesChipsView}>
@@ -277,7 +292,6 @@ const PostView = ({ postId }) => {
 
         <View style={styles.buyButtonWrapper}>
           <Button
-            mode="contained"
             onPress={navigateToOrder}
             style={{ width: "100%" }}
           >
@@ -294,12 +308,11 @@ export default () => {
 
   const { postId } = route.params
 
+  const ThemedPostView = withTheme(PostView)
 
   return (
     <Screen>
-      <View style={{ flex: 1 }}>
-        <PostView postId={postId} />
-      </View>
+      <ThemedPostView postId={postId} />
 
       <Divider />
 
