@@ -1,5 +1,5 @@
-import { showMessage } from '../components/AppSnackBar'
 import * as Linking from 'expo-linking'
+import { Alert } from 'react-native'
 import { List, TouchableRipple } from 'react-native-paper'
 
 const TrackLocationIcon = ({ delivery, ...props }) => {
@@ -7,7 +7,10 @@ const TrackLocationIcon = ({ delivery, ...props }) => {
 
   const openLink = async () => {
     if (!(await Linking.canOpenURL(uberTrackingUrl))) {
-      showMessage("Hubo un error intentando abrir el enlace de seguimiento de Uber")
+      Alert.alert(
+        "No se pudo abrir el enlace",
+        "Hubo un error intentando abrir el enlace de seguimiento de Uber"
+      )
     }
 
     await Linking.openURL(uberTrackingUrl)

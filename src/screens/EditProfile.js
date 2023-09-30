@@ -4,14 +4,13 @@ import { requestServer } from '../utilities/requests'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
 import { useSession } from '../context'
-import { showMessage } from '../components/AppSnackBar'
 import { makeNotEmptyChecker, checkPhoneNumber } from '../utilities/validators'
 import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
 import Button from '../components/Button'
 import Screen from '../components/Screen'
-import { StyleSheet } from 'react-native'
+import { Alert, StyleSheet } from 'react-native'
 import { Text } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -58,7 +57,10 @@ export default () => {
   const handleSuccess = () => {
     queryClient.refetchQueries({ queryKey: ["customer"] })
 
-    showMessage("Información actualizada con éxito")
+    Alert.alert(
+      "Éxito",
+      "Información actualizada con éxito"
+    )
 
     navigation.goBack()
   }

@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
 import { useSession } from '../context'
-import { showMessage } from '../components/AppSnackBar'
 import { requestServer } from '../utilities/requests'
 import {
   makeNotEmptyChecker,
@@ -16,7 +15,7 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
 import Button from '../components/Button'
 import Screen from '../components/Screen'
-import { View, StyleSheet } from 'react-native'
+import { View, Alert, StyleSheet } from 'react-native'
 import { Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -63,7 +62,10 @@ const signUpWithPlainAccount = async (userInformation) => {
 
   const handleError = (data) => {
     if (data.message === "UNAVAILABLE_EMAIL") {
-      showMessage("El correo electrónico que ingresaste ya está en uso")
+      Alert.alert(
+        "Correo ocupado",
+        "El correo electrónico que ingresaste ya está en uso"
+      )
 
       return true
     }
@@ -91,7 +93,10 @@ const signUpWithGoogleAccount = async (userInformation, googleUniqueIdentifier) 
 
   const handleError = (data) => {
     if (data.message === "GOOGLE_ACCOUNT_ALREADY_EXISTS") {
-      showMessage("Alguien ya se registró con esta cuenta de Google")
+      Alert.alert(
+        "Cuanta de Google ocupada",
+        "Alguien ya se registró con esta cuenta de Google"
+      )
 
       return true
     }
@@ -119,7 +124,10 @@ export default () => {
 
   const handleSignUp = () => {
     if (form.hasErrors()) {
-      showMessage("Ingresa información necesaria para registrarte")
+      Alert.alert(
+        "Información incompleta",
+        "Ingresa información necesaria para registrarte"
+      )
 
       return
     }

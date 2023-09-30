@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { makeNotEmptyChecker, checkEmail } from '../utilities/validators'
-import { showMessage } from '../components/AppSnackBar'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Button from '../components/Button'
 import Screen from '../components/Screen'
-import { StyleSheet } from 'react-native'
+import { Alert, StyleSheet } from 'react-native'
 import { Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -49,7 +48,10 @@ const signInWithPlainAccount = async (credentials) => {
 
   const handleError = (data) => {
     if (data.message === "INCORRECT_CREDENTIALS") {
-      showMessage("Las credenciales que ingresaste son incorrectas")
+      Alert.alert(
+        "Credenciales incorrectas",
+        "Las credenciales que ingresaste son incorrectas"
+      )
 
       return true
     }
@@ -73,7 +75,8 @@ const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
 
   const handleError = (data) => {
     if (data.message === "GOOGLE_ACCOUNT_NOT_FOUND") {
-      showMessage(
+      Alert.alert(
+        "Cuenta no encontrada",
         "No hay ninguna cuenta registrada con la cuenta de Google que escogiste"
       )
 
@@ -98,7 +101,8 @@ export default () => {
 
   const handleSignInWithPlainAccount = () => {
     if (form.hasErrors()) {
-      showMessage(
+      Alert.alert(
+        "Información incompleta",
         "Ingresa la información necesaria para iniciar sesión"
       )
 

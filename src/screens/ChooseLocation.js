@@ -3,13 +3,12 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { showMessage } from '../components/AppSnackBar'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
 import Screen from '../components/Screen'
 import { Fragment } from 'react'
-import { View, StyleSheet, Dimensions } from 'react-native'
+import { View, StyleSheet, Alert, Dimensions } from 'react-native'
 import { Button, FAB } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -68,7 +67,10 @@ const LocationsScrollView = ({ saleId }) => {
   const handleSuccess = (_) => {
     queryClient.refetchQueries({ queryKey: ["activeDeliveries"] })
 
-    showMessage("Tu entrega ahora está pendiente")
+    Alert.alert(
+      "Éxito",
+      "Tu entrega ahora está pendiente"
+    )
 
     navigation.goBack()
   }

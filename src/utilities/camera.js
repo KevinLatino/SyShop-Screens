@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker'
-import { showMessage } from '../components/AppSnackBar'
+import { Alert } from 'react-native'
 
 export const selectPictureFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -9,7 +9,9 @@ export const selectPictureFromGallery = async () => {
     })
 
     if (result.canceled) {
-      showMessage("Cancelaste la selección de la foto")
+      Alert.alert(
+        "Cancelaste la selección de la foto"
+      )
 
       return
     }
