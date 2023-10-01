@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { View } from 'react-native'
 import { List, Text } from 'react-native-paper'
@@ -50,15 +49,24 @@ const DeliveriesListItems = ({ deliveries }) => {
 }
 
 export default () => {
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
+
   const activeDeliveriesQuery = useQuery({
     queryKey: ["activeDeliveries"],
-    queryFn: () => fetchActiveDeliveries(session.customerId)
+    queryFn: () => fetchActiveDeliveries(session.data.customerId),
+    disabled: session.isLoading
   })
   const inactiveDeliveriesQuery = useQuery({
     queryKey: ["inactiveDeliveries"],
-    queryFn: () => fetchInactiveDeliveries(session.customerId)
+    queryFn: () => fetchInactiveDeliveries(session.data.customerId),
+    disabled: session.isLoading
   })
+
+  if (session.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
 
   return (
     <Screen>

@@ -1,27 +1,21 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { useNavigation } from '@react-navigation/native'
-import { useCounter } from '../utilities/hooks'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Screen from '../components/Screen'
+import { Fragment } from 'react'
 import {
   Portal,
   Modal,
   Surface,
   FAB
 } from 'react-native-paper'
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  Dimensions
-} from 'react-native'
+import { View, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
   fab: {
@@ -42,11 +36,9 @@ const styles = StyleSheet.create({
   }
 })
 
-const fetchPosts = async (customerId, pageNumber) => {
+const fetchPosts = async (customerId) => {
   const payload = {
-    customer_id: customerId,
-    start: pageNumber * 20,
-    amount: (pageNumber + 1) * 20
+    customer_id: customerId
   }
   const posts = await requestServer(
     "/posts_service/get_posts_from_customer_following_stores",
@@ -57,34 +49,37 @@ const fetchPosts = async (customerId, pageNumber) => {
 }
 
 const PostsList = () => {
-  const pageNumber = useCounter()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
+
   const postsQuery = useQuery({
     queryKey: ["feedPosts"],
-    queryFn: () => fetchPosts(session.customerId, pageNumber.value)
+    queryFn: () => fetchPosts(session.data.customerId),
+    disabled: session.isLoading
   })
 
-  if (postsQuery.isLoading) {
+  if (postsQuery.isLoading || session.isLoading) {
     return (
-      <View style={{ height: Dimensions.get("screen").height }}>
-        <LoadingSpinner inScreen />
-      </View>
+      <LoadingSpinner inScreen />
     )
   }
 
   return (
-    <FlatList
-      contentContainerStyle={styles.postsListContainer}
-      data={postsQuery.data}
-      renderItem={({ item }) => <PostTile post={item} />}
-      keyExtractor={(post) => post.post_id}
-    />
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        data={postsQuery.data}
+        keyExtractor={(post) => post.post_id}
+        renderItem={({ item }) => <PostTile post={item} />}
+        emptyIcon="basket-plus"
+        emptyMessage="Sigue a algunas tiendas para ver contenido que te pueda interesar"
+      />
+    </View>
   )
 }
 
 export default () => {
-  const [isModalVisible, setIsModalVisible] = useState(false)
   const navigation = useNavigation()
+
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const handleSearchSubmit = (text, categoriesNames, storesNames) => {
     setIsModalVisible(false)
@@ -97,26 +92,31 @@ export default () => {
   }
 
   return (
-    <SafeAreaView>
-      <PostsList />
+    <Fragment>
+      <Screen>
+        <PostsList />
 
-      <Portal>
-        <Modal
-          visible={isModalVisible}
-          onDismiss={() => setIsModalVisible(false)}
-          contentContainerStyle={styles.searchBarModal}
-        >
-          <Surface elevation={5}>
-            <SearchBar onSearchSubmit={handleSearchSubmit} />
-          </Surface>
-        </Modal>
-      </Portal>
+        <Portal>
+          <Modal
+            visible={isModalVisible}
+            onDismiss={() => setIsModalVisible(false)}
+            contentContainerStyle={styles.searchBarModal}
+          >
+            <Surface elevation={5}>
+              <SearchBar
+                onSearchSubmit={handleSearchSubmit}
+                onCancel={() => setIsModalVisible(false)}
+              />
+            </Surface>
+          </Modal>
+        </Portal>
+      </Screen>
 
       <FAB
         icon="magnify"
         onPress={() => setIsModalVisible(true)}
         style={styles.fab}
       />
-    </SafeAreaView>
+    </Fragment>
   )
 }

@@ -1,15 +1,39 @@
-import { formatBase64String } from '../utilities/formatting'
-import { Card } from 'react-native-paper'
+import { formatDate, formatBase64String } from '../utilities/formatting'
+import { View, Image } from 'react-native'
+import { Card } from '@ui-kitten/components'
+import { Headline, Caption1 } from 'react-native-ios-kit'
 
 export default ({ sale }) => {
-    return (
-        <Card>
-            <Card.Cover source={{ uri: formatBase64String(sale.post.multimedia[0]) }}/>
+  const header = (
+    <View>
+      <Headline>
+        {sale.post.title}
+      </Headline>
 
-            <Card.Title
-                title={`${sale.post.title} (₡ ${sale.post.price})`}
-                subtitle={sale.sale_date.purchase_date}
-            />
-        </Card>
-    )
+      <Caption1>
+        ₡{sale.post.price * sale.amount} 
+        •
+        {
+          sale.amount === 1 ?
+          "Una unidad" :
+          `${sale.amount} unidades`
+        }
+        •
+        Comprado el {formatDate(sale.purchase_date)}
+      </Caption1>
+    </View>
+  )
+
+  return (
+    <Card
+      header={header}
+    >
+        <Image
+          source={{
+            uri: formatBase64String(sale.post.multimedia[0]),
+            height: 100
+          }}
+        />
+    </Card>
+  )
 }

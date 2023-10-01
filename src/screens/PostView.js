@@ -2,28 +2,21 @@ import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { useCounter } from '../utilities/hooks'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import TextField from '../components/TextField'
+import { formatDate } from '../utilities/formatting'
+import TextArea from '../components/TextArea'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
 import LikeButton from '../components/LikeButton'
-import OrderForm from '../components/OrderForm'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Button from '../components/Button'
+import Screen from '../components/Screen'
 import { ImageSlider } from 'react-native-image-slider-banner'
-import { BottomSheet } from 'react-native-btr'
+import { withTheme, Title2, Title3, Body, Caption1 } from 'react-native-ios-kit'
+import { View, StyleSheet } from 'react-native'
 import {
-  View,
-  StyleSheet,
-  ScrollView as ReactNativeScrollView
-} from 'react-native'
-import {
-  Text,
   Divider,
-  Button,
   IconButton,
   Chip,
   TouchableRipple
@@ -34,14 +27,15 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-evenly",
     alignItems: "flex-start",
-    gap: 16,
+    gap: 8,
     padding: 16
   },
   informationActionsView: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%"
+    width: "100%",
+    padding: 8
   },
   categoriesChipsView: {
     flexDirection: "row",
@@ -77,11 +71,9 @@ const fetchPost = async (postId, customerId) => {
   return post
 }
 
-const fetchPostComments = async (postId, pageNumber) => {
+const fetchPostComments = async (postId) => {
   const payload = {
-    post_id: postId,
-    start: pageNumber * 20,
-    amount: 20
+    post_id: postId
   }
   const comments = await requestServer(
     "/comments_service/get_post_comments",
@@ -103,31 +95,26 @@ const addPostComment = async (postId, customerId, text) => {
   )
 }
 
-const formatPublicationDate = (isoDateString) => {
-  const date = new Date(isoDateString)
+const formatPostDate = (isoDateString) => {
+  const formatted = `Publicado el ${formatDate(isoDateString)}`
 
-  const day = date.getDay() + 1
-  const month = date.getMonth() + 1
-  const year = date.getFullYear()
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
+  return formatted
+}
 
-  const formatted = `${day} de ${month} ${year} a las ${hours}:${minutes}`
+const formatPostAmount = (amount) => {
+  if (amount === 1) {
+    return ""
+  }
+
+  const formatted = `${amount} unidades disponibles`
 
   return formatted
 }
 
 const CommentInput = ({ postId, customerId }) => {
-  const [text, setText] = useState("")
   const queryClient = useQueryClient()
-  const addCommentMutation = useMutation(
-    ({ postId, customerId, text }) => addPostComment(postId, customerId, text),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["postComments"]
-      })
-    }
-  )
+
+  const [text, setText] = useState("")
 
   const handleCommentSubmit = async () => {
     addCommentMutation.mutate({
@@ -137,35 +124,46 @@ const CommentInput = ({ postId, customerId }) => {
     })
   }
 
+  const addCommentMutation = useMutation(
+    ({ postId, customerId, text }) => addPostComment(postId, customerId, text),
+    {
+      onSuccess: () => queryClient.refetchQueries({
+        queryKey: ["postComments"]
+      })
+    }
+  )
+
   return (
     <View style={styles.commentInputView}>
-      <TextField
+      <TextArea
         value={text}
         onChangeText={setText}
-        multiline
-        numberOflines={4}
         placeholder="Escribe un comentario"
       />
 
-      <IconButton
-        icon="send"
-        mode="contained"
-        disabled={text === ""}
-        onPress={handleCommentSubmit}
-      />
+      {
+        addCommentMutation.isLoading ?
+        <LoadingSpinner /> :
+        <IconButton
+          icon="send"
+          mode="contained"
+          disabled={text === ""}
+          onPress={handleCommentSubmit}
+        />
+      }
     </View>
   )
 }
 
 const CommentsScrollView = ({ postId }) => {
-  const [session, _] = useAtom(sessionAtom)
-  const pageNumber = useCounter()
+  const [session, _] = useSession()
+
   const commentsQuery = useQuery({
     queryKey: ["postComments"],
-    queryFn: () => fetchPostComments(postId, pageNumber.value)
+    queryFn: () => fetchPostComments(postId)
   })
 
-  if (commentsQuery.isLoading) {
+  if (commentsQuery.isLoading || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -174,7 +172,7 @@ const CommentsScrollView = ({ postId }) => {
   return (
     <View>
       <CommentInput
-        customerId={session.customerId}
+        customerId={session.data.customerId}
         postId={postId}
       />
 
@@ -182,26 +180,16 @@ const CommentsScrollView = ({ postId }) => {
         data={commentsQuery.data}
         keyExtractor={(comment) => comment.comment_id}
         renderItem={({ item }) => <CommentTile comment={item} />}
-        onEndReached={pageNumber.increment}
+        emptyIcon="comment"
+        emptyMessage="No hay comentarios por aquí"
       />
     </View>
   )
 }
 
-const PostView = ({ post }) => {
+const PostView = ({ postId, theme }) => {
   const navigation = useNavigation()
-
-  const categoriesChips = post.categories.map((category) => {
-    return (
-      <Chip
-        key={category}
-        mode="flat"
-        icon="shape"
-      >
-        {category}
-      </Chip>
-    )
-  })
+  const [session, _] = useSession()
 
   const navigateToStoreView = () => {
     navigation.navigate("StoreView", {
@@ -215,6 +203,32 @@ const PostView = ({ post }) => {
     })
   }
 
+  const postQuery = useQuery({
+    queryKey: ["post"],
+    queryFn: () => fetchPost(postId, session.data.customerId),
+    disabled: session.isLoading
+  })
+
+  if (postQuery.isLoading || session.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
+
+  const categoriesChips = postQuery.data.categories.map((category) => {
+    return (
+      <Chip
+        key={category}
+        mode="flat"
+        icon="shape"
+      >
+        {category}
+      </Chip>
+    )
+  })
+
+  const post = postQuery.data
+
   return (
     <View>
       <ImageSlider
@@ -226,33 +240,34 @@ const PostView = ({ post }) => {
         <TouchableRipple
           onPress={navigateToStoreView}
         >
-          <Text
-            variant="titleMedium"
-            style={{ color: "red" }}
+          <Title3
+            style={{ color: theme.primaryColor }}
           >
             {post.store_name}
-          </Text>
+          </Title3>
         </TouchableRipple>
 
-        <Text variant="titleLarge">
+        <Title2>
           {post.title}
-        </Text>
+        </Title2>
 
-        <Text variant="bodyMedium">
-          {formatPublicationDate(post.publication_date)}
-        </Text>
+        <Caption1
+          style={{ color: "gray" }}
+        >
+          {formatPostDate(post.publication_date)}
+        </Caption1>
 
-        <Text variant="bodyLarge">
+        <Caption1
+          style={{ color: "gray" }}
+        >
           {
-            post.amount > 1 ?
-            `${post.amount} unidades disponibles` :
-            "Solo una unidad disponible"
+            formatPostAmount(post.amount)
           }
-        </Text>
+        </Caption1>
 
-        <Text variant="bodyLarge">
+        <Body>
           {post.description}
-        </Text>
+        </Body>
 
         <View style={styles.informationActionsView}>
           <View style={styles.categoriesChipsView}>
@@ -267,7 +282,6 @@ const PostView = ({ post }) => {
 
         <View style={styles.buyButtonWrapper}>
           <Button
-            mode="contained"
             onPress={navigateToOrder}
             style={{ width: "100%" }}
           >
@@ -281,27 +295,18 @@ const PostView = ({ post }) => {
 
 export default () => {
   const route = useRoute()
-  const [session, _] = useAtom(sessionAtom)
 
   const { postId } = route.params
-  const postQuery = useQuery({
-    queryKey: ["post"],
-    queryFn: () => fetchPost(postId, session.customerId)
-  })
+
+  const ThemedPostView = withTheme(PostView)
 
   return (
-    <ReactNativeScrollView>
-      <SafeAreaView>
-        {
-          postQuery.isLoading ?
-          <LoadingSpinner inScreen /> :
-          <PostView post={postQuery.data} />
-        }
+    <Screen>
+      <ThemedPostView postId={postId} />
 
-        <Divider />
+      <Divider />
 
-        <CommentsScrollView postId={postId} />
-      </SafeAreaView>
-    </ReactNativeScrollView>
+      <CommentsScrollView postId={postId} />
+    </Screen>
   )
 }

@@ -23,7 +23,8 @@ export const autocompleteAddress = async (text) => {
   }
 
   const queryString = formatQueryString(text)
-  const { data } = axios.get(geoapifyUrl + queryString)
+
+  const { data } = await axios.get(geoapifyUrl + queryString)
   const { results } = data
 
   return results

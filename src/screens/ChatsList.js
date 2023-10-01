@@ -1,20 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-import { useCounter } from '../utilities/hooks'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Screen from '../components/Screen'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { View, Dimensions } from 'react-native'
 import { Text } from 'react-native-paper'
 
-const fetchChats = async (customerId, pageNumber) => {
+const fetchChats = async (customerId) => {
   const payload = {
-    start: pageNumber * 10,
-    amount: 10,
     user_id: customerId
   }
   const chats = await requestServer(
@@ -26,12 +20,19 @@ const fetchChats = async (customerId, pageNumber) => {
 }
 
 export default () => {
-  const [session, _] = useAtom(sessionAtom)
-  const pageNumber = useCounter()
+  const [session, _] = useSession()
+
   const chatsQuery = useQuery({
     queryKey: ["listOfChats"],
-    queryFn: () => fetchChats(session.customerId, pageNumber.value)
+    queryFn: () => fetchChats(session.data.customerId),
+    disabled: session.isLoading
   })
+
+  if (chatsQuery.isLoading || session.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
 
   return (
     <Screen>
@@ -39,19 +40,13 @@ export default () => {
         Tus mensajes
       </Text>
 
-      {
-        chatsQuery.isLoading ?
-        (
-          <View style={{ height: Dimensions.get("window").height }}>
-            <LoadingSpinner inScreen />
-          </View>
-        ) :
-        <ScrollView
-          data={chatsQuery.data}
-          renderItem={({ item }) => <ChatTile chat={item} />}
-          onEndReached={pageNumber.increment}
-        />
-      }
+      <ScrollView
+        data={chatsQuery.data}
+        keyExtractor={(chat) => chat.chat_id}
+        renderItem={({ item }) => <ChatTile chat={item} />}
+        emptyIcon="chat"
+        emptyMessage="No has hablado con nadie"
+      />
     </Screen>
   )
 }

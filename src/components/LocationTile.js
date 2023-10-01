@@ -1,11 +1,5 @@
-import { StyleSheet } from 'react-native'
+import { withTheme } from 'react-native-ios-kit'
 import { TouchableRipple, List } from "react-native-paper"
-
-const styles = StyleSheet.create({
-  locationTileSelected: {
-    backgroundColor: "darkgray"
-  }
-})
 
 const formatLocationSubtitle = (location) => {
   const formatted
@@ -14,13 +8,33 @@ const formatLocationSubtitle = (location) => {
   return formatted
 }
 
-export default ({ location, isSelected, onPress }) => {
+const LocationTile = ({ location, isSelected, onPress, theme }) => {
   return (
     <TouchableRipple
       onPress={onPress}
     >
       <List.Item
-        style={isSelected ? styles.locationTileSelected : null}
+        style={
+          isSelected ?
+          {
+            backgroundColor: theme.primaryColor,
+          } :
+          null
+        }
+        titleStyle={
+          isSelected ?
+          {
+            color: "white"
+          } :
+          null
+        }
+        descriptionStyle={
+          isSelected ?
+          {
+            color: "white"
+          } :
+          null
+        }
         title={location.place_name}
         description={formatLocationSubtitle(location)}
         left={(props) => <List.Icon {...props} icon="map-marker" />}
@@ -28,3 +42,5 @@ export default ({ location, isSelected, onPress }) => {
     </TouchableRipple>
   )
 }
+
+export default withTheme(LocationTile)

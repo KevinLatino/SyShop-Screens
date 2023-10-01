@@ -1,4 +1,5 @@
 import * as ImagePicker from 'expo-image-picker'
+import { Alert } from 'react-native'
 
 export const selectPictureFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -8,7 +9,11 @@ export const selectPictureFromGallery = async () => {
     })
 
     if (result.canceled) {
-        throw Error("Image selection was cancelled")
+      Alert.alert(
+        "Cancelaste la selección de la foto"
+      )
+
+      return
     }
 
     const picture = result.assets[0].base64

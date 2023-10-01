@@ -80,7 +80,7 @@ const RecommendedCategoriesList = ({ categoriesNames, onToggle }) => {
   )
 }
 
-export default ({ onSearchSubmit }) => {
+export default ({ onSearchSubmit, ...searchInputProps }) => {
   const [text, setText] = useState("")
   const [categoriesNames, setCategoriesNames] = useState([])
   const categoriesQuery = useQuery({
@@ -103,10 +103,10 @@ export default ({ onSearchSubmit }) => {
     setText("")
   }
 
-  const handleSearchUpdate = (newText) => {
+  const handleSearchUpdate = async (newText) => {
     setText(newText)
 
-    categoriesQuery.refetch()
+    await categoriesQuery.refetch()
   }
 
   return (
@@ -117,6 +117,7 @@ export default ({ onSearchSubmit }) => {
           value={text}
           onChangeText={handleSearchUpdate}
           onSubmitEditing={() => onSearchSubmit(text, categoriesNames)}
+          {...searchInputProps}
         />
       </View>
 

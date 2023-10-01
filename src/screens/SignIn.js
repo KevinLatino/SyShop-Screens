@@ -2,61 +2,42 @@ import { useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '../utilities/hooks'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { makeNotEmptyChecker, checkEmail } from '../utilities/validators'
-import { showMessage } from '../components/AppSnackBar'
 import TextField from '../components/TextField'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { View, StyleSheet } from 'react-native'
-import { Text, Button, Divider } from 'react-native-paper'
+import Button from '../components/Button'
+import Screen from '../components/Screen'
+import { Alert, StyleSheet } from 'react-native'
+import { Text, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 22,
+    gap: 20,
     paddingTop: 16,
     paddingBottom: 16
-  },
-  Image:{
-    width: 300, //grasa
-    height: 300, //grasa
-    alignItems: "center"
   },
   title: {
     fontSize: 50,
     color: "#344340",
     fontWeight: "bold",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 16,
   },
   subtitle: {
     fontSize: 20,
     color: "gray",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  button: {
-    width: 225,
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#c20000"
   },
   thirdText: {
     fontSize: 18,
     color: "#344340",
     fontWeight: "bold",
     textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center"
   }
 })
 
@@ -64,9 +45,24 @@ const signInWithPlainAccount = async (credentials) => {
   const payload = {
     ...credentials
   }
+
+  const handleError = (data) => {
+    if (data.message === "INCORRECT_CREDENTIALS") {
+      Alert.alert(
+        "Credenciales incorrectas",
+        "Las credenciales que ingresaste son incorrectas"
+      )
+
+      return true
+    }
+
+    return false
+  }
+
   const session = await requestServer(
     "/users_service/sign_in_user_with_plain_account",
-    payload
+    payload,
+    handleError
   )
 
   return session
@@ -76,9 +72,24 @@ const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
   const payload = {
     google_unique_identifier: googleUniqueIdentifier
   }
+
+  const handleError = (data) => {
+    if (data.message === "GOOGLE_ACCOUNT_NOT_FOUND") {
+      Alert.alert(
+        "Cuenta no encontrada",
+        "No hay ninguna cuenta registrada con la cuenta de Google que escogiste"
+      )
+
+      return true
+    }
+
+    return false
+  }
+
   const session = await requestServer(
     "/users_service/sign_in_user_with_google_account",
-    payload
+    payload,
+    handleError
   )
 
   return session
@@ -86,28 +97,13 @@ const signInWithGoogleAccount = async (googleUniqueIdentifier) => {
 
 export default () => {
   const navigation = useNavigation()
-  const [_, setSession] = useAtom(sessionAtom)
-  const form = useForm(
-    {
-      email: "",
-      password: ""
-    },
-    {
-      email: checkEmail,
-      password: makeNotEmptyChecker("Contraseña vacía")
-    }
-  )
-  const signInWithPlainAccountMutation = useMutation(
-    ({ ...credentials }) => signInWithPlainAccount(credentials)
-  )
-  const signInWithGoogleAccountMutation = useMutation(
-    ({ googleUniqueIdentifier }) => signInWithGoogleAccount(googleUniqueIdentifier)
-  )
+  const [_, setSession] = useSession()
 
   const handleSignInWithPlainAccount = () => {
-    if (form.hasErrors()) {
-      showMessage(
-        "Por favor provee la información necesaria para iniciar sesión"
+    if (!form.validate()) {
+      Alert.alert(
+        "Información incompleta",
+        "Ingresa la información necesaria para iniciar sesión"
       )
 
       return
@@ -122,9 +118,21 @@ export default () => {
     signInWithGoogleAccountMutation.mutate({ googleUniqueIdentifier })
   }
 
-  const isSignInLoading = (
-    (signInWithPlainAccountMutation.isLoading) ||
-    (signInWithGoogleAccountMutation.isLoading)
+  const form = useForm(
+    {
+      email: "",
+      password: ""
+    },
+    {
+      email: checkEmail,
+      password: makeNotEmptyChecker("Contraseña vacía")
+    }
+  )
+  const signInWithPlainAccountMutation = useMutation(
+    ({ credentials }) => signInWithPlainAccount(credentials)
+  )
+  const signInWithGoogleAccountMutation = useMutation(
+    ({ googleUniqueIdentifier }) => signInWithGoogleAccount(googleUniqueIdentifier)
   )
 
   const signInData =
@@ -135,6 +143,10 @@ export default () => {
       signInWithGoogleAccountMutation.data :
       null
     )
+  const isSignInLoading = (
+    (signInWithPlainAccountMutation.isLoading) ||
+    (signInWithGoogleAccountMutation.isLoading)
+  )
 
   useEffect(() => {
     if (signInData !== null) {
@@ -148,7 +160,7 @@ export default () => {
   }, [signInData])
 
   return (
-    <View style={styles.container}>
+    <Screen style={styles.container}>
       <Text style={styles.title}>
         Bienvenido
       </Text>
@@ -173,17 +185,14 @@ export default () => {
       />
 
       <Button
-        style={styles.button}
-        mode="contained"
+        style={{ width: "80%" }}
         onPress={handleSignInWithPlainAccount}
-        disabled={form.hasErrors() || isSignInLoading}
+        disabled={isSignInLoading}
       >
         {
-          signInWithPlainAccountMutation.isLoading
-          ? (
-            <LoadingSpinner />
-          )
-          : "Iniciar sesión"
+          signInWithPlainAccountMutation.isLoading ?
+          <LoadingSpinner /> :
+          "Iniciar sesión"
         }
       </Button>
 
@@ -202,6 +211,6 @@ export default () => {
           disabled={isSignInLoading}
         />
       }
-    </View>
+    </Screen>
   )
 }

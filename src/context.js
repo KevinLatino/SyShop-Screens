@@ -1,5 +1,19 @@
-import { atomWithStorage, createJSONStorage } from 'jotai/utils'
+import { useAtom } from 'jotai'
+import { atomWithStorage, createJSONStorage, loadable } from 'jotai/utils'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const storage = createJSONStorage(() => AsyncStorage)
-export const sessionAtom = atomWithStorage("session", null, storage)
+const sessionAtom = atomWithStorage("session", null, storage)
+const loadableSessionAtom = loadable(sessionAtom)
+
+export const useSession = () => {
+  const [session] = useAtom(loadableSessionAtom)
+  const [_, setSession] = useAtom(sessionAtom)
+
+  const fineSession = {
+    ...session,
+    isLoading: session.state === "loading"
+  }
+
+  return [fineSession, setSession]
+}

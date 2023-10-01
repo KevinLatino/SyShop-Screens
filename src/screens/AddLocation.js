@@ -1,12 +1,26 @@
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useSession } from '../context'
 import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
 import SearchInput from '../components/SearchInput'
+import LoadingSpinner from '../components/LoadingSpinner'
+import Button from '../components/Button'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { View } from 'react-native'
+import { View, StyleSheet, Dimensions } from 'react-native'
+import { withTheme } from 'react-native-ios-kit'
 import { TouchableRipple, List } from 'react-native-paper'
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    width: "100%",
+    position: "absolute",
+    top: Dimensions.get("screen").height * 0.8,
+    justifyContent: "center",
+    alignItems: "center"
+  }
+})
 
 const addLocation = async (geoapifyAddress, customerId) => {
   const location = {
@@ -26,16 +40,33 @@ const addLocation = async (geoapifyAddress, customerId) => {
   )
 }
 
-const AddressAutocompleteTile = ({ address, onSelect }) => {
-  const isDisabled = address.name === undefined
-
+const _AddressAutocompleteTile = ({ isSelected, address, onSelect, theme }) => {
   return (
     <TouchableRipple
       onPress={() => onSelect(address)}
-      disabled={isDisabled}
-      style={isDisabled ? { backgroundColor: "darkgray" } : {}}
     >
       <List.Item
+        style={
+          isSelected ?
+          {
+            backgroundColor: theme.primaryColor,
+          } :
+          null
+        }
+        titleStyle={
+          isSelected ?
+          {
+            color: "white"
+          } :
+          null
+        }
+        descriptionStyle={
+          isSelected ?
+          {
+            color: "white"
+          } :
+          null
+        }
         key={address.place_id}
         title={address.formatted}
         left={(props) => <List.Icon {...props} icon="map-marker" />}
@@ -44,36 +75,57 @@ const AddressAutocompleteTile = ({ address, onSelect }) => {
   )
 }
 
-const AddressAutocompleteInput = ({ onSelect }) => {
+const AddressAutocompleteTile = withTheme(_AddressAutocompleteTile)
+
+const AddressAutocompleteInput = ({ selectedAddress, onSelect }) => {
   const [searchedText, setSearchedText] = useState("")
-  const addressesQuery = useQuery({
-    queryKey: ["autocompletedAddresses"],
-    queryFn: () => autocompleteAddress(searchedText)
-  })
+
+  const handleSearch = () => {
+    getAddressesMutation.mutate({ searchedText })
+  }
+
+  const getAddressesMutation = useMutation(
+    ({ searchedText }) => autocompleteAddress(searchedText)
+  )
+
+  if (getAddressesMutation.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
+
+  const tiles = !getAddressesMutation.data
+      ? null
+      : (
+        getAddressesMutation.data.map((address) => {
+          console.log(address, selectedAddress)
+
+          return (
+            <AddressAutocompleteTile
+              key={address.place_id}
+              address={address}
+              isSelected={
+                (selectedAddress !== null) &&
+                (address.place_id === selectedAddress.place_id)
+              }
+              onSelect={onSelect}
+            />
+          )
+        })
+      )
 
   return (
     <View>
       <SearchInput
         value={searchedText}
         onChangeText={setSearchedText}
+        onSubmitEditing={handleSearch}
         placeholder="Ubicación"
       />
 
       <View>
         <List.Section>
-          {
-            addressesQuery.isLoading ?
-            <LoadingSpinner /> :
-            addressesQuery.data.map((address) => {
-              return (
-                <AddressAutocompleteTile
-                  key={address.place_id}
-                  result={address}
-                  onSelect={onSelect}
-                />
-              )
-            })
-          }
+          {tiles}
         </List.Section>
       </View>
     </View>
@@ -81,47 +133,58 @@ const AddressAutocompleteInput = ({ onSelect }) => {
 }
 
 export default () => {
-  const [selectedAddress, setSelectedAddress] = useState(null)
-  const [session, _] = useAtom(sessionAtom)
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const addLocationMutation = useMutation(
-    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["customerLocations"]
-      })
-    }
-  )
+  const [session, _] = useSession()
+
+  const [selectedAddress, setSelectedAddress] = useState(null)
 
   const handleAdd = () => {
     addLocationMutation.mutate({
       selectedAddress,
-      customerId: session.customerId
+      customerId: session.data.customerId
     })
   }
 
-  if (addLocationMutation.isSuccess) {
-    navigation.navigate("ChooseLocation")
+  const handleSuccess = (_) => {
+    queryClient.refetchQueries({
+      queryKey: ["customerLocations"]
+    })
+
+    navigation.goBack()
   }
 
-  return (
-    <SafeAreaView>
-      <AddressAutocompleteInput onSelect={setSelectedAddress} />
+  const addLocationMutation = useMutation(
+    ({ selectedAddress, customerId }) => addLocation(selectedAddress, customerId),
+    {
+      onSuccess: handleSuccess
+    }
+  )
 
-      <Button
-        mode="contained"
-        onPress={handleAdd}
-        disabled={
-          selectedAddress === null || addLocationMutation.isLoading
-        }
+  return (
+    <SafeAreaView style={{ gap: 20 }}>
+      <AddressAutocompleteInput
+        selectedAddress={selectedAddress}
+        onSelect={setSelectedAddress}
+      />
+
+      <View
+        style={styles.buttonContainer}
       >
-        {
-          addLocationMutation.isLoading ?
-          <LoadingSpinner /> :
-          "Añadir domicilio"
-        }
-      </Button>
+        <Button
+          style={{ width: "70%" }}
+          onPress={handleAdd}
+          disabled={
+            selectedAddress === null || addLocationMutation.isLoading
+          }
+        >
+          {
+            addLocationMutation.isLoading ?
+            <LoadingSpinner /> :
+            "Añadir domicilio"
+          }
+        </Button>
+      </View>
     </SafeAreaView>
   )
 }

@@ -1,25 +1,28 @@
 import { useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { showMessage } from '../components/AppSnackBar'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
+import Button from '../components/Button'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { View, StyleSheet, Dimensions } from 'react-native'
-import { Button, FAB } from 'react-native-paper'
+import { Fragment } from 'react'
+import { View, StyleSheet, Alert, Dimensions } from 'react-native'
+import { FAB } from 'react-native-paper'
 
 const styles = StyleSheet.create({
-  container: {
-    height: Dimensions.get("screen").height,
-    width: Dimensions.get("screen").width
+  buttonContainer: {
+    width: "100%",
+    position: "absolute",
+    top: Dimensions.get("screen").height * 0.8,
+    justifyContent: "center",
+    alignItems: "center"
   },
   fab: {
     position: 'absolute',
-    bottom: Dimensions.get("screen").height * 0.85,
+    top: Dimensions.get("screen").height * 0.85,
     left: Dimensions.get("screen").width * 0.8
   }
 })
@@ -47,25 +50,12 @@ const createDelivery = async (saleId, locationId) => {
   )
 }
 
-const LocationsScrollView = () => {
+const LocationsScrollView = ({ saleId }) => {
   const navigation = useNavigation()
-  const route = useRoute()
-  const [selectedLocation, setSelectedLocation] = useState()
-  const [session, _] = useAtom(sessionAtom)
   const queryClient = useQueryClient()
-  const locationsQuery = useQuery({
-    queryKey: ["customerLocations"],
-    queryFn: () => fetchLocations(session.customerId)
-  })
-  const createDeliveryMutation = useMutation(
-    ({ saleId, locationId }) => createDelivery(saleId, locationId),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["activeDeliveries"]
-      })
-    }
-  )
-  const { saleId } = route.params
+  const [session, _] = useSession()
+
+  const [selectedLocation, setSelectedLocation] = useState(null)
 
   const handleSelect = (location) => {
     setSelectedLocation(location)
@@ -78,13 +68,30 @@ const LocationsScrollView = () => {
     })
   }
 
-  if (createDeliveryMutation.isSuccess) {
-    showMessage("Tu entrega ahora está pendiente")
+  const handleSuccess = (_) => {
+    queryClient.refetchQueries({ queryKey: ["activeDeliveries"] })
 
-    navigation.navigate("Home")
+    Alert.alert(
+      "Éxito",
+      "Tu entrega ahora está pendiente"
+    )
+
+    navigation.goBack()
   }
 
-  if (locationsQuery.isLoading) {
+  const locationsQuery = useQuery({
+    queryKey: ["customerLocations"],
+    queryFn: () => fetchLocations(session.data.customerId),
+    disabled: session.isLoading
+  })
+  const createDeliveryMutation = useMutation(
+    ({ saleId, locationId }) => createDelivery(saleId, locationId),
+    {
+      onSuccess: handleSuccess
+    }
+  )
+
+  if (locationsQuery.isLoading || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -92,6 +99,20 @@ const LocationsScrollView = () => {
 
   return (
     <View>
+      <View style={{ padding: 20, justifyContent: "center", alignItems: "center" }}>
+        <Button
+          style={{ width: "70%" }}
+          onPress={handleSubmit}
+          disabled={selectedLocation === null || createDeliveryMutation.isLoading}
+        >
+          {
+            createDeliveryMutation.isLoading ?
+            <LoadingSpinner /> :
+            "Programar entrega"
+          }
+        </Button>
+      </View>
+
       <ScrollView
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
@@ -100,44 +121,43 @@ const LocationsScrollView = () => {
             return (
               <LocationTile
                 location={item}
-                isSelected={item.location_id == selectedLocation.location_id}
+                isSelected={
+                  (selectedLocation !== null) &&
+                  (item.location_id == selectedLocation.location_id)
+                }
                 onPress={() => handleSelect(item)}
               />
             )
           }
         }
-        onStartReached={locationsQuery.refetch}
+        emptyIcon="map-marker"
+        emptyMessage="No has añadido ningún domicilio"
       />
-
-      <Button
-        onPress={handleSubmit}
-      >
-        {
-          createDeliveryMutation.isLoading ?
-          <LoadingSpinner /> :
-          "Programar entrega"
-        }
-      </Button>
     </View>
   )
 }
 
 export default () => {
   const navigation = useNavigation()
+  const route = useRoute()
+
+  const { saleId } = route.params
 
   const navigateToAddLocation = () => {
     navigation.navigate("AddLocation")
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LocationsScrollView />
+    <Fragment>
+      <SafeAreaView>
+        <LocationsScrollView saleId={saleId} />
+      </SafeAreaView>
 
       <FAB
         icon="plus"
         style={styles.fab}
         onPress={navigateToAddLocation}
       />
-    </SafeAreaView>
+    </Fragment>
   )
 }

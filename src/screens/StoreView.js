@@ -1,24 +1,17 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { useCounter } from '../utilities/hooks'
-import { useAtom } from 'jotai'
-import { sessionAtom } from '../context'
+import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatLocation } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { View, StyleSheet } from 'react-native'
-import { Appbar, Text, Divider } from 'react-native-paper'
+import Screen from '../components/Screen'
+import { View } from 'react-native'
+import { Body, Caption1, Title2 } from 'react-native-ios-kit'
+import { Appbar, Divider } from 'react-native-paper'
 import { ImageSlider } from 'react-native-image-slider-banner'
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 16
-  }
-})
 
 const fetchStore = async (storeId, customerId) => {
   const payload = {
@@ -33,10 +26,8 @@ const fetchStore = async (storeId, customerId) => {
   return store
 }
 
-const fetchStorePosts = async (storeId, customerId, pageNumber) => {
+const fetchStorePosts = async (storeId, customerId) => {
   const payload = {
-    start: pageNumber * 10,
-    amount: 10,
     store_id: storeId,
     customer_id: customerId
   }
@@ -74,22 +65,16 @@ const followStore = async (storeId, customerId) => {
 
 const StoreView = ({ storeId, customerId }) => {
   const navigation = useNavigation()
-  const [session, _] = useAtom(sessionAtom)
-  const [isFollowing, setIsFollowing] = useState(null)
   const queryClient = useQueryClient()
-  const storeQuery = useQuery({
-    queryKey: ["store"],
-    queryFn: () => fetchStore(storeId, session.customerId),
-    onSuccess: (data) => setIsFollowing(data.does_customer_follow_store)
-  })
-  const followStoreMutation = useMutation(
-    ({ storeId, customerId }) => followStore(storeId, customerId),
-    {
-      onSuccess: () => queryClient.refetchQueries({
-        queryKey: ["feedPosts"]
-      })
-    }
-  )
+  const [session, _] = useSession()
+
+  const [isFollowing, setIsFollowing] = useState(null)
+
+  const handleQuerySuccess = (data) => {
+    console.log(data.does_customer_follow_store)
+
+    setIsFollowing(data.does_customer_follow_store)
+  }
 
   const handleFollow = () => {
     followStoreMutation.mutate({
@@ -100,8 +85,14 @@ const StoreView = ({ storeId, customerId }) => {
     setIsFollowing(!isFollowing)
   }
 
+  const handleFollowSuccess = (_) => {
+    queryClient.refetchQueries({
+      queryKey: ["feedPosts"]
+    })
+  }
+
   const navigateToChat = async () => {
-    const optionalChat = await fetchChat(session.customerId, storeId)
+    const optionalChat = await fetchChat(session.data.customerId, storeId)
 
     const chatId = optionalChat?.chat_id
 
@@ -116,6 +107,19 @@ const StoreView = ({ storeId, customerId }) => {
       }
     })
   }
+
+  const storeQuery = useQuery({
+    queryKey: ["store"],
+    queryFn: () => fetchStore(storeId, session.data.customerId),
+    onSuccess: handleQuerySuccess,
+    disabled: session.isLoading
+  })
+  const followStoreMutation = useMutation(
+    ({ storeId, customerId }) => followStore(storeId, customerId),
+    {
+      onSuccess: handleFollowSuccess
+    }
+  )
 
   if (storeQuery.isLoading) {
     return (
@@ -133,7 +137,10 @@ const StoreView = ({ storeId, customerId }) => {
 
   return (
     <View>
-      <Appbar.Header>
+      <Appbar.Header
+        mode="center-aligned"
+        statusBarHeight={0}
+      >
         <Appbar.Content title={name} />
 
         <Appbar.Action
@@ -148,33 +155,36 @@ const StoreView = ({ storeId, customerId }) => {
         />
       </Appbar.Header>
 
-      <View>
-        <ImageSlider
-          data={multimedia}
-          autoPlay={false}
-        />
+      <ImageSlider
+        data={multimedia}
+        autoPlay={false}
+      />
 
-        <Text variant="titleMedium">
-          {formatLocation(location)}
-        </Text>
-
-        <Text variant="bodySmall">
+      <View style={{ padding: 15 }}>
+        <Caption1
+          style={{ color: "gray" }}
+        >
           {`${follower_count} ${follower_count > 1 ? 'followers' : 'follower'}`}
-        </Text>
+        </Caption1>
 
-        <Text variant="bodyLarge">
+        <Caption1
+          style={{ color: "gray" }}
+        >
+          {formatLocation(location)}
+        </Caption1>
+
+        <Body>
           {description}
-        </Text>
+        </Body>
       </View>
     </View>
   )
 }
 
 const PostsList = ({ storeId, customerId }) => {
-  const pageNumber = useCounter()
   const storePostsQuery = useQuery({
     queryKey: ["storePosts"],
-    queryFn: () => fetchStorePosts(storeId, customerId, pageNumber.value)
+    queryFn: () => fetchStorePosts(storeId, customerId)
   })
 
   if (storePostsQuery.isLoading) {
@@ -184,34 +194,49 @@ const PostsList = ({ storeId, customerId }) => {
   }
 
   return (
-    <ScrollView
-      data={storePostsQuery.data}
-      keyExtractor={(post) => post.post_id}
-      renderItem={({ item }) => <PostTile post={item} />}
-      onEndReached={pageNumber.increment}
-    />
+    <View style={{ flex: 1, paddingTop: 20, paddingLeft: 15, paddingRight: 15 }}>
+      <View style={{ paddingBottom: 15 }}>
+        <Title2>
+          Publicaciones
+        </Title2>
+      </View>
+
+      <ScrollView
+        data={storePostsQuery.data}
+        keyExtractor={(post) => post.post_id}
+        renderItem={({ item }) => <PostTile post={item} />}
+        emptyIcon="basket"
+        emptyMessage="Esta tienda no ha hecho ninguna publicación"
+      />
+    </View>
   )
 }
 
 export default () => {
   const route = useRoute()
-  const [session, _] = useAtom(sessionAtom)
+  const [session, _] = useSession()
 
   const { storeId } = route.params
 
+  if (session.isLoading) {
+    return (
+      <LoadingSpinner inScreen />
+    )
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <Screen style={{ padding: 0 }}>
       <StoreView
         storeId={storeId}
-        customerId={session.customerId}
+        customerId={session.data.customerId}
       />
 
       <Divider />
 
       <PostsList
         storeId={storeId}
-        customerId={session.customerId}
+        customerId={session.data.customerId}
       />
-    </SafeAreaView>
+    </Screen>
   )
 }

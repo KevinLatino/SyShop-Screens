@@ -2,9 +2,8 @@ import axios from 'axios'
 import * as Google from 'expo-auth-session/providers/google'
 import configuration from "../configuration"
 import { useEffect } from 'react'
-import { showMessage } from './AppSnackBar'
 import { maybeCompleteAuthSession } from "expo-web-browser"
-import { View, Text, Image, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Alert } from 'react-native'
   
 maybeCompleteAuthSession()
 
@@ -60,10 +59,11 @@ export default ({ text, onSignIn, ...touchableOpacityProps }) => {
 
       getUserInformation(accessToken)
         .then((userInformation) => onSignIn(userInformation))
-        .catch((error) => {
-          console.log(error)
-
-          showMessage("No se pudo acceder mediante Google")
+        .catch((_) => {
+          Alert.alert(
+            "Error de Google",
+            "No se pudo acceder mediante Google, inténtalo más tarde"
+          )
         })
     }
   }, [response])
