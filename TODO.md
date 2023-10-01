@@ -1,13 +1,9 @@
-# Jueves
-+ [ ] Acomodar los layouts
-+ [ ] Centrar el LoadingSpinner en los botones
-+ [ ] Rediseñar todos los tiles, views
-+ [ ] Rediseñar SearchResults por completo
-+ [ ] Aplicar tipografías
-+ [ ] Pensar en como desactivar los submits de SignUp y SigIn correctamente
+# Pendiente
++ [ ] Rediseñar SearchResults
++ [ ] Decrementar la cantidad de unidades disponibles después de una venta
 
-# Después
-+ [ ] Arreglar los LoadingSpinners
+# Kevin
++ [ ] Aplicar tipografías
 
 # Después del cliente para vendedores
 + [ ] Implementar verificación de correo electrónico y número telefónico

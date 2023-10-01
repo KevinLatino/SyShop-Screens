@@ -4,7 +4,9 @@ import { requestServer } from '../utilities/requests'
 import LoadingSpinner from "../components/LoadingSpinner"
 import ScrollView from "../components/ScrollView"
 import PostTile from "../components/PostTile"
-import { SafeAreaView } from "react-native-safe-area-context"
+import Screen from '../components/Screen'
+import { View } from 'react-native'
+import { Title2 } from 'react-native-ios-kit'
 
 const fetchLikedPosts = async (customerId) => {
     const payload = {
@@ -34,14 +36,20 @@ export default () => {
     }
 
     return (
-      <SafeAreaView>
-        <ScrollView
-            data={likedPostsQuery.data}
-            keyExtractor={(post) => post.post_id}
-            renderItem={({ item }) => <PostTile post={item} />}
-            emptyIcon="heart"
-            emptyMessage="No te gusta ninguna publicación"
-        />
-      </SafeAreaView>
+      <Screen>
+        <View style={{ flex: 1, gap: 20 }}>
+          <Title2>
+            Tus me gusta
+          </Title2>
+
+          <ScrollView
+              data={likedPostsQuery.data}
+              keyExtractor={(post) => post.post_id}
+              renderItem={({ item }) => <PostTile post={item} />}
+              emptyIcon="heart"
+              emptyMessage="No te gusta ninguna publicación"
+          />
+        </View>
+      </Screen>
     )
 }

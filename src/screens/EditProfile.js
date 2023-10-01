@@ -75,6 +75,15 @@ export default () => {
   }
 
   const handleUpdate = () => {
+    if (!form.validate()) {
+      Alert.alert(
+        "Información incompleta",
+        "Ingresa información necesaria para actualizar los datos"
+      )
+
+      return
+    }
+
     updateCustomerMutation.mutate({
       customerId: session.data.customerId,
       fields: form.fields,
@@ -157,7 +166,7 @@ export default () => {
 
       <Button
         onPress={handleUpdate}
-        disabled={form.hasErrors()}
+        disabled={updateCustomerMutation.isLoading}
       >
         {
           updateCustomerMutation.isLoading ?

@@ -28,7 +28,10 @@ export const requestServer = async (endpoint, payload, errorHandler) => {
         }
       }
     } else {
-      showMessage("No se pudo conectar al servidor, révisa tu conexión a Internet")
+      Alert.alert(
+        "Error de conexión",
+        "No se pudo conectar al servidor, révisa tu conexión a Internet"
+      )
     }
 
     throw error

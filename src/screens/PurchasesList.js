@@ -5,6 +5,8 @@ import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import SaleTile from '../components/SaleTile'
 import Screen from '../components/Screen'
+import { View } from 'react-native'
+import { Title2 } from 'react-native-ios-kit'
 
 const fetchPurchases = async (customerId) => {
     const payload = {
@@ -35,13 +37,19 @@ export default () => {
 
     return (
       <Screen>
-        <ScrollView
-            data={purchasesQuery.data}
-            keyExtractor={(purchase) => purchase.sale_id}
-            renderItem={({ item }) => <SaleTile sale={item} />}
-            emptyIcon="basket"
-            emptyMessage="No has comprado nada"
-        />
+        <View style={{ flex: 1, gap: 20 }}>
+          <Title2>
+            Tus compras
+          </Title2>
+
+          <ScrollView
+              data={purchasesQuery.data}
+              keyExtractor={(purchase) => purchase.sale_id}
+              renderItem={({ item }) => <SaleTile sale={item} />}
+              emptyIcon="basket"
+              emptyMessage="No has comprado nada"
+          />
+        </View>
       </Screen>
     )
 }

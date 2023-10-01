@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, StyleSheet } from 'react-native';
-// import { Button } from 'react-native-paper';
 import Button from '../components/Button'
 import { SafeAreaView } from 'react-native-safe-area-context';
 

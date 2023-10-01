@@ -1,7 +1,8 @@
 import 'react-native-gesture-handler'
-import { useState, Suspense } from 'react'
+import { Suspense } from 'react'
 import { PaperProvider } from 'react-native-paper'
 import { ThemeProvider as IosKitProvider } from 'react-native-ios-kit'
+import { ApplicationProvider as UiKittenProvider } from '@ui-kitten/components'
 import { StripeProvider } from '@stripe/stripe-react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
@@ -9,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useSession } from './src/context'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import * as eva from '@eva-design/eva'
 import configuration from './src/configuration'
 import LoadingSpinner from './src/components/LoadingSpinner'
 import Home from './src/screens/Home'
@@ -29,7 +31,6 @@ import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
 import Order from './src/screens/Order'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const queryClient = new QueryClient()
 const Stack = createStackNavigator()
@@ -152,122 +153,124 @@ const Main = () => {
       publishableKey={configuration.STRIPE_PUBLISHABLE_KEY}
     >
       <QueryClientProvider client={queryClient}>
-        <IosKitProvider>
-          <PaperProvider theme={theme}>
-            <SafeAreaProvider>
-                <NavigationContainer>
-                  <Stack.Navigator
-                    initialRouteName={session.data === null ? "Welcome" : "Home"}
-                    screenOptions={{
-                      headerShown: false
-                    }}
-                  >
-                    <Stack.Screen
-                      name="Welcome"
+        <UiKittenProvider {...eva} theme={eva.light}>
+          <IosKitProvider>
+            <PaperProvider theme={theme}>
+              <SafeAreaProvider>
+                  <NavigationContainer>
+                    <Stack.Navigator
+                      initialRouteName={session.data === null ? "Welcome" : "Home"}
+                      screenOptions={{
+                        headerShown: false
+                      }}
                     >
-                      {() => <Welcome />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="Welcome"
+                      >
+                        {() => <Welcome />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="SignIn"
-                    >
-                      {() => <SignIn />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="SignIn"
+                      >
+                        {() => <SignIn />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="SignUp"
-                    >
-                      {() => <SignUp />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="SignUp"
+                      >
+                        {() => <SignUp />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="Home"
-                    >
-                      {() => <BottomTabNavigator />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="Home"
+                      >
+                        {() => <BottomTabNavigator />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="DeliveriesList"
-                    >
-                      {() => <DeliveriesList />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="DeliveriesList"
+                      >
+                        {() => <DeliveriesList />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="ChatsList"
-                    >
-                      {() => <ChatsList />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="ChatsList"
+                      >
+                        {() => <ChatsList />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="Chat"
-                    >
-                      {() => <Chat />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="Chat"
+                      >
+                        {() => <Chat />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="ChooseLocation"
-                    >
-                      {() => <ChooseLocation />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="ChooseLocation"
+                      >
+                        {() => <ChooseLocation />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="AddLocation"
-                    >
-                      {() => <AddLocation />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="AddLocation"
+                      >
+                        {() => <AddLocation />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="SearchResults"
-                    >
-                      {() => <SearchResults />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="SearchResults"
+                      >
+                        {() => <SearchResults />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="PostView"
-                    >
-                      {() => <PostView />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="PostView"
+                      >
+                        {() => <PostView />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="EditProfile"
-                    >
-                      {() => <EditProfile />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="EditProfile"
+                      >
+                        {() => <EditProfile />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="LikedPosts"
-                    >
-                      {() => <LikedPosts />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="LikedPosts"
+                      >
+                        {() => <LikedPosts />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="PurchasesList"
-                    >
-                      {() => <PurchasesList />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="PurchasesList"
+                      >
+                        {() => <PurchasesList />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="ProfileView"
-                    >
-                      {() => <ProfileView />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="ProfileView"
+                      >
+                        {() => <ProfileView />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="StoreView"
-                    >
-                      {() => <StoreView />}
-                    </Stack.Screen>
+                      <Stack.Screen
+                        name="StoreView"
+                      >
+                        {() => <StoreView />}
+                      </Stack.Screen>
 
-                    <Stack.Screen
-                      name="Order"
-                    >
-                      {() => <Order />}
-                    </Stack.Screen>
-                  </Stack.Navigator>
-                </NavigationContainer>
-            </SafeAreaProvider>
-          </PaperProvider>
-        </IosKitProvider>
+                      <Stack.Screen
+                        name="Order"
+                      >
+                        {() => <Order />}
+                      </Stack.Screen>
+                    </Stack.Navigator>
+                  </NavigationContainer>
+              </SafeAreaProvider>
+            </PaperProvider>
+          </IosKitProvider>
+        </UiKittenProvider>
       </QueryClientProvider>
     </StripeProvider>
   )

@@ -100,7 +100,7 @@ export default () => {
   const [_, setSession] = useSession()
 
   const handleSignInWithPlainAccount = () => {
-    if (form.hasErrors()) {
+    if (!form.validate()) {
       Alert.alert(
         "Información incompleta",
         "Ingresa la información necesaria para iniciar sesión"
@@ -185,9 +185,9 @@ export default () => {
       />
 
       <Button
-        style={{ width: "70%" }}
+        style={{ width: "80%" }}
         onPress={handleSignInWithPlainAccount}
-        disabled={form.hasErrors() || isSignInLoading}
+        disabled={isSignInLoading}
       >
         {
           signInWithPlainAccountMutation.isLoading ?

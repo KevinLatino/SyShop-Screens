@@ -6,9 +6,21 @@ import { autocompleteAddress } from '../utilities/geoapify'
 import { requestServer } from '../utilities/requests'
 import SearchInput from '../components/SearchInput'
 import LoadingSpinner from '../components/LoadingSpinner'
+import Button from '../components/Button'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { View } from 'react-native'
-import { Button, TouchableRipple, List } from 'react-native-paper'
+import { View, StyleSheet, Dimensions } from 'react-native'
+import { withTheme } from 'react-native-ios-kit'
+import { TouchableRipple, List } from 'react-native-paper'
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    width: "100%",
+    position: "absolute",
+    top: Dimensions.get("screen").height * 0.8,
+    justifyContent: "center",
+    alignItems: "center"
+  }
+})
 
 const addLocation = async (geoapifyAddress, customerId) => {
   const location = {
@@ -28,16 +40,33 @@ const addLocation = async (geoapifyAddress, customerId) => {
   )
 }
 
-const AddressAutocompleteTile = ({ address, onSelect }) => {
-  const isDisabled = address.name === undefined
-
+const _AddressAutocompleteTile = ({ isSelected, address, onSelect, theme }) => {
   return (
     <TouchableRipple
       onPress={() => onSelect(address)}
-      disabled={isDisabled}
-      style={isDisabled ? { backgroundColor: "darkgray" } : {}}
     >
       <List.Item
+        style={
+          isSelected ?
+          {
+            backgroundColor: theme.primaryColor,
+          } :
+          null
+        }
+        titleStyle={
+          isSelected ?
+          {
+            color: "white"
+          } :
+          null
+        }
+        descriptionStyle={
+          isSelected ?
+          {
+            color: "white"
+          } :
+          null
+        }
         key={address.place_id}
         title={address.formatted}
         left={(props) => <List.Icon {...props} icon="map-marker" />}
@@ -46,7 +75,9 @@ const AddressAutocompleteTile = ({ address, onSelect }) => {
   )
 }
 
-const AddressAutocompleteInput = ({ onSelect }) => {
+const AddressAutocompleteTile = withTheme(_AddressAutocompleteTile)
+
+const AddressAutocompleteInput = ({ selectedAddress, onSelect }) => {
   const [searchedText, setSearchedText] = useState("")
 
   const handleSearch = () => {
@@ -59,7 +90,7 @@ const AddressAutocompleteInput = ({ onSelect }) => {
 
   if (getAddressesMutation.isLoading) {
     return (
-      <LoadingSpinner />
+      <LoadingSpinner inScreen />
     )
   }
 
@@ -67,10 +98,16 @@ const AddressAutocompleteInput = ({ onSelect }) => {
       ? null
       : (
         getAddressesMutation.data.map((address) => {
+          console.log(address, selectedAddress)
+
           return (
             <AddressAutocompleteTile
               key={address.place_id}
               address={address}
+              isSelected={
+                (selectedAddress !== null) &&
+                (address.place_id === selectedAddress.place_id)
+              }
               onSelect={onSelect}
             />
           )
@@ -125,22 +162,29 @@ export default () => {
   )
 
   return (
-    <SafeAreaView>
-      <AddressAutocompleteInput onSelect={setSelectedAddress} />
+    <SafeAreaView style={{ gap: 20 }}>
+      <AddressAutocompleteInput
+        selectedAddress={selectedAddress}
+        onSelect={setSelectedAddress}
+      />
 
-      <Button
-        mode="contained"
-        onPress={handleAdd}
-        disabled={
-          selectedAddress === null || addLocationMutation.isLoading
-        }
+      <View
+        style={styles.buttonContainer}
       >
-        {
-          addLocationMutation.isLoading ?
-          <LoadingSpinner /> :
-          "Añadir domicilio"
-        }
-      </Button>
+        <Button
+          style={{ width: "70%" }}
+          onPress={handleAdd}
+          disabled={
+            selectedAddress === null || addLocationMutation.isLoading
+          }
+        >
+          {
+            addLocationMutation.isLoading ?
+            <LoadingSpinner /> :
+            "Añadir domicilio"
+          }
+        </Button>
+      </View>
     </SafeAreaView>
   )
 }

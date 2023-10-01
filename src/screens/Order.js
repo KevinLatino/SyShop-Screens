@@ -6,18 +6,18 @@ import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
-import NumericInput from 'react-native-numeric-input'
+import Button from '../components/Button'
 import Screen from '../components/Screen'
-import { Alert, StyleSheet } from 'react-native'
-import { Card, Text, Button } from 'react-native-paper'
+import { Alert, StyleSheet, Dimensions } from 'react-native'
+import { TableView, InfoRow, Avatar, Stepper, Title2 } from 'react-native-ios-kit'
 
 const styles = StyleSheet.create({
   container: {
+    height: Dimensions.get("screen").height,
     justifyContent: "center",
     alignItems: "center",
     gap: 24,
-    padding: 16,
-    borderRadius: 12,
+    padding: 16
   }
 })
 
@@ -46,27 +46,6 @@ const createSaleIntent = async (postId, customerId, amount) => {
   )
 
   return response
-}
-
-const PostTile = ({ post }) => {
-    return (
-        <Card style={{ width: "95%" }}>
-            <Card.Cover
-                source={{ uri: formatBase64String(post.multimedia[0]) }}
-            />
-
-            <Card.Title
-                title={post.title}
-                subtitle={post.price}
-            />
-
-            <Card.Content>
-                <Text variant="bodyMedium">
-                    {post.description}
-                </Text>
-            </Card.Content>
-        </Card>
-    )
 }
 
 export default () => {
@@ -114,6 +93,8 @@ export default () => {
           "Hubo un error al intentar conectarse a Stripe, inténtale de nuevo más tarde"
         )
 
+        console.log(presentation.error)
+
         return
       }
 
@@ -134,7 +115,7 @@ export default () => {
       }
     )
 
-    if (postQuery.isLoading || session.isLoading) {
+    if (postQuery.isLoading) {
         return (
           <LoadingSpinner inScreen />
         )
@@ -142,18 +123,36 @@ export default () => {
 
     return (
       <Screen style={styles.container}>
-        <PostTile post={postQuery.data} />
+        <Title2>
+          Comprando '{postQuery.data.title}'
+        </Title2>
 
-        <NumericInput
-            minValue={1}
-            maxValue={postQuery.data.amount}
-            value={amount}
-            onChange={setAmount}
+        <Avatar
+          url={formatBase64String(postQuery.data.multimedia[0])}
+        />
+
+        <TableView>
+          <InfoRow
+            title="Cantidad de unidades a comprar"
+            info={amount}
+          />
+
+          <InfoRow
+            title="Precio total de la compra"
+            info={`₡${postQuery.data.price * amount}`}
+          />
+        </TableView>
+
+        <Stepper
+          minValue={1}
+          maxValue={postQuery.data.amount}
+          value={amount}
+          onValueChange={setAmount}
         />
 
         <Button
-            mode="contained"
             onPress={handleBuy}
+            style={{ width: "70%" }}
         >
           {
             createSaleIntentMutation.isLoading ?

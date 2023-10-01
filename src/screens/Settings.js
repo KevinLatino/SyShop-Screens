@@ -100,7 +100,7 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
   }
 
   return (
-    <Dialog.Container visible={isVisible}>
+    <Dialog.Container visible={isVisible} onBackdropPress={onDismiss}>
       <Dialog.Title>
         Cambia tu correo de electrónico
       </Dialog.Title>
@@ -163,7 +163,7 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
   }
 
   return (
-    <Dialog.Container visible={isVisible}>
+    <Dialog.Container visible={isVisible} onBackdropPress={onDismiss}>
       <Dialog.Title>
         Cambia tu contraseña
       </Dialog.Title>
@@ -206,7 +206,7 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
   }
 
   return (
-    <Dialog.Container visible={isVisible}>
+    <Dialog.Container visible={isVisible} onBackdropPress={onDismiss}>
       <Dialog.Title>
         ¿Estás seguro?
       </Dialog.Title>
@@ -252,7 +252,7 @@ const DeleteAccountDialog = ({ isVisible, onDismiss }) => {
   )
 
   return (
-    <Dialog.Container visible={isVisible}>
+    <Dialog.Container visible={isVisible} onBackdropPress={onDismiss}>
       <Dialog.Title>
         ¿Estás seguro?
       </Dialog.Title>

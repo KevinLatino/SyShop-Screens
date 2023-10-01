@@ -6,15 +6,19 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
-import Screen from '../components/Screen'
+import Button from '../components/Button'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Fragment } from 'react'
 import { View, StyleSheet, Alert, Dimensions } from 'react-native'
-import { Button, FAB } from 'react-native-paper'
+import { FAB } from 'react-native-paper'
 
 const styles = StyleSheet.create({
-  container: {
-    height: Dimensions.get("screen").height,
-    width: Dimensions.get("screen").width
+  buttonContainer: {
+    width: "100%",
+    position: "absolute",
+    top: Dimensions.get("screen").height * 0.8,
+    justifyContent: "center",
+    alignItems: "center"
   },
   fab: {
     position: 'absolute',
@@ -95,6 +99,20 @@ const LocationsScrollView = ({ saleId }) => {
 
   return (
     <View>
+      <View style={{ padding: 20, justifyContent: "center", alignItems: "center" }}>
+        <Button
+          style={{ width: "70%" }}
+          onPress={handleSubmit}
+          disabled={selectedLocation === null || createDeliveryMutation.isLoading}
+        >
+          {
+            createDeliveryMutation.isLoading ?
+            <LoadingSpinner /> :
+            "Programar entrega"
+          }
+        </Button>
+      </View>
+
       <ScrollView
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
@@ -115,18 +133,6 @@ const LocationsScrollView = ({ saleId }) => {
         emptyIcon="map-marker"
         emptyMessage="No has añadido ningún domicilio"
       />
-
-      <Button
-        mode="contained"
-        onPress={handleSubmit}
-        disabled={selectedLocation === null || createDeliveryMutation.isLoading}
-      >
-        {
-          createDeliveryMutation.isLoading ?
-          <LoadingSpinner /> :
-          "Programar entrega"
-        }
-      </Button>
     </View>
   )
 }
@@ -143,9 +149,9 @@ export default () => {
 
   return (
     <Fragment>
-      <Screen>
+      <SafeAreaView>
         <LocationsScrollView saleId={saleId} />
-      </Screen>
+      </SafeAreaView>
 
       <FAB
         icon="plus"

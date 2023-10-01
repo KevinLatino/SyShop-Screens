@@ -123,7 +123,7 @@ export default () => {
   const [picture, setPicture] = useState("")
 
   const handleSignUp = () => {
-    if (form.hasErrors()) {
+    if (!form.validate()) {
       Alert.alert(
         "Información incompleta",
         "Ingresa información necesaria para registrarte"
@@ -287,7 +287,7 @@ export default () => {
 
       <Button
         onPress={handleSignUp}
-        disabled={form.hasErrors()}
+        disabled={isSignUpLoading}
         style={{ width: "70%" }}
       >
         {

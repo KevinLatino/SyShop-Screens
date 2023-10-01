@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
+import { formatDate } from '../utilities/formatting'
 import TextArea from '../components/TextArea'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -95,18 +96,7 @@ const addPostComment = async (postId, customerId, text) => {
 }
 
 const formatPostDate = (isoDateString) => {
-  const date = new Date(isoDateString)
-
-  const day = date.getDate() + 1
-  const month = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio",
-    "julio", "agosto", "septiembre", "noviembre", "diciembre"
-  ][date.getMonth()]
-  const year = date.getFullYear()
-  const hours = (date.getHours() % 12).toString().padStart(2, "0")
-  const minutes = date.getMinutes().toString().padStart(2, "0")
-
-  const formatted = `Publicado en ${day} de ${month} de ${year} a las ${hours}:${minutes}`
+  const formatted = `Publicado el ${formatDate(isoDateString)}`
 
   return formatted
 }

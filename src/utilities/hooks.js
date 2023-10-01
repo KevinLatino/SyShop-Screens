@@ -6,44 +6,48 @@ export const useForm = (initialValues, errorHandlers) => {
 
   const getField = (name) => fieldsState[name]
 
+  const getError = (name) => {
+    return errorsState[name]
+  }
+
   const setField = (name) => {
-    const errorHandler = errorHandlers[name]
-
     const setter = (value) => {
-      const error = errorHandler(value)
-
       setFieldsState(fs => ({
         ...fs,
         [name]: value
-      }))
-
-      setErrorsState(es => ({
-        ...es,
-        [name]: error
       }))
     }
 
     return setter
   }
 
-  const getError = (name) => {
-    return errorsState[name]
-  }
+  const validate = () => {
+    const names = Object.keys(fieldsState)
+    let isValid = true
 
-  const hasErrors = () => {
-    return Object.values(errorsState).some((v) => v !== null)
-  }
+    for (const name of names) {
+      const value = fieldsState[name]
+      const error = errorHandlers[name](value)
 
-  const isFilled = () => {
-    return Object.values(fieldsState).every((v) => v !== "")
+      setErrorsState(es => ({
+        ...es,
+        [name]: error
+      }))
+
+
+      if (error !== null) {
+        isValid = false
+      }
+    }
+
+    return isValid
   }
 
   return {
     getField,
     setField,
     getError,
-    hasErrors,
-    isFilled,
-    fields: fieldsState
+    fields: fieldsState,
+    validate
   }
 }
