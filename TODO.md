@@ -1,11 +1,10 @@
 # Viernes después de exámenes
-+ [ ] Quitar los errores 'undefined is not a function' de las consultas al servidor
-+ [ ] Arreglar la reutilización de sesiones
-+ [ ] Cubrir los huecos de la navegación
-+ [ ] Quitar paddings extraños
-+ [ ] Probar con un dataset más extenso
++ [ ] Arreglar el error de SearchResults al devolverse
++ [ ] Arreglar el error del follow en StoreView
+
+# Kevin
 + [ ] Aplicar tipografías
-+ [ ] Limitar la navegación hacia atrás
++ [ ] Acomodar los LoadingSpinners
 
 # Después del cliente para vendedores
 + [ ] Implementar verificación de correo electrónico y número telefónico

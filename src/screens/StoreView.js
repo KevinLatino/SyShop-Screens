@@ -7,7 +7,7 @@ import { formatLocation } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
-import Screen from '../components/Screen'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { View } from 'react-native'
 import { Body, Caption1, Title2 } from 'react-native-ios-kit'
 import { Appbar, Divider } from 'react-native-paper'
@@ -218,6 +218,8 @@ export default () => {
 
   const { storeId } = route.params
 
+  console.log("StoreId", storeId)
+
   if (session.isLoading) {
     return (
       <LoadingSpinner inScreen />
@@ -225,7 +227,7 @@ export default () => {
   }
 
   return (
-    <Screen style={{ padding: 0 }}>
+    <SafeAreaView>
       <StoreView
         storeId={storeId}
         customerId={session.data.customerId}
@@ -237,6 +239,6 @@ export default () => {
         storeId={storeId}
         customerId={session.data.customerId}
       />
-    </Screen>
+    </SafeAreaView>
   )
 }

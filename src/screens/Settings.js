@@ -283,6 +283,10 @@ export default () => {
   const [isCloseSessionDialogVisible, setIsCloseSessionDialogVisible] = useState(false)
   const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false)
 
+  navigation.addListener("beforeRemove", (event) => {
+    event.preventDefault()
+  })
+
   const customerQuery = useQuery({
     queryKey: ["customerSettings"],
     queryFn: () => fetchCustomer(session.data.customerId),

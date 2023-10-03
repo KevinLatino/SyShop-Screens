@@ -45,6 +45,7 @@ const fetchStores = async (searchedName) => {
 }
 
 const fetchPosts = async (text, categories, filters) => {
+  console.log("AAAAA", text, categories, filters)
   const payload = {
     searched_text: text,
     categories,
@@ -105,33 +106,35 @@ const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
     }
 
     return (
-      <View style={{ gap: 5 }}>
+      <View style={{ gap: 16 }}>
         <SegmentedControl
           values={["precio", "fecha de publicación"]}
           selectedIndex={sortingPropertyIndex}
           onChange={handleSelectSortingPropertyIndex}
         />
 
-        {
-          sortingPropertyIndex === 0 ?
-          (
-            <View>
-              <Caption1>
-                Rango de precio
-              </Caption1>
+        <View style={{ gap: 12 }}>
+          {
+            sortingPropertyIndex === 0 ?
+            (
+              <View>
+                <Caption1>
+                  Rango de precio
+                </Caption1>
 
-              <Slider
-                minimumValue={0}
-                maximumValue={limitPrice}
-                selectedMinimumValue={minimumPrice}
-                selectedMaximumValue={maximumPrice}
-                onChange={handleChangePriceRange}
-                step={100}
-              />
-            </View>
-          ) :
-          null
-        }
+                <Slider
+                  minimumValue={0}
+                  maximumValue={limitPrice}
+                  selectedMinimumValue={minimumPrice}
+                  selectedMaximumValue={maximumPrice}
+                  onChange={handleChangePriceRange}
+                  step={100}
+                />
+              </View>
+            ) :
+            null
+          }
+        </View>
       </View>
     )
 }
@@ -227,7 +230,7 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
         searchedText,
         categoriesNames,
         {
-          minimumPrice: searchFilters.minimumValue,
+          minimumPrice: searchFilters.minimumPrice,
           maximumPrice: searchFilters.maximumPrice,
           sortingProperty: ["price", "sent_datetime"][searchFilters.sortingPropertyIndex],
           sortingSchema: "ascending"
@@ -235,6 +238,8 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
       ),
       enabled: maximumPriceQuery.isSuccess
     })
+
+  console.log(postsQuery)
 
     if (maximumPriceQuery.isLoading) {
         return (
@@ -249,6 +254,8 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
                 filters={searchFilters}
                 onChangeFilters={handleChangeFilters}
             />
+
+            <Divider style={{ width: "90%" }} />
 
             <View style={{ flex: 1 }}>
               {
@@ -285,7 +292,7 @@ export default () => {
               categoriesNames={categoriesNames}
           />
 
-          <View style={{ flex: 1, gap: 20 }}>
+          <View style={{ flex: 1, gap: 16 }}>
             <Title2>
                 Tiendas
             </Title2>

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { View } from 'react-native'
@@ -49,7 +50,12 @@ const DeliveriesListItems = ({ deliveries }) => {
 }
 
 export default () => {
+  const navigation = useNavigation()
   const [session, _] = useSession()
+
+  navigation.addListener("beforeRemove", (event) => {
+    event.preventDefault()
+  })
 
   const activeDeliveriesQuery = useQuery({
     queryKey: ["activeDeliveries"],

@@ -81,6 +81,10 @@ export default () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
 
+  navigation.addListener("beforeRemove", (event) => {
+    event.preventDefault()
+  })
+
   const handleSearchSubmit = (text, categoriesNames, storesNames) => {
     setIsModalVisible(false)
 
