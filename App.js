@@ -7,7 +7,7 @@ import { StripeProvider } from '@stripe/stripe-react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { useSession, isUserLoggedIn } from './src/context'
+import { useSession } from './src/context'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import * as eva from '@eva-design/eva'
@@ -32,7 +32,13 @@ import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
 import Order from './src/screens/Order'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      cacheTime: 0
+    }
+  }
+})
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
 

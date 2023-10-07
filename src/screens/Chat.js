@@ -71,8 +71,6 @@ const addMessage = async (message, senderId, receiverId) => {
 const Header = ({ chat, isLoading }) => {
   const navigation = useNavigation()
 
-  console.log(chat)
-
   const navigateToStoreView = () => {
     navigation.navigate(
       "StoreView",

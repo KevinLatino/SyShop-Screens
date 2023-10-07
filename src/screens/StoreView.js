@@ -3,8 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { formatLocation } from '../utilities/formatting'
+import { formatBase64String, formatLocation } from '../utilities/formatting'
+import { default as startPhoneCall } from 'react-native-phone-call'
 import ScrollView from '../components/ScrollView'
+import VirtualizedView from '../components/VirtualizedView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -71,8 +73,6 @@ const StoreView = ({ storeId, customerId }) => {
   const [isFollowing, setIsFollowing] = useState(null)
 
   const handleQuerySuccess = (data) => {
-    console.log(data.does_customer_follow_store)
-
     setIsFollowing(data.does_customer_follow_store)
   }
 
@@ -106,6 +106,21 @@ const StoreView = ({ storeId, customerId }) => {
         }
       }
     })
+  }
+
+  const callStore = async () => {
+    try {
+      await startPhoneCall({
+        number: storeQuery.data.phone_number,
+        prompt: true,
+        skipCanOpen: true
+      })
+    } catch (error) {
+      Alert.alert(
+        "No se pudo realizar la llamada",
+        "Inténtalo más tarde"
+      )
+    }
   }
 
   const storeQuery = useQuery({
@@ -144,6 +159,11 @@ const StoreView = ({ storeId, customerId }) => {
         <Appbar.Content title={name} />
 
         <Appbar.Action
+          icon="phone"
+          onPress={callStore}
+        />
+
+        <Appbar.Action
           icon="chat"
           onPress={navigateToChat}
         />
@@ -156,7 +176,7 @@ const StoreView = ({ storeId, customerId }) => {
       </Appbar.Header>
 
       <ImageSlider
-        data={multimedia}
+        data={multimedia.map(formatBase64String)}
         autoPlay={false}
       />
 
@@ -218,8 +238,6 @@ export default () => {
 
   const { storeId } = route.params
 
-  console.log("StoreId", storeId)
-
   if (session.isLoading) {
     return (
       <LoadingSpinner inScreen />
@@ -227,18 +245,20 @@ export default () => {
   }
 
   return (
-    <SafeAreaView>
-      <StoreView
-        storeId={storeId}
-        customerId={session.data.customerId}
-      />
+    <VirtualizedView>
+      <SafeAreaView>
+        <StoreView
+          storeId={storeId}
+          customerId={session.data.customerId}
+        />
 
-      <Divider />
+        <Divider />
 
-      <PostsList
-        storeId={storeId}
-        customerId={session.data.customerId}
-      />
-    </SafeAreaView>
+        <PostsList
+          storeId={storeId}
+          customerId={session.data.customerId}
+        />
+      </SafeAreaView>
+    </VirtualizedView>
   )
 }

@@ -93,8 +93,6 @@ export default () => {
           "Hubo un error al intentar conectarse a Stripe, inténtale de nuevo más tarde"
         )
 
-        console.log(presentation.error)
-
         return
       }
 

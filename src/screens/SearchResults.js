@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
@@ -45,7 +45,6 @@ const fetchStores = async (searchedName) => {
 }
 
 const fetchPosts = async (text, categories, filters) => {
-  console.log("AAAAA", text, categories, filters)
   const payload = {
     searched_text: text,
     categories,
@@ -71,17 +70,46 @@ const fetchMaximumPrice = async () => {
   return maximumPrice
 }
 
-const CategoryChip = ({ category }) => {
-    return (
-        <Chip
-            icon="shape"
-        >
-            {category}
-        </Chip>
-    )
+const PriceRangeSlider = ({
+  limitPrice,
+  minimumPrice,
+  maximumPrice,
+  onChangePriceRange
+}) => {
+  return (
+    <View>
+      <Caption1>
+        Rango de precio
+      </Caption1>
+
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+      }}>
+        <Caption1>
+          ₡0
+        </Caption1>
+
+        <Caption1>
+          ₡{limitPrice}
+        </Caption1>
+      </View>
+
+      <Slider
+        minimumValue={0}
+        maximumValue={limitPrice}
+        selectedMinimumValue={minimumPrice}
+        selectedMaximumValue={maximumPrice}
+        onChange={onChangePriceRange}
+        step={100}
+      />
+    </View>
+  )
 }
 
 const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
+    const queryClient = useQueryClient()
     const {
         minimumPrice,
         maximumPrice,
@@ -95,6 +123,10 @@ const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
         ...f,
         sortingPropertyIndex: newIndex
       }))
+
+      queryClient.refetchQueries({
+        queryKey: ["postsResults"]
+      })
     }
 
     const handleChangePriceRange = ([newMinimumPrice, newMaximumPrice]) => {
@@ -102,6 +134,10 @@ const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
         ...filters,
         minimumPrice: newMinimumPrice,
         maximumPrice: newMaximumPrice
+      })
+
+      queryClient.refetchQueries({
+        queryKey: ["postsResults"]
       })
     }
 
@@ -116,22 +152,12 @@ const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
         <View style={{ gap: 12 }}>
           {
             sortingPropertyIndex === 0 ?
-            (
-              <View>
-                <Caption1>
-                  Rango de precio
-                </Caption1>
-
-                <Slider
-                  minimumValue={0}
-                  maximumValue={limitPrice}
-                  selectedMinimumValue={minimumPrice}
-                  selectedMaximumValue={maximumPrice}
-                  onChange={handleChangePriceRange}
-                  step={100}
-                />
-              </View>
-            ) :
+            <PriceRangeSlider
+              limitPrice={limitPrice}
+              minimumPrice={minimumPrice}
+              maximumPrice={maximumPrice}
+              onChangePriceRange={handleChangePriceRange}
+            /> :
             null
           }
         </View>
@@ -146,10 +172,12 @@ const SearchedCategoriesScrollView = ({ categoriesNames }) => {
 
     const categoriesNamesChips = categoriesNames.map((categoryName) => {
         return (
-            <CategoryChip
+            <Chip
+                icon="shape"
                 key={categoryName}
-                category={categoryName}
-            />
+            >
+              {categoryName}
+            </Chip>
         )
     })
 
@@ -238,8 +266,6 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
       ),
       enabled: maximumPriceQuery.isSuccess
     })
-
-  console.log(postsQuery)
 
     if (maximumPriceQuery.isLoading) {
         return (
