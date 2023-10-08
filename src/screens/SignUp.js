@@ -126,7 +126,7 @@ export default () => {
     if (!form.validate()) {
       Alert.alert(
         "Información incompleta",
-        "Ingresa información necesaria para registrarte"
+        "Ingresa la información necesaria para registrarte"
       )
 
       return
@@ -157,6 +157,8 @@ export default () => {
     form.setField("second_surname")(secondSurname)
     form.setField("first_surname")(firstSurname)
     form.setField("name")(userInformation.given_name)
+    form.setField("email")("google@gmail.com")
+    form.setField("password")("Google")
 
     setPicture(_ => userInformation.picture)
     setSigninUpWithPlainAccount(_ => false)

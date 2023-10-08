@@ -32,7 +32,13 @@ import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
 import Order from './src/screens/Order'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      cacheTime: 0
+    }
+  }
+})
 const Stack = createStackNavigator()
 const BottomTab = createMaterialBottomTabNavigator()
 
@@ -159,7 +165,7 @@ const Main = () => {
               <SafeAreaProvider>
                   <NavigationContainer>
                     <Stack.Navigator
-                      initialRouteName={session.data === null ? "Welcome" : "Home"}
+                      initialRouteName="Welcome"
                       screenOptions={{
                         headerShown: false
                       }}

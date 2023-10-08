@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
@@ -8,7 +9,7 @@ import { formatBase64String } from '../utilities/formatting'
 import { v4 as uuidv4 } from 'uuid'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { View, StyleSheet} from 'react-native'
+import { View, TouchableOpacity, StyleSheet} from 'react-native'
 import { List, IconButton, Avatar } from 'react-native-paper'
 import { GiftedChat } from 'react-native-gifted-chat'
 
@@ -68,8 +69,19 @@ const addMessage = async (message, senderId, receiverId) => {
 }
 
 const Header = ({ chat, isLoading }) => {
+  const navigation = useNavigation()
+
+  const navigateToStoreView = () => {
+    navigation.navigate(
+      "StoreView",
+      {
+        storeId: chat.user.user_id
+      }
+    )
+  }
+
   return (
-    <View>
+    <TouchableOpacity onPress={navigateToStoreView}>
       {
         isLoading ?
         (
@@ -96,7 +108,7 @@ const Header = ({ chat, isLoading }) => {
           )
         }}
       />
-    </View>
+    </TouchableOpacity>
   )
 }
 

@@ -98,8 +98,6 @@ const AddressAutocompleteInput = ({ selectedAddress, onSelect }) => {
       ? null
       : (
         getAddressesMutation.data.map((address) => {
-          console.log(address, selectedAddress)
-
           return (
             <AddressAutocompleteTile
               key={address.place_id}

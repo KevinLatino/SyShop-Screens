@@ -1,22 +1,11 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native'
-import { Divider, IconButton } from 'react-native-paper'
+import Empty from './Empty'
+import { View, FlatList } from 'react-native'
+import { Divider } from 'react-native-paper'
 
-const styles = StyleSheet.create({
-  emptyComponent: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
-  }
-})
-
-const Empty = ({ icon, message }) => {
+const Separator = () => {
   return (
-    <View style={styles.emptyComponent}>
-      <IconButton disabled icon={icon} size={50} />
-
-      <Text variant="bodySmall" color="#f0f0f0">
-        {message}
-      </Text>
+    <View style={{ paddingVertical: 8 }}>
+      <Divider />
     </View>
   )
 }
@@ -26,7 +15,7 @@ export default ({ data, emptyMessage, emptyIcon, ...flatListProps }) => {
     <FlatList
       data={data}
       {...flatListProps}
-      ItemSeparatorComponent={<Divider />}
+      ItemSeparatorComponent={<Separator />}
       ListEmptyComponent={<Empty icon={emptyIcon} message={emptyMessage} />}
     />
   )

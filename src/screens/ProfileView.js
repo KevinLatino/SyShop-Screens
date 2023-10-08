@@ -43,6 +43,10 @@ export default () => {
     const navigation = useNavigation()
     const [session, _] = useSession()
 
+    navigation.addListener("beforeRemove", (event) => {
+      event.preventDefault()
+    })
+
     const navigateToEditProfile = () => {
       navigation.navigate("EditProfile")
     }

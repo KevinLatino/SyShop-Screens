@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
@@ -20,7 +21,12 @@ const fetchChats = async (customerId) => {
 }
 
 export default () => {
+  const navigation = useNavigation()
   const [session, _] = useSession()
+
+  navigation.addListener("beforeRemove", (event) => {
+    event.preventDefault()
+  })
 
   const chatsQuery = useQuery({
     queryKey: ["listOfChats"],

@@ -4,6 +4,7 @@ import { requestServer } from '../utilities/requests'
 import SearchInput from './SearchInput'
 import LoadingSpinner from './LoadingSpinner'
 import { View, StyleSheet, Dimensions } from 'react-native'
+import { TableView, RowItem } from 'react-native-ios-kit'
 import { List, Chip } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -11,12 +12,14 @@ const styles = StyleSheet.create({
     width: Dimensions.get("screen").width
   },
   selectedCategoriesList: {
+    backgroundColor: "white",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
     alignSelf: "flex-start",
     gap: 4,
-    padding: 4
+    padding: 10,
+    width: "100%"
   }
 })
 
@@ -39,6 +42,10 @@ const fetchCategories = async (text) => {
 }
 
 const SelectedCategoriesList = ({ categoriesNames, onDelete }) => {
+  if (categoriesNames.length === 0) {
+    return null
+  }
+
   const chips = categoriesNames
     .map((categoryName) => {
       return (
@@ -61,22 +68,21 @@ const SelectedCategoriesList = ({ categoriesNames, onDelete }) => {
 }
 
 const RecommendedCategoriesList = ({ categoriesNames, onToggle }) => {
-  const listItems = categoriesNames
+  const items = categoriesNames
       .map((categoryName) => {
         return (
-          <List.Item
+          <RowItem
             key={categoryName}
             title={categoryName}
-            left={(props) => <List.Icon {...props} icon="shape" />}
             onPress={() => onToggle(categoryName)}
           />
         )
       })
 
   return (
-    <View>
-      {listItems}
-    </View>
+    <TableView header="Categorías">
+      {items}
+    </TableView>
   )
 }
 
@@ -127,21 +133,19 @@ export default ({ onSearchSubmit, ...searchInputProps }) => {
           onDelete={toggleCategoryName}
         />
       </View>
-
-      <List.Section>
-        <List.Subheader>
-          Categorías
-        </List.Subheader>
-
-        {
+      
+      {
+        text !== "" ?
+        (
           categoriesQuery.isLoading ?
           <LoadingSpinner /> :
           <RecommendedCategoriesList
             categoriesNames={categoriesQuery.data}
             onToggle={toggleCategoryName}
           />
-        }
-      </List.Section>
+        ) :
+        null
+      }
     </View>
   )
 }

@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { formatDate } from '../utilities/formatting'
+import { formatBase64String, formatDate } from '../utilities/formatting'
 import TextArea from '../components/TextArea'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -39,8 +39,10 @@ const styles = StyleSheet.create({
   },
   categoriesChipsView: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
+    width: "40%",
     gap: 8
   },
   buyButtonWrapper: {
@@ -232,7 +234,8 @@ const PostView = ({ postId, theme }) => {
   return (
     <View>
       <ImageSlider
-        data={post.multimedia}
+        data={post.multimedia.map(formatBase64String)}
+        localImg={false}
         autoPlay={false}
       />
 

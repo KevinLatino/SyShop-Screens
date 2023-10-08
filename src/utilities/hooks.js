@@ -23,6 +23,7 @@ export const useForm = (initialValues, errorHandlers) => {
 
   const validate = () => {
     const names = Object.keys(fieldsState)
+
     let isValid = true
 
     for (const name of names) {
@@ -33,7 +34,6 @@ export const useForm = (initialValues, errorHandlers) => {
         ...es,
         [name]: error
       }))
-
 
       if (error !== null) {
         isValid = false

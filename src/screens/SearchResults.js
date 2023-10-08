@@ -2,58 +2,33 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
-import { formatBase64String } from '../utilities/formatting'
 import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
+import StoreTile from '../components/StoreTile'
 import LoadingSpinner from '../components/LoadingSpinner'
+import SearchInput from '../components/SearchInput'
+import Slider from '../components/Slider'
+import Empty from '../components/Empty'
 import Screen from '../components/Screen'
-import { Slider } from '@miblanchard/react-native-slider'
+import SegmentedControl from '@react-native-community/segmented-control'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
     View,
     StyleSheet,
     ScrollView as ReactNativeScrollView
 } from 'react-native'
-import {
-    Card,
-    Chip,
-    IconButton,
-    Text,
-    Menu,
-    Button,
-    Divider
-} from 'react-native-paper'
+import { Title2, Caption1 } from 'react-native-ios-kit'
+import { Chip, Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      rowGap: 16,
+    searchFiltersPropertyView: {
     },
     horizontalScrollView: {
-        padding: 16
-    },
-    searchedTextDisplay: {
-        padding: 8,
-        backgroundColor: "red"
-    },
-    searchedTextWrapper: {
-      flexDirection: "row",
-      justifyContent: "flex-start",
-      alignItems: "center",
-      rowGap: 8,
-      padding: 1,
-      backgroundColor: "white",
-      borderRadius: 12
-    },
-    postsResultsFiltersInnerView: {
-      flexDirection: "row",
-      justifyContent: "flex-end",
-      alignItems: "center",
-      gap: 8,
-      padding: 20
-
+        gap: 10
     },
     postsResultsContainer: {
-      flex: 1
+      flex: 1,
+      gap: 15
     }
 })
 
@@ -95,109 +70,58 @@ const fetchMaximumPrice = async () => {
   return maximumPrice
 }
 
-const CategoryChip = ({ category }) => {
-    return (
-        <Chip
-            icon="shape"
-        >
-            {category}
-        </Chip>
-    )
-}
-
-const StoreTile = ({ store }) => {
-    return (
-        <Card style={{ width: 250 }} elevation={5}>
-            <Card.Cover source={{ uri: formatBase64String(store.picture) }} />
-
-            <Card.Title title={store.name} />
-
-            <Card.Content>
-                <Text variant="bodyMedium">
-                    {store.description}
-                </Text>
-            </Card.Content>
-        </Card>
-    )
-}
-
-const SearchedTextDisplay = ({ searchedText }) => {
-    return (
-      <View style={styles.searchedTextDisplay}>
-        <View style={styles.searchedTextWrapper}>
-            <IconButton
-              icon="magnify"
-              disabled
-            />
-
-            <Text variant="bodyMedium">
-                {searchedText}
-            </Text>
-        </View>
-      </View>
-    )
-}
-
-const SortingPropertyFilterMenu = ({
-    sortingProperty,
-    onSelect,
-    isVisible,
-    setIsVisible
+const PriceRangeSlider = ({
+  limitPrice,
+  minimumPrice,
+  maximumPrice,
+  onChangePriceRange
 }) => {
-    const handleSelect = (selectedSortingProperty) => {
-      onSelect(selectedSortingProperty)
+  return (
+    <View>
+      <Caption1>
+        Rango de precio
+      </Caption1>
 
-      setIsVisible(() => false)
-    }
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+      }}>
+        <Caption1>
+          ₡0
+        </Caption1>
 
-    const anchorText = sortingProperty === "publication_date" ?
-      "Fecha de publicación" :
-      "Precio"
+        <Caption1>
+          ₡{limitPrice}
+        </Caption1>
+      </View>
 
-    const anchor = (
-        <Button
-            onPress={() => setIsVisible(true)}
-        >
-          {anchorText}
-        </Button>
-    )
-
-    return (
-        <Menu
-            visible={isVisible}
-            onDismiss={() => setIsVisible(false)}
-            anchor={anchor}
-        >
-            <Menu.Item
-                title="Fecha de publicación"
-                onPress={() => handleSelect("publication_date")}
-            />
-
-            <Menu.Item
-                title="Precio"
-                onPress={() => handleSelect("price")}
-            />
-        </Menu>
-    )
+      <Slider
+        minimumValue={0}
+        maximumValue={limitPrice}
+        selectedMinimumValue={minimumPrice}
+        selectedMaximumValue={maximumPrice}
+        onChange={onChangePriceRange}
+        step={100}
+      />
+    </View>
+  )
 }
 
-const PostsResultsFilters = ({ filters, onChangeFilters }) => {
+const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
     const {
         minimumPrice,
         maximumPrice,
-        sortingProperty,
-        sortingSchema
+        sortingPropertyIndex
     } = filters
-    const [isMenuVisible, setIsMenuVisible] = useState(false)
 
-    const handleToggleSortingSchema = () => {
-      const newSortingSchema = sortingSchema === "ascending" ?
-        "descending" :
-        "ascending"
+    const handleSelectSortingPropertyIndex = (event) => {
+      const newIndex = event.nativeEvent.selectedSegmentIndex
+      console.log("NEW INDEX", newIndex)
 
       onChangeFilters({
         ...filters,
-        sortingSchema: newSortingSchema
+        sortingPropertyIndex: newIndex
       })
     }
 
@@ -209,69 +133,50 @@ const PostsResultsFilters = ({ filters, onChangeFilters }) => {
       })
     }
 
-    const handleSelectSortingProperty = (selectedSortingProperty) => {
-      onChangeFilters(f => ({
-        ...f,
-        sortingProperty: selectedSortingProperty
-      }))
-    }
-
-    const sortingIcon = sortingSchema === "ascending" ?
-      "arrow-up-drop-circle-outline" :
-      "arrow-down-drop-circle-outline"
-
     return (
-        <View style={{ flex: 1, padding: 16 }}>
-            <Text variant="titleMedium">
-              Ordernar por
-            </Text>
+      <View style={{ gap: 16 }}>
+        <SegmentedControl
+          values={["precio", "fecha de publicación"]}
+          selectedIndex={sortingPropertyIndex}
+          onChange={handleSelectSortingPropertyIndex}
+        />
 
-            <View style={styles.postsResultsFiltersInnerView}>
-                <IconButton
-                    mode="outlined"
-                    icon={sortingIcon}
-                    onPress={handleToggleSortingSchema}
-                />
-
-                <SortingPropertyFilterMenu
-                    isVisible={isMenuVisible}
-                    setIsVisible={setIsMenuVisible}
-                    sortingProperty={sortingProperty}
-                    onSelect={handleSelectSortingProperty}
-                />
-            </View>
-
-            <Text variant="titleMedium">
-              Rango de precio
-            </Text>
-
-            <View style={{ padding: 20 }}>
-                <Slider
-                    minimumValue={0}
-                    maximumValue={maximumPrice}
-                    step={1000}
-                    value={[minimumPrice, maximumPrice]}
-                    onValueChange={handleChangePriceRange}
-                />
-            </View>
+        <View style={{ gap: 12 }}>
+          {
+            sortingPropertyIndex === 0 ?
+            <PriceRangeSlider
+              limitPrice={limitPrice}
+              minimumPrice={minimumPrice}
+              maximumPrice={maximumPrice}
+              onChangePriceRange={handleChangePriceRange}
+            /> :
+            null
+          }
         </View>
+      </View>
     )
 }
 
 const SearchedCategoriesScrollView = ({ categoriesNames }) => {
+    if (categoriesNames.length === 0) {
+      return null
+    }
+
     const categoriesNamesChips = categoriesNames.map((categoryName) => {
         return (
-            <CategoryChip
+            <Chip
+                icon="shape"
                 key={categoryName}
-                category={categoryName}
-            />
+            >
+              {categoryName}
+            </Chip>
         )
     })
 
     return (
         <ReactNativeScrollView
             horizontal
-            style={styles.horizontalScrollView}
+            contentContainerStyle={styles.horizontalScrollView}
         >
             {categoriesNamesChips}
         </ReactNativeScrollView>
@@ -286,11 +191,20 @@ const StoresResultsScrollView = ({ searchedText }) => {
 
     if (storesQuery.isLoading) {
         return (
-            <LoadingSpinner />
+            <LoadingSpinner inScreen />
         )
     }
 
-    const storesCards = storesQuery.data.map((store) => {
+    if (storesQuery.data.length === 0) {
+      return (
+        <Empty
+          icon="basket"
+          message="No se encontraron resultados de tiendas"
+        />
+      )
+    }
+
+    const storesTiles = storesQuery.data.map((store) => {
         return (
             <StoreTile
                 key={store.user_id}
@@ -302,9 +216,9 @@ const StoresResultsScrollView = ({ searchedText }) => {
     return (
         <ReactNativeScrollView
             horizontal
-            style={styles.horizontalScrollView}
+            contentContainerStyle={styles.horizontalScrollView}
         >
-            {storesCards}
+            {storesTiles}
         </ReactNativeScrollView>
     )
 }
@@ -313,12 +227,13 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
     const [searchFilters, setSearchFilters] = useState({
         minimumPrice: 0,
         maximumPrice: null,
-        sortingProperty: "publication_date",
-        sortingSchema: "descending"
+        sortingPropertyIndex: 0
     })
 
+    console.log("SEARCH FILTERS", searchFilters)
+
     const handleChangeFilters = (newSearchFilters) => {
-        setSearchFilters(newSearchFilters)
+        setSearchFilters(_ => newSearchFilters)
 
         postsQuery.refetch()
     }
@@ -336,36 +251,42 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
       queryFn: () => fetchPosts(
         searchedText,
         categoriesNames,
-        searchFilters
+        {
+          minimumPrice: searchFilters.minimumPrice,
+          maximumPrice: searchFilters.maximumPrice,
+          sortingProperty: ["price", "sent_datetime"][searchFilters.sortingPropertyIndex],
+          sortingSchema: "ascending"
+        }
       ),
       enabled: maximumPriceQuery.isSuccess
     })
 
     if (maximumPriceQuery.isLoading) {
         return (
-          <View style={styles.postsResultsContainer}>
-            <LoadingSpinner inScreen />
-          </View>
+          <LoadingSpinner inScreen />
         )
     }
 
     return (
         <View style={styles.postsResultsContainer}>
             <PostsResultsFilters
+                limitPrice={maximumPriceQuery.data}
                 filters={searchFilters}
                 onChangeFilters={handleChangeFilters}
             />
 
-            <Divider />
+            <Divider style={{ width: "90%" }} />
 
             <View style={{ flex: 1 }}>
               {
-                  postsQuery.isLoading ?
+                  postsQuery.isFetching ?
                   <LoadingSpinner inScreen /> :
                   <ScrollView
                       data={postsQuery.data}
                       keyExtractor={(post) => post.post_id}
                       renderItem={({ item }) => <PostTile post={item} />}
+                      emptyIcon="basket"
+                      emptyMessage="No se encontraron resultados de publicaciones"
                   />
               }
             </View>
@@ -379,31 +300,39 @@ export default () => {
     const { text, categoriesNames } = route.params
 
     return (
-      <Screen>
-        <SearchedTextDisplay searchedText={text} />
+      <SafeAreaView>
+        <SearchInput
+          value={text}
+          showCancel={false}
+          disabled
+        />
 
-        <ReactNativeScrollView>
+        <Screen style={{ paddingTop: 0 }}>
           <SearchedCategoriesScrollView
               categoriesNames={categoriesNames}
           />
 
-          <Text variant="titleLarge">
-              Tiendas
-          </Text>
+          <View style={{ flex: 1, gap: 16 }}>
+            <Title2>
+                Tiendas
+            </Title2>
 
-          <StoresResultsScrollView
-              searchedText={text}
-          />
+            <StoresResultsScrollView
+                searchedText={text}
+            />
 
-          <Text variant="titleLarge">
-              Publicaciones
-          </Text>
+            <Divider />
 
-          <PostsResults
-              searchedText={text}
-              categoriesNames={categoriesNames}
-          />
-        </ReactNativeScrollView>
-      </Screen>
+            <Title2>
+                Publicaciones
+            </Title2>
+
+            <PostsResults
+                searchedText={text}
+                categoriesNames={categoriesNames}
+            />
+          </View>
+        </Screen>
+      </SafeAreaView>
     )
 }

@@ -17,3 +17,9 @@ export const useSession = () => {
 
   return [fineSession, setSession]
 }
+
+export const isUserLoggedIn = async () => {
+  const session = await AsyncStorage.getItem("session")
+
+  return (session !== null)
+}
