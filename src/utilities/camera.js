@@ -10,10 +10,28 @@ export const selectPictureFromGallery = async () => {
 
     if (result.canceled) {
       Alert.alert(
-        "Cancelaste la selección de la foto"
+        "Cancelaste la selección de la fotografía"
       )
 
-      return
+      return null
+    }
+
+    const picture = result.assets[0].base64
+
+    return picture
+}
+
+export const takePictureFromCameraRoll = async () => {
+    const result = await ImagePicker.launchCameraAsync({
+        base64: true
+    })
+
+    if (result.canceled) {
+      Alert.alert(
+        "Cancelaste al tomar la fotografía"
+      )
+
+      return null
     }
 
     const picture = result.assets[0].base64

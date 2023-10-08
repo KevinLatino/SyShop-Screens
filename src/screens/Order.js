@@ -133,6 +133,7 @@ export default () => {
             height: 200,
             width: 300
           }}
+          style={{ borderRadius: 5 }}
         />
 
         <TableView>

@@ -6,6 +6,10 @@ export default ({ picture, onChangePicture, useUrl, ...avatarProps }) => {
   const handleChangePicture = async () => {
     const newPicture = await selectPictureFromGallery()
 
+    if (newPicture === null) {
+      return
+    }
+
     onChangePicture(newPicture)
   }
 

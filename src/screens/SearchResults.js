@@ -117,7 +117,6 @@ const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
 
     const handleSelectSortingPropertyIndex = (event) => {
       const newIndex = event.nativeEvent.selectedSegmentIndex
-      console.log("NEW INDEX", newIndex)
 
       onChangeFilters({
         ...filters,
@@ -229,8 +228,6 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
         maximumPrice: null,
         sortingPropertyIndex: 0
     })
-
-    console.log("SEARCH FILTERS", searchFilters)
 
     const handleChangeFilters = (newSearchFilters) => {
         setSearchFilters(_ => newSearchFilters)

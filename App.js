@@ -24,6 +24,7 @@ import SignUp from './src/screens/SignUp'
 import ChooseLocation from './src/screens/ChooseLocation'
 import AddLocation from './src/screens/AddLocation'
 import SearchResults from './src/screens/SearchResults'
+import PictureSearchResults from './src/screens/PictureSearchResults'
 import PostView from './src/screens/PostView'
 import EditProfile from './src/screens/EditProfile'
 import LikedPosts from './src/screens/LikedPosts'
@@ -228,6 +229,12 @@ const Main = () => {
                         name="SearchResults"
                       >
                         {() => <SearchResults />}
+                      </Stack.Screen>
+
+                      <Stack.Screen
+                        name="PictureSearchResults"
+                      >
+                        {() => <PictureSearchResults />}
                       </Stack.Screen>
 
                       <Stack.Screen

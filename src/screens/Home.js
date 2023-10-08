@@ -95,6 +95,14 @@ export default () => {
     })
   }
 
+  const handleSearchByPicture = (picture) => {
+    setIsModalVisible(false)
+
+    navigation.navigate("PictureSearchResults", {
+      picture
+    })
+  }
+
   return (
     <Fragment>
       <Screen>
@@ -109,6 +117,7 @@ export default () => {
             <Surface elevation={5}>
               <SearchBar
                 onSearchSubmit={handleSearchSubmit}
+                onPictureTaken={handleSearchByPicture}
                 onCancel={() => setIsModalVisible(false)}
               />
             </Surface>
