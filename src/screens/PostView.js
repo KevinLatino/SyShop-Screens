@@ -39,8 +39,10 @@ const styles = StyleSheet.create({
   },
   categoriesChipsView: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
+    width: "40%",
     gap: 8
   },
   buyButtonWrapper: {

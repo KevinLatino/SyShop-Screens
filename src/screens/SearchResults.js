@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
@@ -109,7 +109,6 @@ const PriceRangeSlider = ({
 }
 
 const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
-    const queryClient = useQueryClient()
     const {
         minimumPrice,
         maximumPrice,
@@ -118,14 +117,11 @@ const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
 
     const handleSelectSortingPropertyIndex = (event) => {
       const newIndex = event.nativeEvent.selectedSegmentIndex
+      console.log("NEW INDEX", newIndex)
 
-      onChangeFilters(f => ({
-        ...f,
+      onChangeFilters({
+        ...filters,
         sortingPropertyIndex: newIndex
-      }))
-
-      queryClient.refetchQueries({
-        queryKey: ["postsResults"]
       })
     }
 
@@ -134,10 +130,6 @@ const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
         ...filters,
         minimumPrice: newMinimumPrice,
         maximumPrice: newMaximumPrice
-      })
-
-      queryClient.refetchQueries({
-        queryKey: ["postsResults"]
       })
     }
 
@@ -238,8 +230,10 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
         sortingPropertyIndex: 0
     })
 
+    console.log("SEARCH FILTERS", searchFilters)
+
     const handleChangeFilters = (newSearchFilters) => {
-        setSearchFilters(newSearchFilters)
+        setSearchFilters(_ => newSearchFilters)
 
         postsQuery.refetch()
     }
@@ -285,7 +279,7 @@ const PostsResults = ({ searchedText, categoriesNames }) => {
 
             <View style={{ flex: 1 }}>
               {
-                  postsQuery.isLoading ?
+                  postsQuery.isFetching ?
                   <LoadingSpinner inScreen /> :
                   <ScrollView
                       data={postsQuery.data}

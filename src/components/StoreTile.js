@@ -35,7 +35,8 @@ export default ({ store }) => {
     >
       <Image
         source={{
-          uri: formatBase64String(store.picture)
+          uri: formatBase64String(store.picture),
+          height: 100
         }}
       />
     </Card>

@@ -8,8 +8,8 @@ import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Button from '../components/Button'
 import Screen from '../components/Screen'
-import { Alert, StyleSheet, Dimensions } from 'react-native'
-import { TableView, InfoRow, Avatar, Stepper, Title2 } from 'react-native-ios-kit'
+import { Alert, Image, StyleSheet, Dimensions } from 'react-native'
+import { TableView, InfoRow, Stepper, Title2 } from 'react-native-ios-kit'
 
 const styles = StyleSheet.create({
   container: {
@@ -119,14 +119,20 @@ export default () => {
         )
     }
 
+
+
     return (
       <Screen style={styles.container}>
         <Title2>
           Comprando '{postQuery.data.title}'
         </Title2>
 
-        <Avatar
-          url={formatBase64String(postQuery.data.multimedia[0])}
+        <Image
+          source={{
+            uri: formatBase64String(postQuery.data.multimedia[0]),
+            height: 200,
+            width: 300
+          }}
         />
 
         <TableView>

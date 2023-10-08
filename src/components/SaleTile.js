@@ -1,9 +1,21 @@
+import { useNavigation } from '@react-navigation/native'
 import { formatDate, formatBase64String } from '../utilities/formatting'
 import { View, Image } from 'react-native'
 import { Card } from '@ui-kitten/components'
 import { Headline, Caption1 } from 'react-native-ios-kit'
 
 export default ({ sale }) => {
+  const navigation = useNavigation()
+
+  const navigateToPostView = () => {
+    navigation.navigate(
+      "PostView",
+      {
+        postId: sale.post.post_id
+      }
+    )
+  }
+
   const header = (
     <View>
       <Headline>
@@ -27,6 +39,7 @@ export default ({ sale }) => {
   return (
     <Card
       header={header}
+      onPress={navigateToPostView}
     >
         <Image
           source={{
