@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     paddingTop: 15,
     paddingBottom: 15,
     paddingLeft: 15,
@@ -16,7 +16,10 @@ const styles = StyleSheet.create({
 export default ({ children, style, ...safeAreaViewProps }) => {
   return (
     <VirtualizedView>
-      <KeyboardAwareScrollView>
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flex: 1 }}
+        keyboardShouldPersistTaps='handled'
+      >
         <SafeAreaView
           style={{
             ...styles.container,

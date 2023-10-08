@@ -149,6 +149,11 @@ const StoreView = ({ storeId, customerId }) => {
     location,
     follower_count
   } = storeQuery.data
+  const imageSliderData = multimedia.map((image) => {
+    return {
+      img: formatBase64String(image)
+    }
+  })
 
   return (
     <View>
@@ -176,7 +181,7 @@ const StoreView = ({ storeId, customerId }) => {
       </Appbar.Header>
 
       <ImageSlider
-        data={multimedia.map(formatBase64String)}
+        data={imageSliderData}
         autoPlay={false}
       />
 

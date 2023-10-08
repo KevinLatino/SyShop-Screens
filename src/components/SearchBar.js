@@ -1,15 +1,21 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { requestServer } from '../utilities/requests'
+import { selectPictureFromGallery } from '../utilities/camera'
 import SearchInput from './SearchInput'
 import LoadingSpinner from './LoadingSpinner'
 import { View, StyleSheet, Dimensions } from 'react-native'
 import { TableView, RowItem } from 'react-native-ios-kit'
-import { List, Chip } from 'react-native-paper'
+import { IconButton, Chip } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
     width: Dimensions.get("screen").width
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white"
   },
   selectedCategoriesList: {
     backgroundColor: "white",
@@ -86,7 +92,7 @@ const RecommendedCategoriesList = ({ categoriesNames, onToggle }) => {
   )
 }
 
-export default ({ onSearchSubmit, ...searchInputProps }) => {
+export default ({ onSearchSubmit, onPictureTaken, ...searchInputProps }) => {
   const [text, setText] = useState("")
   const [categoriesNames, setCategoriesNames] = useState([])
   const categoriesQuery = useQuery({
@@ -115,16 +121,33 @@ export default ({ onSearchSubmit, ...searchInputProps }) => {
     await categoriesQuery.refetch()
   }
 
+  const handleTakePicture = async () => {
+    const picture = await selectPictureFromGallery()
+
+    if (picture === null) {
+      return
+    }
+
+    onPictureTaken(picture)
+  }
+
   return (
     <View style={styles.container}>
-      <View>
-        <SearchInput
-          placeholder="Buscar..."
-          value={text}
-          onChangeText={handleSearchUpdate}
-          onSubmitEditing={() => onSearchSubmit(text, categoriesNames)}
-          {...searchInputProps}
-        />
+      <View style={styles.header}>
+        <View style={{ flex: 1 }}>
+          <SearchInput
+            placeholder="Buscar..."
+            value={text}
+            onChangeText={handleSearchUpdate}
+            onSubmitEditing={() => onSearchSubmit(text, categoriesNames)}
+            {...searchInputProps}
+          />
+        </View>
+
+        <IconButton
+          icon="camera"
+          onPress={handleTakePicture}
+        /> 
       </View>
 
       <View>

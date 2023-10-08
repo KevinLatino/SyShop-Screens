@@ -230,12 +230,16 @@ const PostView = ({ postId, theme }) => {
   })
 
   const post = postQuery.data
+  const imageSliderData = post.multimedia.map((image) => {
+    return {
+      img: formatBase64String(image)
+    }
+  })
 
   return (
     <View>
       <ImageSlider
-        data={post.multimedia.map(formatBase64String)}
-        localImg={false}
+        data={imageSliderData}
         autoPlay={false}
       />
 

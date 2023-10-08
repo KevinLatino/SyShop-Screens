@@ -22,6 +22,12 @@ const styles = StyleSheet.create({
   }
 })
 
+const generateId = () => {
+  const id = Date.now().toString()
+
+  return id
+}
+
 const giftMessage = (message) => {
   const text =
     message.content_type === "text" ?
@@ -146,6 +152,11 @@ export default () => {
 
   const handlePictureMessageChoosen = async () => {
     const picture = await selectPictureFromGallery()
+
+    if (picture === null) {
+      return
+    }
+
     const message = {
       content: picture,
       content_type: "image"
@@ -158,7 +169,7 @@ export default () => {
     })
 
     const giftedMessage = {
-      _id: uuidv4(),
+      _id: generateId(),
       image: formatBase64String(picture),
       createdAt: new Date(),
       user: {
@@ -171,9 +182,8 @@ export default () => {
 
   const handleLoadMessages = (fetchedMessages) => {
     const giftedFetchedMessages = fetchedMessages.map(giftMessage)
-    const allMessages = GiftedChat.append(messages, giftedFetchedMessages)
 
-    setMessages(allMessages)
+    setMessages(giftedFetchedMessages)
   }
 
   const handleMutationSuccess = () => {
@@ -209,7 +219,7 @@ export default () => {
     <SafeAreaView style={{ flex: 1 }}>
       <Header
         chat={chat}
-        isLoading={messagesQuery.isLoading}
+        isLoading={messagesQuery.isFetching}
       />
 
       <GiftedChat
