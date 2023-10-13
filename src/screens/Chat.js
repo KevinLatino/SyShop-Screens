@@ -6,7 +6,7 @@ import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import { selectPictureFromGallery } from '../utilities/camera'
 import { formatBase64String } from '../utilities/formatting'
-import { v4 as uuidv4 } from 'uuid'
+import uuid from 'react-native-uuid'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, TouchableOpacity, StyleSheet} from 'react-native'
@@ -21,12 +21,6 @@ const styles = StyleSheet.create({
     alignItems: "center"
   }
 })
-
-const generateId = () => {
-  const id = Date.now().toString()
-
-  return id
-}
 
 const giftMessage = (message) => {
   const text =
@@ -169,7 +163,7 @@ export default () => {
     })
 
     const giftedMessage = {
-      _id: generateId(),
+      _id: uuid.v4(),
       image: formatBase64String(picture),
       createdAt: new Date(),
       user: {
