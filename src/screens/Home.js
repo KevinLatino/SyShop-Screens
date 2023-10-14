@@ -7,7 +7,7 @@ import ScrollView from '../components/ScrollView'
 import PostTile from '../components/PostTile'
 import SearchBar from '../components/SearchBar'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
+import Padder from '../components/Padder'
 import { Fragment } from 'react'
 import {
   Portal,
@@ -105,7 +105,7 @@ export default () => {
 
   return (
     <Fragment>
-      <Screen>
+      <Padder>
         <PostsList />
 
         <Portal>
@@ -123,7 +123,7 @@ export default () => {
             </Surface>
           </Modal>
         </Portal>
-      </Screen>
+      </Padder>
 
       <FAB
         icon="magnify"

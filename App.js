@@ -32,6 +32,7 @@ import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
 import Order from './src/screens/Order'
+import CreateReport from './src/screens/CreateReport'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -272,6 +273,7 @@ const Main = () => {
                       >
                         {() => <StoreView />}
                       </Stack.Screen>
+
 
                       <Stack.Screen
                         name="Order"

@@ -14,7 +14,9 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
 import Button from '../components/Button'
-import Screen from '../components/Screen'
+import Scroller from '../components/Scroller'
+import Padder from '../components/Padder'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { View, Alert, StyleSheet } from 'react-native'
 import { Text, Divider } from 'react-native-paper'
 
@@ -218,97 +220,101 @@ export default () => {
   }, [signUpData])
 
   return (
-    <Screen style={styles.container}>
-      <Text style={styles.title}>
-        Registrarse
-      </Text>
+    <Scroller>
+      <KeyboardAwareScrollView>
+        <Padder style={styles.container}>
+          <Text style={styles.title}>
+            Registrarse
+          </Text>
 
-      <Text style={styles.subtitle}>
-        Ingresa tus datos personales
-      </Text>
+          <Text style={styles.subtitle}>
+            Ingresa tus datos personales
+          </Text>
 
-      <PictureInput
-        picture={picture}
-        onChangePicture={handleChangePicture}
-        useUrl={useUrlPicture}
-      />
+          <PictureInput
+            picture={picture}
+            onChangePicture={handleChangePicture}
+            useUrl={useUrlPicture}
+          />
 
-      <View style={styles.inputsContainer}>
-        <TextField
-          value={form.getField("name")}
-          onChangeText={form.setField("name")}
-          error={form.getError("name")}
-          placeholder="Nombre"
-        />
+          <View style={styles.inputsContainer}>
+            <TextField
+              value={form.getField("name")}
+              onChangeText={form.setField("name")}
+              error={form.getError("name")}
+              placeholder="Nombre"
+            />
 
-        <TextField
-          value={form.getField("first_surname")}
-          onChangeText={form.setField("first_surname")}
-          error={form.getError("first_surname")}
-          placeholder="Primer apellido"
-        />
+            <TextField
+              value={form.getField("first_surname")}
+              onChangeText={form.setField("first_surname")}
+              error={form.getError("first_surname")}
+              placeholder="Primer apellido"
+            />
 
-        <TextField
-          value={form.getField("second_surname")}
-          onChangeText={form.setField("second_surname")}
-          error={form.getError("second_surname")}
-          placeholder="Segundo apellido"
-        />
+            <TextField
+              value={form.getField("second_surname")}
+              onChangeText={form.setField("second_surname")}
+              error={form.getError("second_surname")}
+              placeholder="Segundo apellido"
+            />
 
-        <TextField
-          value={form.getField("phone_number")}
-          onChangeText={form.setField("phone_number")}
-          error={form.getError("phone_number")}
-          placeholder="Número telefónico"
-          keyboardType="numeric"
-        />
+            <TextField
+              value={form.getField("phone_number")}
+              onChangeText={form.setField("phone_number")}
+              error={form.getError("phone_number")}
+              placeholder="Número telefónico"
+              keyboardType="numeric"
+            />
 
-        {
-          signingUpWithPlainAccount ?
-          (
-            <View style={styles.inputsContainer}>
-              <TextField
-                value={form.getField("email")}
-                onChangeText={form.setField("email")}
-                error={form.getError("email")}
-                placeholder="Correo electrónico"
-              />
+            {
+              signingUpWithPlainAccount ?
+              (
+                <View style={styles.inputsContainer}>
+                  <TextField
+                    value={form.getField("email")}
+                    onChangeText={form.setField("email")}
+                    error={form.getError("email")}
+                    placeholder="Correo electrónico"
+                  />
 
-              <TextField
-                value={form.getField("password")}
-                onChangeText={form.setField("password")}
-                error={form.getError("password")}
-                placeholder="Contraseña"
-                secureTextEntry
-              />
-            </View>
-          ) :
-          null
-        }
-      </View>
+                  <TextField
+                    value={form.getField("password")}
+                    onChangeText={form.setField("password")}
+                    error={form.getError("password")}
+                    placeholder="Contraseña"
+                    secureTextEntry
+                  />
+                </View>
+              ) :
+              null
+            }
+          </View>
 
-      <Button
-        onPress={handleSignUp}
-        disabled={isSignUpLoading}
-        style={{ width: "70%" }}
-      >
-        {
-          isSignUpLoading ?
-          <LoadingSpinner /> :
-          "Registrarse"
-        }
-      </Button>
+          <Button
+            onPress={handleSignUp}
+            disabled={isSignUpLoading}
+            style={{ width: "70%" }}
+          >
+            {
+              isSignUpLoading ?
+              <LoadingSpinner /> :
+              "Registrarse"
+            }
+          </Button>
 
-      <Divider style={{ width: "90%" }} />
+          <Divider style={{ width: "90%" }} />
 
-      <Text style={styles.thirdText}>
-        También puedes registrarte con
-      </Text>
+          <Text style={styles.thirdText}>
+            También puedes registrarte con
+          </Text>
 
-      <GoogleSignInButton
-        text="Registrate con Google"
-        onSignIn={fillUpFormWithGoogleData}
-      />
-    </Screen>
+          <GoogleSignInButton
+            text="Registrate con Google"
+            onSignIn={fillUpFormWithGoogleData}
+          />
+        </Padder>
+      </KeyboardAwareScrollView>
+    </Scroller>
   )
 }

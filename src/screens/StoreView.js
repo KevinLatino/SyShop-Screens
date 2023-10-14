@@ -6,7 +6,7 @@ import { requestServer } from '../utilities/requests'
 import { formatBase64String, formatLocation } from '../utilities/formatting'
 import { default as startPhoneCall } from 'react-native-phone-call'
 import ScrollView from '../components/ScrollView'
-import VirtualizedView from '../components/VirtualizedView'
+import Scroller from '../components/Scroller'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PostTile from '../components/PostTile'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -250,7 +250,7 @@ export default () => {
   }
 
   return (
-    <VirtualizedView>
+    <Scroller>
       <SafeAreaView>
         <StoreView
           storeId={storeId}
@@ -264,6 +264,6 @@ export default () => {
           customerId={session.data.customerId}
         />
       </SafeAreaView>
-    </VirtualizedView>
+    </Scroller>
   )
 }

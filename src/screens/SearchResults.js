@@ -9,7 +9,8 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import SearchInput from '../components/SearchInput'
 import Slider from '../components/Slider'
 import Empty from '../components/Empty'
-import Screen from '../components/Screen'
+import Scroller from '../components/Scroller'
+import Padder from '../components/Padder'
 import SegmentedControl from '@react-native-community/segmented-control'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {
@@ -304,32 +305,34 @@ export default () => {
           disabled
         />
 
-        <Screen style={{ paddingTop: 0 }}>
-          <SearchedCategoriesScrollView
-              categoriesNames={categoriesNames}
-          />
-
-          <View style={{ flex: 1, gap: 16 }}>
-            <Title2>
-                Tiendas
-            </Title2>
-
-            <StoresResultsScrollView
-                searchedText={text}
-            />
-
-            <Divider />
-
-            <Title2>
-                Publicaciones
-            </Title2>
-
-            <PostsResults
-                searchedText={text}
+        <Scroller>
+          <Padder>
+            <SearchedCategoriesScrollView
                 categoriesNames={categoriesNames}
             />
-          </View>
-        </Screen>
+
+            <View style={{ flex: 1, gap: 16 }}>
+              <Title2>
+                  Tiendas
+              </Title2>
+
+              <StoresResultsScrollView
+                  searchedText={text}
+              />
+
+              <Divider />
+
+              <Title2>
+                  Publicaciones
+              </Title2>
+
+              <PostsResults
+                  searchedText={text}
+                  categoriesNames={categoriesNames}
+              />
+            </View>
+          </Padder>
+        </Scroller>
       </SafeAreaView>
     )
 }

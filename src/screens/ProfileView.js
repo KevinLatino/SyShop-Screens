@@ -4,7 +4,7 @@ import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
+import Padder from '../components/Padder'
 import { Fragment } from 'react'
 import { StyleSheet, Dimensions } from 'react-native'
 import { TableView, InfoRow, RowItem, Avatar } from 'react-native-ios-kit'
@@ -74,7 +74,7 @@ export default () => {
 
     return (
       <Fragment>
-        <Screen>
+        <Padder>
           <Text variant="titleLarge">
             Tu información
           </Text>
@@ -109,7 +109,7 @@ export default () => {
             onPress={navigateToEditProfile}
             style={styles.fab}
           />
-        </Screen>
+        </Padder>
 
         <FAB
           icon="pencil"
