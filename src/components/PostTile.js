@@ -35,13 +35,12 @@ const styles = StyleSheet.create({
   }
 })
 
-export default ({ post, isOwnPost }) => {
+export default ({ post }) => {
   const navigation = useNavigation()
 
   const navigateToPostView = () => {
     navigation.navigate("PostView", {
-      postId: post.post_id,
-      isOwnPost
+      postId: post.post_id
     })
   }
 

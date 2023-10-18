@@ -1,29 +1,38 @@
 import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String, formatDate } from '../utilities/formatting'
-import TextArea from '../components/TextArea'
-import ScrollView from '../components/ScrollView'
+import TextField from '../components/TextField'
+import Empty from '../components/Empty'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
+import SecondaryTitle from '../components/SecondaryTitle'
 import LikeButton from '../components/LikeButton'
-import Button from '../components/Button'
-import Scroller from '../components/Scroller'
+import VividIconButton from '../components/VividIconButton'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { ImageSlider } from 'react-native-image-slider-banner'
-import { withTheme, Title2, Title3, Body, Caption1 } from 'react-native-ios-kit'
-import { View, StyleSheet } from 'react-native'
+import { Body, Caption1 } from 'react-native-ios-kit'
+import {
+  View,
+  ScrollView as ReactNativeScrollview,
+  StyleSheet
+} from 'react-native'
 import {
   Divider,
   IconButton,
-  Chip,
-  TouchableRipple
+  Chip
 } from 'react-native-paper'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    columnGap: 20,
+    backgroundColor: "white"
+  },
   informationView: {
     flexDirection: "column",
     justifyContent: "space-evenly",
@@ -31,26 +40,16 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 16
   },
-  informationActionsView: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    padding: 8
-  },
   categoriesChipsView: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
-    width: "40%",
-    gap: 8
-  },
-  buyButtonWrapper: {
-    flexDirection: "row",
-    justifyContent: "center",
     width: "100%",
-    padding: 8
+    gap: 10
+  },
+  commentsScrollView: {
+    flex: 1,
+    paddingVertical: 15,
+    gap: 20
   },
   commentInputView: {
     flexDirection: "row",
@@ -58,13 +57,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
     width: "100%",
+  },
+  buttonsView: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 10
   }
 })
 
-const fetchPost = async (postId, customerId) => {
+const fetchPost = async (postId) => {
   const payload = {
-    post_id: postId,
-    customer_id: customerId
+    post_id: postId
   }
   const post = await requestServer(
     "/posts_service/get_post_by_id",
@@ -120,6 +125,8 @@ const CommentInput = ({ postId, customerId }) => {
   const [text, setText] = useState("")
 
   const handleCommentSubmit = async () => {
+    setText("")
+
     addCommentMutation.mutate({
       postId,
       customerId,
@@ -138,18 +145,20 @@ const CommentInput = ({ postId, customerId }) => {
 
   return (
     <View style={styles.commentInputView}>
-      <TextArea
+      <TextField
         value={text}
         onChangeText={setText}
         placeholder="Escribe un comentario"
+        multiline
+        light
+        style={{ color: "black" }}
       />
 
       {
         addCommentMutation.isLoading ?
         <LoadingSpinner /> :
-        <IconButton
+        <VividIconButton
           icon="send"
-          mode="contained"
           disabled={text === ""}
           onPress={handleCommentSubmit}
         />
@@ -172,47 +181,48 @@ const CommentsScrollView = ({ postId }) => {
     )
   }
 
+  const commentsTiles = commentsQuery.data.map((comment) => {
+    return (
+      <CommentTile
+        key={comment.comment_id}
+        comment={comment}
+      />
+    )
+  })
+
   return (
-    <View>
+    <View style={styles.commentsScrollView}>
       <CommentInput
         customerId={session.data.customerId}
         postId={postId}
       />
 
-      <ScrollView
-        data={commentsQuery.data}
-        keyExtractor={(comment) => comment.comment_id}
-        renderItem={({ item }) => <CommentTile comment={item} />}
-        emptyIcon="comment"
-        emptyMessage="No hay comentarios por aquí"
-      />
+      <View>
+        {
+          commentsTiles.length === 0 ?
+          <Empty icon="comment" message="No hay comentarios" /> :
+          commentsTiles
+        }
+      </View>
     </View>
   )
 }
 
-const PostView = ({ postId, theme }) => {
+const PostView = ({ postId }) => {
   const navigation = useNavigation()
-  const [session, _] = useSession()
 
   const navigateToStoreView = () => {
     navigation.navigate("StoreView", {
-      storeId: post.store_id
-    })
-  }
-
-  const navigateToOrder = () => {
-    navigation.navigate("Order", {
-      postId: post.post_id
+      storeId: postQuery.data.store_id
     })
   }
 
   const postQuery = useQuery({
     queryKey: ["post"],
-    queryFn: () => fetchPost(postId, session.data.customerId),
-    disabled: session.isLoading
+    queryFn: () => fetchPost(postId)
   })
 
-  if (postQuery.isLoading || session.isLoading) {
+  if (postQuery.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -223,7 +233,9 @@ const PostView = ({ postId, theme }) => {
       <Chip
         key={category}
         mode="flat"
-        icon="shape"
+        icon="pound"
+        style={{ backgroundColor: configuration.BACKGROUND_COLOR }}
+        textStyle={{ color: "white" }}
       >
         {category}
       </Chip>
@@ -238,26 +250,20 @@ const PostView = ({ postId, theme }) => {
   })
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <ImageSlider
         data={imageSliderData}
         autoPlay={false}
       />
 
       <View style={styles.informationView}>
-        <TouchableRipple
-          onPress={navigateToStoreView}
-        >
-          <Title3
-            style={{ color: theme.primaryColor }}
-          >
-            {post.store_name}
-          </Title3>
-        </TouchableRipple>
-
-        <Title2>
+        <SecondaryTitle>
           {post.title}
-        </Title2>
+        </SecondaryTitle>
+
+        <Body>
+          {post.description}
+        </Body>
 
         <Caption1
           style={{ color: "gray" }}
@@ -273,28 +279,33 @@ const PostView = ({ postId, theme }) => {
           }
         </Caption1>
 
-        <Body>
-          {post.description}
-        </Body>
+        <Caption1
+          style={{ color: configuration.ACCENT_COLOR_1 }}
+        >
+          ₡{post.price}
+        </Caption1>
 
-        <View style={styles.informationActionsView}>
-          <View style={styles.categoriesChipsView}>
-            {categoriesChips}
-          </View>
+        <ReactNativeScrollview
+          horizontal
+          contentContainerStyle={styles.categoriesChipsView}
+        >
+          {categoriesChips}
+        </ReactNativeScrollview>
+
+        <View style={styles.buttonsView}>
+          <IconButton
+            icon="store-outline"
+            iconColor={configuration.ACCENT_COLOR_1}
+            style={{ backgroundColor: "white" }}
+            onPress={navigateToStoreView}
+          />
 
           <LikeButton
-            postId={post.post_id}
+            postId={postId}
             doesCustomerLikePost={post.does_customer_like_post}
+            iconColor={configuration.ACCENT_COLOR_1}
+            style={{ backgroundColor: "white" }}
           />
-        </View>
-
-        <View style={styles.buyButtonWrapper}>
-          <Button
-            onPress={navigateToOrder}
-            style={{ width: "100%" }}
-          >
-            Comprar (₡{post.price})
-          </Button>
         </View>
       </View>
     </View>
@@ -306,17 +317,15 @@ export default () => {
 
   const { postId } = route.params
 
-  const ThemedPostView = withTheme(PostView)
-
   return (
-    <Scroller>
-      <SafeAreaView>
-        <ThemedPostView postId={postId} />
+    <KeyboardAwareScrollView style={{ flex: 1, flexGrow: 1 }}>
+        <SafeAreaView style={styles.container}>
+          <PostView postId={postId} />
 
-        <Divider />
+          <Divider style={{ color: configuration.ACCENT_COLOR_1 }}/>
 
-        <CommentsScrollView postId={postId} />
-      </SafeAreaView>
-    </Scroller>
+          <CommentsScrollView postId={postId} />
+        </SafeAreaView>
+    </KeyboardAwareScrollView>
   )
 }
