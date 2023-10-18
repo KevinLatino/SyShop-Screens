@@ -9,7 +9,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useSession } from './src/context'
 import { createStackNavigator } from '@react-navigation/stack'
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import * as eva from '@eva-design/eva'
 import configuration from './src/configuration'
 import LoadingSpinner from './src/components/LoadingSpinner'
@@ -32,7 +32,6 @@ import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
 import Order from './src/screens/Order'
-import CreateReport from './src/screens/CreateReport'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,7 +41,7 @@ const queryClient = new QueryClient({
   }
 })
 const Stack = createStackNavigator()
-const BottomTab = createMaterialBottomTabNavigator()
+const BottomTab = createBottomTabNavigator()
 
 const theme = {
   "colors": {
@@ -91,12 +90,21 @@ const theme = {
 
 const BottomTabNavigator = () => {
   return (
-    <BottomTab.Navigator>
+    <BottomTab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tapBarStyle: {
+          backgroundColor: configuration.BACKGROUND_COLOR
+        },
+        tabBarActiveTintColor: configuration.ACCENT_COLOR_1,
+        tabBarInactiveTintColor: "white"
+      }}
+    >
       <BottomTab.Screen
         name="Home"
         options={{
           tabBarLabel: "Inicio",
-          tabBarIcon: "home-variant"
+          tabBarIcon: (props) => <MaterialCommunityIcons name="home-variant" {...props} />
         }}
       >
         {() => <Home />}
@@ -106,7 +114,7 @@ const BottomTabNavigator = () => {
         name="DeliveriesList"
         options={{
           tabBarLabel: "Entregas",
-          tabBarIcon: "moped"
+          tabBarIcon: (props) => <MaterialCommunityIcons name="moped" {...props} />
         }}
       >
         {() => <DeliveriesList />}
@@ -116,7 +124,7 @@ const BottomTabNavigator = () => {
         name="ChatsList"
         options={{
           tabBarLabel: "Mensajes",
-          tabBarIcon: "chat"
+          tabBarIcon: (props) => <MaterialCommunityIcons name="chat" {...props} />
         }}
       >
         {() => <ChatsList />}
@@ -126,7 +134,7 @@ const BottomTabNavigator = () => {
         name="Settings"
         options={{
           tabBarLabel: "Ajustes",
-          tabBarIcon: "cog"
+          tabBarIcon: (props) => <MaterialCommunityIcons name="cog" {...props} />
         }}
       >
         {() => <Settings />}
@@ -136,7 +144,7 @@ const BottomTabNavigator = () => {
         name="ProfileView"
         options={{
           tabBarLabel: "Mi Perfil",
-          tabBarIcon: "account"
+          tabBarIcon: (props) => <MaterialCommunityIcons name="account" {...props} />
         }}
       >
         {() => <ProfileView />}
@@ -146,11 +154,15 @@ const BottomTabNavigator = () => {
 }
 
 const Main = () => {
+  const [loaded] = useFonts({
+    Galada: require("./assets/fonts/Galada-Regular.ttf"),
+    Roboto: require("./assets/fonts/Roboto-Regular.ttf")
+  })
   const [session, _] = useSession()
 
   console.log(session)
 
-  if (session.isLoading) {
+  if (session.isLoading || (!loaded)) {
     return (
       <LoadingSpinner inScreen />
     )

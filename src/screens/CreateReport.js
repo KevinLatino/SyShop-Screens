@@ -5,7 +5,7 @@ import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import Padder from '../components/Padder'
 import Scroller from '../components/Scroller'
-import TextArea from '../components/TextArea'
+import TextField from '../components/TextField'
 import Button from '../components/Button'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -83,9 +83,10 @@ export default () => {
             Haz un reporte
           </Text>
 
-          <TextArea
+          <TextField
             value={content}
             onChangeText={setContent}
+            multiline
           />
 
           <Button

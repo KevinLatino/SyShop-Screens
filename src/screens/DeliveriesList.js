@@ -2,12 +2,20 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { View } from 'react-native'
-import { List, Text } from 'react-native-paper'
+import { View, StyleSheet } from 'react-native'
+import { List } from 'react-native-paper'
 import DeliveryTile from '../components/DeliveryTile'
+import SecondaryTitle from '../components/SecondaryTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Scroller from '../components/Scroller'
 import Padder from '../components/Padder'
+import Scroller from '../components/Scroller'
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white"
+  }
+})
 
 const fetchActiveDeliveries = async (customerId) => {
   const payload = {
@@ -77,10 +85,10 @@ export default () => {
 
   return (
     <Scroller>
-      <Padder>
-        <Text variant="titleLarge">
+      <Padder style={styles.container}>
+        <SecondaryTitle>
           Entregas que esperas
-        </Text>
+        </SecondaryTitle>
 
         <List.Section>
           <List.Subheader>
@@ -90,7 +98,9 @@ export default () => {
           {
             activeDeliveriesQuery.isLoading ?
             <LoadingSpinner /> :
-            <DeliveriesListItems deliveries={activeDeliveriesQuery.data} />
+            <DeliveriesListItems
+              deliveries={activeDeliveriesQuery.data}
+            />
           }
 
           <List.Subheader>
@@ -100,7 +110,9 @@ export default () => {
           {
             inactiveDeliveriesQuery.isLoading ?
             <LoadingSpinner /> :
-            <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
+            <DeliveriesListItems
+              deliveries={inactiveDeliveriesQuery.data}
+            />
           }
         </List.Section>
       </Padder>

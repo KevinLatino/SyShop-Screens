@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
+import { call } from '../utilities/calls'
 import { selectPictureFromGallery } from '../utilities/camera'
 import { formatBase64String } from '../utilities/formatting'
 import uuid from 'react-native-uuid'
@@ -11,14 +12,16 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, TouchableOpacity, StyleSheet} from 'react-native'
 import { List, IconButton, Avatar } from 'react-native-paper'
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   headerLoadingView: {
     padding: 10,
     width: "100%",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    backgroundColor: "white"
   }
 })
 
@@ -80,6 +83,10 @@ const Header = ({ chat, isLoading }) => {
     )
   }
 
+  const handleCallUser = async () => {
+    call(chat.user.phone_number)
+  }
+
   return (
     <TouchableOpacity onPress={navigateToStoreView}>
       {
@@ -95,6 +102,8 @@ const Header = ({ chat, isLoading }) => {
       }
 
       <List.Item
+        style={{ backgroundColor: "white" }}
+        titleStyle={{ color: configuration.SECONDARY_COLOR }}
         title={chat.user.name}
         left={(props) => {
           return (
@@ -104,6 +113,17 @@ const Header = ({ chat, isLoading }) => {
               source={{
                 uri: formatBase64String(chat.user.picture)
               }}
+            />
+          )
+        }}
+        right={(props) => {
+          return (
+            <IconButton
+              {...props}
+              icon="phone"
+              iconColor={configuration.ACCENT_COLOR_1}
+              style={{ backgroundColor: "white" }}
+              onPress={handleCallUser}
             />
           )
         }}
@@ -209,6 +229,19 @@ export default () => {
     )
   }
 
+  const renderBubble = (props) => {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: configuration.BACKGROUND_COLOR
+          }
+        }}
+      />
+    )
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header
@@ -224,7 +257,12 @@ export default () => {
         }}
 
         placeholder='Mensaje...'
-        renderActions={() => <IconButton icon="camera-outline" onPress={handlePictureMessageChoosen}/>}
+        renderBubble={renderBubble}
+        renderActions={() => <IconButton
+          icon="camera-outline"
+          iconColor={configuration.SECONDARY_COLOR}
+          onPress={handlePictureMessageChoosen}
+        />}
         renderLoading={() => <LoadingSpinner inScreen /> }
 
         scrollToBottom

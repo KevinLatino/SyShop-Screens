@@ -4,21 +4,31 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { useStripe } from '@stripe/stripe-react-native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { formatBase64String } from '../utilities/formatting'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Button from '../components/Button'
 import Padder from '../components/Padder'
-import { Alert, Image, StyleSheet, Dimensions } from 'react-native'
-import { TableView, InfoRow, Stepper, Title2 } from 'react-native-ios-kit'
+import Subtitle from '../components/Subtitle'
+import NumberStepper from '../components/NumberStepper'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { View, Alert, StyleSheet } from 'react-native'
+import { Caption1 } from 'react-native-ios-kit'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   container: {
-    height: Dimensions.get("screen").height,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
-    gap: 24,
-    padding: 16
-  }
+    gap: 20,
+    padding: 15
+  },
+  informationEntry: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 15,
+    padding: 5
+  },
 })
 
 const fetchPost = async (postId, customerId) => {
@@ -46,6 +56,37 @@ const createSaleIntent = async (postId, customerId, amount) => {
   )
 
   return response
+}
+
+const InformationEntry = ({ icon, text }) => {
+  return (
+    <View style={styles.informationEntry}>
+      <MaterialCommunityIcons
+        name={icon}
+        size={30}
+        color="silver"
+      />
+
+      <Caption1 style={{ color: configuration.ACCENT_COLOR_1, flexShrink: 1 }}>
+        {text}
+      </Caption1>
+    </View>
+  )
+}
+
+const InformationContainer = ({ post, amount }) => {
+  return (
+    <View>
+      <InformationEntry
+        icon="pound"
+        text={amount}
+      />
+      <InformationEntry
+        icon="currency-usd"
+        text={post.price * amount}
+      />
+    </View>
+  )
 }
 
 export default () => {
@@ -119,40 +160,22 @@ export default () => {
         )
     }
 
-
-
     return (
       <Padder style={styles.container}>
-        <Title2>
+        <Subtitle>
           Comprando '{postQuery.data.title}'
-        </Title2>
+        </Subtitle>
 
-        <Image
-          source={{
-            uri: formatBase64String(postQuery.data.multimedia[0]),
-            height: 200,
-            width: 300
-          }}
-          style={{ borderRadius: 5 }}
+        <InformationContainer
+          post={postQuery.data}
+          amount={amount}
         />
 
-        <TableView>
-          <InfoRow
-            title="Cantidad de unidades a comprar"
-            info={amount}
-          />
-
-          <InfoRow
-            title="Precio total de la compra"
-            info={`₡${postQuery.data.price * amount}`}
-          />
-        </TableView>
-
-        <Stepper
-          minValue={1}
-          maxValue={postQuery.data.amount}
+        <NumberStepper
+          min={1}
+          max={postQuery.data.amount}
           value={amount}
-          onValueChange={setAmount}
+          onChange={setAmount}
         />
 
         <Button

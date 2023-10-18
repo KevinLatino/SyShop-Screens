@@ -14,46 +14,25 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
 import Button from '../components/Button'
+import Title from '../components/Title'
+import Subtitle from '../components/Subtitle'
 import Scroller from '../components/Scroller'
 import Padder from '../components/Padder'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { View, Alert, StyleSheet } from 'react-native'
-import { Text, Divider } from 'react-native-paper'
+import { Divider } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     gap: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 16,
-    paddingBottom: 16
+    backgroundColor: configuration.BACKGROUND_COLOR
   },
   inputsContainer: {
-    flex: 1,
-    gap: 1,
+    gap: 15,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 35,
-    color: "#344340",
-    fontWeight: "bold",
-    display: "flex",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 20,
-    color: "gray",
-    display: "flex",
-    textAlign: "center",
-  },
-  thirdText: {
-    fontSize: 18,
-    color: "#344340",
-    fontWeight: "bold",
-    display: "flex",
-    textAlign: "center",
+    justifyContent: 'center'
   }
 })
 
@@ -223,13 +202,13 @@ export default () => {
     <Scroller>
       <KeyboardAwareScrollView>
         <Padder style={styles.container}>
-          <Text style={styles.title}>
+          <Title>
             Registrarse
-          </Text>
+          </Title>
 
-          <Text style={styles.subtitle}>
+          <Subtitle>
             Ingresa tus datos personales
-          </Text>
+          </Subtitle>
 
           <PictureInput
             picture={picture}
@@ -305,9 +284,9 @@ export default () => {
 
           <Divider style={{ width: "90%" }} />
 
-          <Text style={styles.thirdText}>
+          <Subtitle>
             También puedes registrarte con
-          </Text>
+          </Subtitle>
 
           <GoogleSignInButton
             text="Registrate con Google"

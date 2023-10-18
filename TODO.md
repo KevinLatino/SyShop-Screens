@@ -1,13 +1,9 @@
-# Sábado (hoy)
-+ [ ] Pelearme con el chat
+# Cosas por hacer
++ [ ] Quitar los usos de mutation.isSuccess en ambas aplicaciones
++ [ ] Revisar y, de ser necesario, modificar los textos en ambas aplicaciones
 
-# Domingo
-+ [ ] Arreglar el error de los inputs
+# Screen por estilizar (díficil)
 
-# Kevin
-+ [ ] Aplicar tipografías
-+ [ ] Acomodar los LoadingSpinners
-
-# Después del cliente para vendedores
-+ [ ] Implementar verificación de correo electrónico y número telefónico
-+ [ ] Suscribirse a eventos del backend
+ProfileView.js
+StoreView.js
+PostView.js

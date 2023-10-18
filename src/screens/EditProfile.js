@@ -9,10 +9,10 @@ import TextField from '../components/TextField'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PictureInput from '../components/PictureInput'
 import Button from '../components/Button'
+import Title from '../components/Title'
 import Scroller from '../components/Scroller'
 import Padder from '../components/Padder'
 import { Alert, StyleSheet } from 'react-native'
-import { Text } from 'react-native-paper'
 
 const styles = StyleSheet.create({
   container: {
@@ -129,9 +129,9 @@ export default () => {
   return (
     <Scroller>
       <Padder style={styles.container}>
-        <Text variant="titleLarge">
-          Configuración
-        </Text>
+        <Title>
+          Edita tu información
+        </Title>
 
         <PictureInput
           picture={picture}

@@ -5,8 +5,8 @@ import LoadingSpinner from "../components/LoadingSpinner"
 import ScrollView from "../components/ScrollView"
 import PostTile from "../components/PostTile"
 import Padder from '../components/Padder'
+import SecondaryTitle from '../components/SecondaryTitle'
 import { View } from 'react-native'
-import { Title2 } from 'react-native-ios-kit'
 
 const fetchLikedPosts = async (customerId) => {
     const payload = {
@@ -38,9 +38,9 @@ export default () => {
     return (
       <Padder>
         <View style={{ flex: 1, gap: 20 }}>
-          <Title2>
+          <SecondaryTitle>
             Tus me gusta
-          </Title2>
+          </SecondaryTitle>
 
           <ScrollView
               data={likedPostsQuery.data}

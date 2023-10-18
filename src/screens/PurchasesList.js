@@ -4,9 +4,9 @@ import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import LoadingSpinner from '../components/LoadingSpinner'
 import SaleTile from '../components/SaleTile'
+import SecondaryTitle from '../components/SecondaryTitle'
 import Padder from '../components/Padder'
 import { View } from 'react-native'
-import { Title2 } from 'react-native-ios-kit'
 
 const fetchPurchases = async (customerId) => {
     const payload = {
@@ -38,9 +38,9 @@ export default () => {
     return (
       <Padder>
         <View style={{ flex: 1, gap: 20 }}>
-          <Title2>
+          <SecondaryTitle>
             Tus compras
-          </Title2>
+          </SecondaryTitle>
 
           <ScrollView
               data={purchasesQuery.data}

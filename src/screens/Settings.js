@@ -8,9 +8,25 @@ import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Padder from '../components/Padder'
 import Dialog from 'react-native-dialog'
-import { View } from 'react-native'
-import { RowItem, TableView } from 'react-native-ios-kit'
-import { Text } from 'react-native-paper'
+import SecondaryTitle from '../components/SecondaryTitle'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { View, StyleSheet } from 'react-native'
+import { List, TouchableRipple, Text, Divider } from 'react-native-paper'
+import configuration from '../configuration'
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    gap: 20
+  },
+  settingEntry: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    padding: 10
+  }
+})
 
 const changeEmail = async (customerId, email, password) => {
   const payload = {
@@ -55,6 +71,29 @@ const deleteCustomer = async (customerId) => {
   const _ = await requestServer(
     "/users_service/delete_user",
     payload
+  )
+}
+
+const SettingEntry = ({ setting, isDangerous, onPress }) => {
+  return (
+    <TouchableRipple
+      onPress={onPress}
+    >
+      <View style={styles.settingEntry}>
+        <Text
+          variant="bodyMedium"
+          style={isDangerous ? { color: "red" } : { color: configuration.SECONDARY_COLOR }}
+        >
+          {setting}
+        </Text>
+
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={24}
+          color={isDangerous ? "red" : configuration.SECONDARY_COLOR}
+        />
+      </View>
+    </TouchableRipple>
   )
 }
 
@@ -121,6 +160,7 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -185,6 +225,7 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -202,6 +243,8 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
   const handleCloseSession = () => {
     setSession(null)
 
+    onDismiss()
+
     navigation.navigate("Welcome")
   }
 
@@ -218,6 +261,7 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -264,6 +308,7 @@ const DeleteAccountDialog = ({ isVisible, onDismiss }) => {
       <Dialog.Button
         label="Cancelar"
         onPress={onDismiss}
+        color="red"
       />
 
       <Dialog.Button
@@ -304,36 +349,36 @@ export default () => {
   }
 
   return (
-    <Padder>
-      <Text variant="titleLarge">
+    <Padder style={styles.container}>
+      <SecondaryTitle>
         Configuración
-      </Text>
+      </SecondaryTitle>
 
-      <TableView header="Historial">
-        <RowItem
-          title="Publicaciones que te gustan"
+      <List.Section>
+        <SettingEntry
+          setting="Publicaciones que te gustan"
           onPress={() => navigation.navigate("LikedPosts")}
         />
 
-        <RowItem
-          title="Tus compras"
+        <SettingEntry
+          setting="Tus compras"
           onPress={() => navigation.navigate("PurchasesList")}
         />
-      </TableView>
 
-      <TableView header="Cuenta">
+        <Divider />
+
         <View>
           {
             customerQuery.data.account_type === "PlainAccount" ?
             (
               <View>
-                <RowItem
-                  title="Cambiar correo electrónico"
+                <SettingEntry
+                  setting="Cambiar correo electrónico"
                   onPress={() => setIsChangeEmailDialogVisible(true)}
                 />
 
-                <RowItem
-                  title="Cambiar contraseña"
+                <SettingEntry
+                  setting="Cambiar contraseña"
                   onPress={() => setIsChangePasswordDialogVisible(true)}
                 />
               </View>
@@ -342,21 +387,23 @@ export default () => {
           }
         </View>
 
-        <RowItem
-          title="Hacer un reporte"
+        <SettingEntry
+          setting="Hacer un reporte"
           onPress={navigateToCreateReport}
         />
 
-        <RowItem
-          title="Cerrar sesión"
+        <SettingEntry
+          setting="Cerrar sesión"
           onPress={() => setIsCloseSessionDialogVisible(true)}
+          isDangerous
         />
 
-        <RowItem
-          title="Eliminar cuenta"
+        <SettingEntry
+          setting="Eliminar cuenta"
           onPress={() => setIsDeleteAccountDialogVisible(true)}
+          isDangerous
         />
-      </TableView>
+      </List.Section>
 
       <ChangeEmailDialog
         isVisible={isChangeEmailDialogVisible}
