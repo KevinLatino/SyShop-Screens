@@ -10,7 +10,7 @@ import Padder from '../components/Padder'
 import Dialog from 'react-native-dialog'
 import SecondaryTitle from '../components/SecondaryTitle'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { View, StyleSheet } from 'react-native'
+import { View, Alert, StyleSheet } from 'react-native'
 import { List, TouchableRipple, Text, Divider } from 'react-native-paper'
 import configuration from '../configuration'
 
@@ -34,9 +34,24 @@ const changeEmail = async (customerId, email, password) => {
     email,
     password
   }
+
+  const handleError = (data) => {
+    if (data.message === "INCORRECT_PASSWORD") {
+      Alert.alert(
+        "Contraseña incorrecta",
+        "La contraseña que ingresaste es incorrecta"
+      )
+
+      return true
+    }
+
+    return false
+  }
+
   const _ = await requestServer(
     "/users_service/change_user_email",
-    payload
+    payload,
+    handleError
   )
 }
 
@@ -46,9 +61,24 @@ const changePassword = async (customerId, oldPassword, newPassword) => {
     old_password: oldPassword,
     new_password: newPassword
   }
+
+  const handleError = (data) => {
+    if (data.message === "INCORRECT_PASSWORD") {
+      Alert.alert(
+        "Contraseña incorrecta",
+        "La contraseña que ingresaste es incorrecta"
+      )
+
+      return true
+    }
+
+    return false
+  }
+
   const _ = await requestServer(
     "/users_service/change_user_password",
-    payload
+    payload,
+    handleError
   )
 }
 
@@ -108,6 +138,15 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
     changeEmailMutation.mutate(form.fields)
   }
 
+  const handleSuccess = () => {
+    onDismiss()
+
+    Alert.alert(
+      "Éxito",
+      "Tu correo electrónico se actualizó con éxito"
+    )
+  }
+
   const customerQuery = useQuery({
     queryKey: ["customerChangeEmail"],
     queryFn: () => fetchCustomer(session.data.customerId),
@@ -115,7 +154,10 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
     disabled: session.isLoading
   })
   const changeEmailMutation = useMutation(
-    ({ email, password }) => changeEmail(session.data.customerId, email, password)
+    ({ email, password }) => changeEmail(session.data.customerId, email, password),
+    {
+      onSuccess: handleSuccess
+    }
   )
   const form = useForm(
     {
@@ -127,10 +169,6 @@ const ChangeEmailDialog = ({ isVisible, onDismiss }) => {
       password: makeNotEmptyChecker("Contraseña vacía")
     }
   )
-
-  if (changeEmailMutation.isSuccess) {
-    onDismiss()
-  }
 
   if (isVisible && (customerQuery.isLoading || changeEmailMutation.isLoading)) {
     return (
@@ -178,8 +216,20 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
     changePasswordMutation.mutate(form.fields)
   }
 
+  const handleSuccess = () => {
+    onDismiss()
+
+    Alert.alert(
+      "Éxito",
+      "Tu contraseña se actualizó con éxito"
+    )
+  }
+
   const changePasswordMutation = useMutation(
-    ({ oldPassword, newPassword }) => changePassword(session.data.customerId, oldPassword, newPassword)
+    ({ oldPassword, newPassword }) => changePassword(session.data.customerId, oldPassword, newPassword),
+    {
+      onSuccess: handleSuccess
+    }
   )
   const form = useForm(
     {
@@ -191,10 +241,6 @@ const ChangePasswordDialog = ({ isVisible, onDismiss }) => {
       newPassword: makeNotEmptyChecker("Contraseña vacía")
     }
   )
-
-  if (changePasswordMutation.isSuccess) {
-    onDismiss()
-  }
 
   if (isVisible && changePasswordMutation.isLoading) {
     return (
