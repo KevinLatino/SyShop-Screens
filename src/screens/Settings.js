@@ -287,7 +287,7 @@ const CloseSessionDialog = ({ isVisible, onDismiss }) => {
   const [_, setSession] = useSession()
 
   const handleCloseSession = () => {
-    setSession(null)
+    setSession(_ => null)
 
     onDismiss()
 

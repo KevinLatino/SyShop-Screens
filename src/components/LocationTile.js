@@ -24,7 +24,7 @@ export default ({ location, isSelected, onPress }) => {
           color: "white"
         }}
         title={location.place_name}
-        description={formatLocation={}(location)}
+        description={formatLocation(location)}
         left={(props) => <List.Icon {...props} icon="map-marker" />}
       />
     </TouchableRipple>

@@ -44,8 +44,13 @@ export default ({ post }) => {
     })
   }
 
-  const navigateToProfileView = () => {
-    navigation.navigate("ProfileView")
+  const navigateToStoreView= () => {
+    navigation.navigate(
+      "StoreView",
+      {
+        storeId: post.store_id
+      }
+    )
   }
 
   return (
@@ -103,7 +108,7 @@ export default ({ post }) => {
               icon="store-outline"
               iconColor={configuration.ACCENT_COLOR_1}
               style={{ backgroundColor: "white" }}
-              onPress={navigateToProfileView}
+              onPress={navigateToStoreView}
             />
           </View>
         </View>

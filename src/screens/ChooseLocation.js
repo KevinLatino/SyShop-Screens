@@ -13,6 +13,11 @@ import FloatingActionButton from '../components/FloatingActionButton'
 import { View, Alert, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 20,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   buttonContainer: {
     width: "100%",
     position: "absolute",
@@ -147,7 +152,7 @@ export default () => {
   }
 
   return (
-    <Padder>
+    <Padder style={styles.container}>
       <Title>
         Escoge el destino de tu compra
       </Title>

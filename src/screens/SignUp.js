@@ -21,6 +21,7 @@ import Padder from '../components/Padder'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { View, Alert, StyleSheet } from 'react-native'
 import { Divider } from 'react-native-paper'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   container: {
@@ -101,7 +102,7 @@ export default () => {
   const [signingUpWithPlainAccount, setSigninUpWithPlainAccount] = useState(true)
   const [useUrlPicture, setUseUrlPicture] = useState(false)
   const [googleUniqueIdentifier, setGoogleUniqueIdentifier] = useState(null)
-  const [picture, setPicture] = useState("")
+  const [picture, setPicture] = useState(null)
 
   const handleSignUp = () => {
     if (!form.validate()) {
@@ -211,6 +212,7 @@ export default () => {
           </Subtitle>
 
           <PictureInput
+            defaultIcon="account"
             picture={picture}
             onChangePicture={handleChangePicture}
             useUrl={useUrlPicture}

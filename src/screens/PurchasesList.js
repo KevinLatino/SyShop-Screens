@@ -6,7 +6,13 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import SaleTile from '../components/SaleTile'
 import SecondaryTitle from '../components/SecondaryTitle'
 import Padder from '../components/Padder'
-import { View } from 'react-native'
+import { View, StyleSheet } from 'react-native'
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white"
+  }
+})
 
 const fetchPurchases = async (customerId) => {
     const payload = {
@@ -36,7 +42,7 @@ export default () => {
     }
 
     return (
-      <Padder>
+      <Padder style={styles.container}>
         <View style={{ flex: 1, gap: 20 }}>
           <SecondaryTitle>
             Tus compras

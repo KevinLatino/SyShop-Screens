@@ -22,6 +22,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8
   },
+  informationContainer: {
+    gap: 8,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    padding: 20,
+    width: "87.5%" 
+  },
   buttonsContainer: {
     margin: 20,
     width: "100%",
@@ -60,7 +68,7 @@ export default () => {
         ¡Empieza a comprar!
       </Title>
 
-      <View style={{ gap: 8, alignItems: "flex-start", padding: 20 }}>
+      <View style={styles.informationContainer}>
         <InformationEntry
           icon="magnify"
           text="Encuentra lo que buscas fácilmente"

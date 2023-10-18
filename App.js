@@ -10,8 +10,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useSession } from './src/context'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { useFonts } from 'expo-font'
 import * as eva from '@eva-design/eva'
 import configuration from './src/configuration'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import LoadingSpinner from './src/components/LoadingSpinner'
 import Home from './src/screens/Home'
 import DeliveriesList from './src/screens/DeliveriesList'
@@ -32,6 +34,8 @@ import PurchasesList from './src/screens/PurchasesList'
 import ProfileView from './src/screens/ProfileView'
 import StoreView from './src/screens/StoreView'
 import Order from './src/screens/Order'
+import MultimediaView from './src/screens/MultimediaView'
+import StorePosts from './src/screens/StorePosts'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -93,8 +97,8 @@ const BottomTabNavigator = () => {
     <BottomTab.Navigator
       screenOptions={{
         headerShown: false,
-        tapBarStyle: {
-          backgroundColor: configuration.BACKGROUND_COLOR
+        tabBarStyle: {
+          backgroundColor: configuration.BACKGROUND_COLOR,
         },
         tabBarActiveTintColor: configuration.ACCENT_COLOR_1,
         tabBarInactiveTintColor: "white"
@@ -286,6 +290,17 @@ const Main = () => {
                         {() => <StoreView />}
                       </Stack.Screen>
 
+                      <Stack.Screen
+                        name="StorePosts"
+                      >
+                        {() => <StorePosts />}
+                      </Stack.Screen>
+
+                      <Stack.Screen
+                        name="MultimediaView"
+                      >
+                        {() => <MultimediaView />}
+                      </Stack.Screen>
 
                       <Stack.Screen
                         name="Order"

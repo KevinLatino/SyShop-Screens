@@ -14,6 +14,8 @@ import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 20
   }
 })
@@ -65,7 +67,11 @@ export default () => {
       </Title>
 
       <Subtitle>
-        {formatLocation(location)}
+        {
+          location !== null ?
+          formatLocation(location) :
+          null
+        }
       </Subtitle>
 
       <LocationSelector

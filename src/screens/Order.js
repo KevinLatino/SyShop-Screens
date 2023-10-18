@@ -11,7 +11,7 @@ import Subtitle from '../components/Subtitle'
 import NumberStepper from '../components/NumberStepper'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { View, Alert, StyleSheet } from 'react-native'
-import { Caption1 } from 'react-native-ios-kit'
+import { Text } from 'react-native-paper'
 import configuration from '../configuration'
 
 const styles = StyleSheet.create({
@@ -19,7 +19,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     gap: 20,
-    padding: 15
+    padding: 15,
+    width: "100%"
+  },
+  informationContainer: {
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 20,
   },
   informationEntry: {
     flexDirection: "row",
@@ -64,23 +70,27 @@ const InformationEntry = ({ icon, text }) => {
       <MaterialCommunityIcons
         name={icon}
         size={30}
-        color="silver"
+        color={configuration.ACCENT_COLOR_1}
       />
 
-      <Caption1 style={{ color: configuration.ACCENT_COLOR_1, flexShrink: 1 }}>
+      <Text
+        variant="bodySmall"
+        style={{ color: configuration.ACCENT_COLOR_1, flexShrink: 1 }}
+      >
         {text}
-      </Caption1>
+      </Text>
     </View>
   )
 }
 
 const InformationContainer = ({ post, amount }) => {
   return (
-    <View>
+    <View style={styles.informationContainer}>
       <InformationEntry
         icon="pound"
         text={amount}
       />
+
       <InformationEntry
         icon="currency-usd"
         text={post.price * amount}

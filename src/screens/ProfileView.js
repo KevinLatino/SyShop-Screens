@@ -7,7 +7,6 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import FloatingActionButton from '../components/FloatingActionButton'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { View, StyleSheet, Dimensions } from 'react-native'
-import { Caption1 } from 'react-native-ios-kit'
 import { Avatar, Text } from 'react-native-paper'
 import configuration from '../configuration'
 
@@ -23,25 +22,12 @@ const styles = StyleSheet.create({
   },
   topContainer: {
     borderRadius: 30,
-    height: "30%",
+    height: "35%",
     width: "100%",
     backgroundColor: configuration.BACKGROUND_COLOR,
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
-  },
-  extraInformationContainer: {
-    width: "100%",
-    backgroundColor: "white",
-    paddingHorizontal: 10,
-  },
-  informationEntry: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    gap: 15,
-    padding: 5
   },
   fab: {
     position: "absolute",
@@ -62,23 +48,7 @@ const fetchCustomer = async (customerId) => {
   return customer
 }
 
-const InformationEntry = ({ icon, text }) => {
-  return (
-    <View style={styles.informationEntry}>
-      <MaterialCommunityIcons
-        name={icon}
-        size={30}
-        color="silver"
-      />
-
-      <Caption1 style={{ color: configuration.ACCENT_COLOR_1, flexShrink: 1 }}>
-        {text}
-      </Caption1>
-    </View>
-  )
-}
-
-const TopContainer = ({ picture, name }) => {
+const TopContainer = ({ picture, name, phoneNumber }) => {
   return (
     <View style={styles.topContainer}>
       <Avatar.Image
@@ -92,17 +62,21 @@ const TopContainer = ({ picture, name }) => {
       >
         {name}
       </Text>
-    </View>
-  )
-}
 
-const ExtraInformationContainer = ({ phoneNumber }) => {
-  return (
-    <View style={styles.extraInformationContainer}>
-      <InformationEntry
-        icon="phone"
-        text={phoneNumber}
-      />
+      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
+        <MaterialCommunityIcons
+          name="phone"
+          color="white"
+          size={24}
+        />
+
+        <Text
+          variant="titleLarge"
+          style={{ color: "white" }}
+        >
+          {phoneNumber}
+        </Text>
+      </View>
     </View>
   )
 }
@@ -135,9 +109,6 @@ const CustomerView = () => {
       <TopContainer
         picture={picture}
         name={formatCustomerName(name, first_surname, second_surname)}
-      />
-
-      <ExtraInformationContainer
         phoneNumber={phone_number}
       />
     </View>

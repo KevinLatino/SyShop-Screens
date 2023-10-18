@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: "absolute",
-    top: Dimensions.get("screen").height * 0.75,
+    top: Dimensions.get("screen").height * 0.8,
     left: Dimensions.get("screen").width * 0.8
   },
   searchBarModal: {

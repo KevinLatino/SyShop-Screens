@@ -5,6 +5,7 @@ import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import { formatBase64String, formatDate } from '../utilities/formatting'
 import TextField from '../components/TextField'
+import Button from '../components/Button'
 import Empty from '../components/Empty'
 import LoadingSpinner from '../components/LoadingSpinner'
 import CommentTile from '../components/CommentTile'
@@ -67,9 +68,10 @@ const styles = StyleSheet.create({
   }
 })
 
-const fetchPost = async (postId) => {
+const fetchPost = async (postId, customerId) => {
   const payload = {
-    post_id: postId
+    post_id: postId,
+    customer_id: customerId
   }
   const post = await requestServer(
     "/posts_service/get_post_by_id",
@@ -210,6 +212,7 @@ const CommentsScrollView = ({ postId }) => {
 
 const PostView = ({ postId }) => {
   const navigation = useNavigation()
+  const [session, _] = useSession()
 
   const navigateToStoreView = () => {
     navigation.navigate("StoreView", {
@@ -217,9 +220,15 @@ const PostView = ({ postId }) => {
     })
   }
 
+  const navigateToOrder = () => {
+    navigation.navigate("Order", {
+      postId: post.post_id
+    })
+  }
+
   const postQuery = useQuery({
     queryKey: ["post"],
-    queryFn: () => fetchPost(postId)
+    queryFn: () => fetchPost(postId, session.data.customerId)
   })
 
   if (postQuery.isLoading) {
@@ -307,6 +316,13 @@ const PostView = ({ postId }) => {
             style={{ backgroundColor: "white" }}
           />
         </View>
+
+        <Button
+          style={{ width: "100%" }}
+          onPress={navigateToOrder}
+        >
+          Comprar
+        </Button>
       </View>
     </View>
   )
