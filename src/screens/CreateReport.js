@@ -6,32 +6,21 @@ import { requestServer } from '../utilities/requests'
 import Padder from '../components/Padder'
 import Scroller from '../components/Scroller'
 import TextField from '../components/TextField'
+import Title from '../components/Title'
 import Button from '../components/Button'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { Text, Alert, StyleSheet } from 'react-native'
+import { Alert, StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     gap: 20,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     paddingTop: 16,
     paddingBottom: 16,
     width: "100%"
-  },
-  title: {
-    fontSize: 35,
-    color: "#344340",
-    fontWeight: "bold",
-    display: "flex",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 20,
-    color: "gray",
-    display: "flex",
-    textAlign: "center",
   }
 })
 
@@ -55,14 +44,14 @@ export default () => {
   const handleSubmitReport = () => {
     createReportMutation.mutate({
       content,
-      userId: session.data.customer_id
+      userId: session.data.customerId
     })
   }
 
   const handleSubmitReportSuccess = () => {
     Alert.alert(
       "Éxito",
-      "Tu reportado se ha publicado con éxito"
+      "Tu reporte se ha publicado con éxito"
     )
 
     navigation.goBack()
@@ -76,16 +65,18 @@ export default () => {
   )
 
   return (
-    <Scroller>
-      <KeyboardAwareScrollView>
+    <Scroller style={{ flex: 1 }}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
         <Padder style={styles.container}>
-          <Text style={styles.title}>
+          <Title>
             Haz un reporte
-          </Text>
+          </Title>
 
           <TextField
             value={content}
             onChangeText={setContent}
+            placeholder="Tu reporte"
+            style={{ height: 100 }}
             multiline
           />
 

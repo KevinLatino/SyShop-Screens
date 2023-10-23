@@ -7,7 +7,8 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import FloatingActionButton from '../components/FloatingActionButton'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { View, StyleSheet, Dimensions } from 'react-native'
-import { Avatar, Text } from 'react-native-paper'
+import { Caption1 } from 'react-native-ios-kit'
+import { Avatar, IconButton } from 'react-native-paper'
 import configuration from '../configuration'
 
 const styles = StyleSheet.create({
@@ -18,16 +19,49 @@ const styles = StyleSheet.create({
   },
   customerView: {
     flex: 1,
-    alignItems: "center"
+    alignItems: "center",
+    gap: 25
+  },
+  actionsContainer: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10
   },
   topContainer: {
     borderRadius: 30,
-    height: "35%",
+    height: "30%",
     width: "100%",
     backgroundColor: configuration.BACKGROUND_COLOR,
     justifyContent: "center",
     alignItems: "center",
+    padding: 10,
     gap: 10,
+  },
+  extraInformationContainer: {
+    width: "100%",
+    backgroundColor: "white",
+    paddingHorizontal: 10,
+  },
+  linksContainer: {
+    width: "100%",
+    paddingHorizontal: 10,
+  },
+  informationEntry: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 15,
+    padding: 5
+  },
+  link: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    padding: 10
   },
   fab: {
     position: "absolute",
@@ -48,7 +82,53 @@ const fetchCustomer = async (customerId) => {
   return customer
 }
 
-const TopContainer = ({ picture, name, phoneNumber }) => {
+const InformationEntry = ({ icon, text }) => {
+  return (
+    <View style={styles.informationEntry}>
+      <MaterialCommunityIcons
+        name={icon}
+        size={30}
+        color="silver"
+      />
+
+      <Caption1 style={{ color: configuration.ACCENT_COLOR_1, flexShrink: 1 }}>
+        {text}
+      </Caption1>
+    </View>
+  )
+}
+
+const ActionsContainer = () => {
+  const navigation = useNavigation()
+
+  const navigateToLikedPosts = () => {
+    navigation.navigate("LikedPosts")
+  }
+
+  const navigateToPurchasesList = () => {
+    navigation.navigate("PurchasesList")
+  }
+
+  return (
+    <View style={styles.actionsContainer}>
+      <IconButton
+        icon="heart"
+        iconColor={configuration.ACCENT_COLOR_1}
+        style={{ backgroundColor: "white" }}
+        onPress={navigateToLikedPosts}
+      />
+
+      <IconButton
+        icon="cart"
+        iconColor={configuration.ACCENT_COLOR_1}
+        style={{ backgroundColor: "white" }}
+        onPress={navigateToPurchasesList}
+      />
+    </View>
+  )
+}
+
+const TopContainer = ({ picture }) => {
   return (
     <View style={styles.topContainer}>
       <Avatar.Image
@@ -56,27 +136,23 @@ const TopContainer = ({ picture, name, phoneNumber }) => {
         size={80}
       />
 
-      <Text
-        variant="titleLarge"
-        style={{ color: "white" }}
-      >
-        {name}
-      </Text>
+      <ActionsContainer />
+    </View>
+  )
+}
 
-      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
-        <MaterialCommunityIcons
-          name="phone"
-          color="white"
-          size={24}
-        />
+const ExtraInformationContainer = ({ name, phoneNumber }) => {
+  return (
+    <View style={styles.extraInformationContainer}>
+      <InformationEntry
+        icon="account"
+        text={name}
+      />
 
-        <Text
-          variant="titleLarge"
-          style={{ color: "white" }}
-        >
-          {phoneNumber}
-        </Text>
-      </View>
+      <InformationEntry
+        icon="phone"
+        text={phoneNumber}
+      />
     </View>
   )
 }
@@ -108,6 +184,9 @@ const CustomerView = () => {
     <View style={styles.customerView}>
       <TopContainer
         picture={picture}
+      />
+
+      <ExtraInformationContainer
         name={formatCustomerName(name, first_surname, second_surname)}
         phoneNumber={phone_number}
       />

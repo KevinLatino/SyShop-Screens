@@ -3,34 +3,36 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useStripe } from '@stripe/stripe-react-native'
 import { useSession } from '../context'
+import { formatBase64String } from '../utilities/formatting'
 import { requestServer } from '../utilities/requests'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Button from '../components/Button'
 import Padder from '../components/Padder'
-import Subtitle from '../components/Subtitle'
+import Title from '../components/Title'
 import NumberStepper from '../components/NumberStepper'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { View, Alert, StyleSheet } from 'react-native'
+import { View, Image, Alert, StyleSheet } from 'react-native'
 import { Text } from 'react-native-paper'
 import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "flex-start",
+    flexDirection: "column",
+    justifyContent: "center",
     alignItems: "center",
-    gap: 20,
-    padding: 15,
+    gap: 25,
     width: "100%"
   },
   informationContainer: {
     justifyContent: "flex-start",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 20,
+    width: "90%"
   },
   informationEntry: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     alignItems: "center",
     gap: 15,
     padding: 5
@@ -74,8 +76,8 @@ const InformationEntry = ({ icon, text }) => {
       />
 
       <Text
-        variant="bodySmall"
-        style={{ color: configuration.ACCENT_COLOR_1, flexShrink: 1 }}
+        variant="bodyLarge"
+        style={{ color: "white", flexShrink: 1 }}
       >
         {text}
       </Text>
@@ -172,9 +174,18 @@ export default () => {
 
     return (
       <Padder style={styles.container}>
-        <Subtitle>
-          Comprando '{postQuery.data.title}'
-        </Subtitle>
+        <Title>
+          Realiza tu compra
+        </Title>
+
+        <Image
+          source={{
+            uri: formatBase64String(postQuery.data.multimedia[0]),
+            height: 200,
+            width: 300
+          }}
+          style={{ resizeMode: "contain" }}
+        />
 
         <InformationContainer
           post={postQuery.data}

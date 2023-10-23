@@ -18,7 +18,7 @@ import {
 import { View, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
-  container: {
+  postsList: {
     flex: 1,
     backgroundColor: "white",
     paddingHorizontal: 15
@@ -64,8 +64,9 @@ const PostsList = () => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.postsList}>
       <ScrollView
+        style={{ flex: 1 }}
         data={postsQuery.data}
         keyExtractor={(post) => post.post_id}
         renderItem={({ item }) => <PostTile post={item} />}
@@ -80,10 +81,6 @@ export default () => {
   const navigation = useNavigation()
 
   const [isModalVisible, setIsModalVisible] = useState(false)
-
-  navigation.addListener("beforeRemove", (event) => {
-    event.preventDefault()
-  })
 
   const handleSearchSubmit = (text, categoriesNames, storesNames) => {
     setIsModalVisible(false)
@@ -104,34 +101,34 @@ export default () => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <HomeHeader text="Feed" />
 
         <PostsList />
+      </View>
 
-        <Portal>
-          <Modal
-            visible={isModalVisible}
-            onDismiss={() => setIsModalVisible(false)}
-            contentContainerStyle={styles.searchBarModal}
-          >
-            <Surface elevation={5}>
-              <SearchBar
-                onSearchSubmit={handleSearchSubmit}
-                onPictureTaken={handleSearchByPicture}
-                onCancel={() => setIsModalVisible(false)}
-              />
-            </Surface>
-          </Modal>
-        </Portal>
-      </SafeAreaView>
+      <Portal>
+        <Modal
+          visible={isModalVisible}
+          onDismiss={() => setIsModalVisible(false)}
+          contentContainerStyle={styles.searchBarModal}
+        >
+          <Surface elevation={5}>
+            <SearchBar
+              onSearchSubmit={handleSearchSubmit}
+              onPictureTaken={handleSearchByPicture}
+              onCancel={() => setIsModalVisible(false)}
+            />
+          </Surface>
+        </Modal>
+      </Portal>
 
       <FloatingActionButton
         icon="magnify"
         onPress={() => setIsModalVisible(true)}
         style={styles.fab}
       />
-    </View>
+    </SafeAreaView>
   )
 }

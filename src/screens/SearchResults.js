@@ -1,5 +1,5 @@
-import { useState, Fragment } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, Fragment } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
@@ -8,21 +8,12 @@ import StoreTile from '../components/StoreTile'
 import LoadingSpinner from '../components/LoadingSpinner'
 import SearchInput from '../components/SearchInput'
 import Slider from '../components/Slider'
-import Empty from '../components/Empty'
-import Padder from '../components/Padder'
-import VirtualizedView from '../components/VirtualizedView'
-import SecondaryTitle from '../components/SecondaryTitle'
-import FloatingActionButton from '../components/FloatingActionButton'
+import Button from '../components/Button'
 import SegmentedControl from '@react-native-community/segmented-control'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import {
-    View,
-    StyleSheet,
-    ScrollView as ReactNativeScrollView,
-    Dimensions
-} from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { Caption1 } from 'react-native-ios-kit'
-import { Portal, Modal, Chip, Divider } from 'react-native-paper'
+import { IconButton, Portal, Modal } from 'react-native-paper'
 import configuration from '../configuration'
 
 const styles = StyleSheet.create({
@@ -41,6 +32,9 @@ const styles = StyleSheet.create({
   },
   searchFiltersModal: {
     backgroundColor: "white",
+    width: "90%",
+    borderRadius: 15,
+    alignSelf: "center"
   },
   horizontalScrollView: {
     backgroundColor: "white",
@@ -51,13 +45,8 @@ const styles = StyleSheet.create({
     gap: 15
   },
   postsResultsFilters: {
-    gap: 15,
-    padding: 5
-  },
-  fab: {
-    position: "static",
-    top: Dimensions.get("screen").height * 0.8,
-    left: Dimensions.get("screen").width * 0.85
+    gap: 30,
+    padding: 10
   }
 })
 
@@ -133,234 +122,6 @@ const PriceRangeSlider = ({
   )
 }
 
-const PostsResultsFilters = ({ limitPrice, filters, onChangeFilters }) => {
-    const {
-        minimumPrice,
-        maximumPrice,
-        sortingPropertyIndex
-    } = filters
-
-    const handleSelectSortingPropertyIndex = (event) => {
-      const newIndex = event.nativeEvent.selectedSegmentIndex
-
-      onChangeFilters({
-        ...filters,
-        sortingPropertyIndex: newIndex
-      })
-    }
-
-    const handleChangePriceRange = ([newMinimumPrice, newMaximumPrice]) => {
-      onChangeFilters({
-        ...filters,
-        minimumPrice: newMinimumPrice,
-        maximumPrice: newMaximumPrice
-      })
-    }
-
-    return (
-      <View style={styles.postsResultsFilters}>
-        <SegmentedControl
-          values={["precio", "fecha de publicación"]}
-          selectedIndex={sortingPropertyIndex}
-          onChange={handleSelectSortingPropertyIndex}
-        />
-
-        <View style={{ gap: 12 }}>
-          {
-            sortingPropertyIndex === 0 ?
-            <PriceRangeSlider
-              limitPrice={limitPrice}
-              minimumPrice={minimumPrice}
-              maximumPrice={maximumPrice}
-              onChangePriceRange={handleChangePriceRange}
-            /> :
-            null
-          }
-        </View>
-      </View>
-    )
-}
-
-const SearchedCategoriesScrollView = ({ categoriesNames }) => {
-    if (categoriesNames.length === 0) {
-      return null
-    }
-
-    const categoriesNamesChips = categoriesNames.map((categoryName) => {
-        return (
-            <Chip
-                key={categoryName}
-                icon="pound"
-                style={{ backgroundColor: configuration.BACKGROUND_COLOR }}
-                textStyle={{ color: "white" }}
-            >
-              {categoryName}
-            </Chip>
-        )
-    })
-
-    return (
-        <ReactNativeScrollView
-            horizontal
-            contentContainerStyle={styles.horizontalScrollView}
-        >
-            {categoriesNamesChips}
-        </ReactNativeScrollView>
-    )
-}
-
-const StoresResultsScrollView = ({ searchedText }) => {
-    const storesQuery = useQuery({
-      queryKey: ["storesResults"],
-      queryFn: () => fetchStores(searchedText)
-    })
-
-    if (storesQuery.isLoading) {
-        return (
-            <LoadingSpinner inScreen />
-        )
-    }
-
-    if (storesQuery.data.length === 0) {
-      return (
-        <Empty
-          icon="basket"
-          message="No se encontraron resultados de tiendas"
-        />
-      )
-    }
-
-    const storesTiles = storesQuery.data.map((store) => {
-        return (
-            <StoreTile
-                key={store.user_id}
-                store={store}
-            />
-        )
-    })
-
-    return (
-        <ReactNativeScrollView
-            horizontal
-            contentContainerStyle={styles.horizontalScrollView}
-        >
-            {storesTiles}
-        </ReactNativeScrollView>
-    )
-}
-
-const PostsResults = ({ searchedText, categoriesNames }) => {
-    const [searchFilters, setSearchFilters] = useState({
-        minimumPrice: 0,
-        maximumPrice: null,
-        sortingPropertyIndex: 0
-    })
-
-    const handleChangeFilters = (newSearchFilters) => {
-        setSearchFilters(_ => newSearchFilters)
-
-        postsQuery.refetch()
-    }
-
-    const maximumPriceQuery = useQuery({
-      queryKey: ["maximumPrice"],
-      queryFn: () => fetchMaximumPrice(),
-      onSuccess: (maximumPrice) => setSearchFilters({
-        ...searchFilters,
-        maximumPrice
-      })
-    })
-    const postsQuery = useQuery({
-      queryKey: ["postsResults"],
-      queryFn: () => fetchPosts(
-        searchedText,
-        categoriesNames,
-        {
-          minimumPrice: searchFilters.minimumPrice,
-          maximumPrice: searchFilters.maximumPrice,
-          sortingProperty: ["price", "sent_datetime"][searchFilters.sortingPropertyIndex],
-          sortingSchema: "ascending"
-        }
-      ),
-      enabled: maximumPriceQuery.isSuccess
-    })
-
-    if (maximumPriceQuery.isLoading) {
-        return (
-          <LoadingSpinner inScreen />
-        )
-    }
-
-    return (
-        <View style={styles.postsResultsContainer}>
-            <PostsResultsFilters
-                limitPrice={maximumPriceQuery.data}
-                filters={searchFilters}
-                onChangeFilters={handleChangeFilters}
-            />
-
-            <Divider style={{ color: configuration.ACCENT_COLOR_1 }}/>
-
-            <View style={{ flex: 1 }}>
-              {
-                  postsQuery.isFetching ?
-                  <LoadingSpinner inScreen /> :
-                  <ScrollView
-                      data={postsQuery.data}
-                      keyExtractor={(post) => post.post_id}
-                      renderItem={({ item }) => <PostTile post={item} />}
-                      emptyIcon="basket"
-                      emptyMessage="No se encontraron resultados de publicaciones"
-                  />
-              }
-            </View>
-        </View>
-    )
-}
-
-const _ = () => {
-    const route = useRoute()
-
-    const { text, categoriesNames } = route.params
-
-    return (
-      <VirtualizedView>
-        <SafeAreaView style={styles.container}>
-          <SearchInput
-            value={text}
-            showCancel={false}
-            disabled
-          />
-
-          <Padder style={styles.content}>
-            <SearchedCategoriesScrollView
-                categoriesNames={categoriesNames}
-            />
-
-            <SecondaryTitle>
-                Tiendas
-            </SecondaryTitle>
-
-            <StoresResultsScrollView
-                searchedText={text}
-            />
-
-            <Divider />
-
-            <SecondaryTitle>
-                Publicaciones
-            </SecondaryTitle>
-
-            <PostsResults
-                searchedText={text}
-                categoriesNames={categoriesNames}
-            />
-          </Padder>
-        </SafeAreaView>
-      </VirtualizedView>
-    )
-}
-
 const ScreenSelector = ({ value, onChange }) => {
   return (
     <View style={styles.screenSelector}>
@@ -377,28 +138,36 @@ const ScreenSelector = ({ value, onChange }) => {
   )
 }
 
-const SearchFiltersModal = ({ limitPrice, value, onChange, isVisible, onDismiss }) => {
-  const {
-      minimumPrice,
-      maximumPrice,
-      sortingPropertyIndex
-  } = value
+const SearchFiltersModal = ({
+  limitPrice,
+  value,
+  onChange,
+  isVisible,
+  onDismiss
+}) => {
+  const [valueState, setValueState] = useState(value)
 
   const handleSelectSortingPropertyIndex = (event) => {
     const newIndex = event.nativeEvent.selectedSegmentIndex
 
-    onChange({
-      ...value,
+    setValueState({
+      ...valueState,
       sortingPropertyIndex: newIndex
     })
   }
 
   const handleChangePriceRange = ([newMinimumPrice, newMaximumPrice]) => {
-    onChange({
-      ...value,
+    setValueState({
+      ...valueState,
       minimumPrice: newMinimumPrice,
       maximumPrice: newMaximumPrice
     })
+  }
+
+  const handleApplyFilters = () => {
+    onDismiss()
+
+    onChange(valueState)
   }
 
   return (
@@ -409,26 +178,32 @@ const SearchFiltersModal = ({ limitPrice, value, onChange, isVisible, onDismiss 
     >
       <View style={styles.postsResultsFilters}>
         <SegmentedControl
-          values={["precio", "fecha de publicación"]}
-          selectedIndex={sortingPropertyIndex}
+          values={["Precio", "Fecha de publicación"]}
+          selectedIndex={valueState.sortingPropertyIndex}
           onChange={handleSelectSortingPropertyIndex}
           backgroundColor={configuration.BACKGROUND_COLOR}
           tintColor={configuration.ACCENT_COLOR_1}
           fontStyle={{ color: "white" }}
+          activeFontStyle={{ color: "white" }}
         />
 
-        <View style={{ gap: 12 }}>
-          {
-            sortingPropertyIndex === 0 ?
-            <PriceRangeSlider
-              limitPrice={limitPrice}
-              minimumPrice={minimumPrice}
-              maximumPrice={maximumPrice}
-              onChangePriceRange={handleChangePriceRange}
-            /> :
-            null
-          }
-        </View>
+        {
+          valueState.sortingPropertyIndex === 0 ?
+          <PriceRangeSlider
+            limitPrice={limitPrice}
+            minimumPrice={valueState.minimumPrice}
+            maximumPrice={valueState.maximumPrice}
+            onChangePriceRange={handleChangePriceRange}
+          /> :
+          null
+        }
+
+        <Button
+          style={{ width: "100%" }}
+          onPress={handleApplyFilters}
+        >
+          Aplicar filtros
+        </Button>
       </View>
     </Modal>
   )
@@ -458,6 +233,8 @@ const StoresList = ({ searchedText }) => {
 }
 
 const PostsList = ({ searchedText, categoriesNames }) => {
+  const queryClient = useQueryClient()
+
   const [isFiltersModalVisible, setIsFiltersModalVisible] = useState(false)
   const [searchFilters, setSearchFilters] = useState({
     minimumPrice: 0,
@@ -466,9 +243,7 @@ const PostsList = ({ searchedText, categoriesNames }) => {
   })
 
   const handleChangeFilters = (newSearchFilters) => {
-    setSearchFilters(_ => newSearchFilters)
-
-    postsQuery.refetch()
+    setSearchFilters(newSearchFilters)
   }
 
   const maximumPriceQuery = useQuery({
@@ -494,6 +269,12 @@ const PostsList = ({ searchedText, categoriesNames }) => {
     enabled: maximumPriceQuery.isSuccess
   })
 
+  useEffect(() => {
+    queryClient.refetchQueries({
+      queryKey: ["postsResults"]
+    })
+  }, [searchFilters])
+
   if (maximumPriceQuery.isLoading || postsQuery.isFetching) {
     return (
       <LoadingSpinner inScreen />
@@ -502,6 +283,15 @@ const PostsList = ({ searchedText, categoriesNames }) => {
 
   return (
     <Fragment>
+      <View style={{ padding: 10, flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
+        <IconButton
+          icon="tune"
+          iconColor={configuration.ACCENT_COLOR_1}
+          style={{ backgroundColor: "white", borderWidth: 1, borderColor: configuration.ACCENT_COLOR_1 }}
+          onPress={() => setIsFiltersModalVisible(true)}
+        />
+      </View>
+
       <ScrollView
         data={postsQuery.data}
         keyExtractor={(post) => post.post_id}
@@ -519,12 +309,6 @@ const PostsList = ({ searchedText, categoriesNames }) => {
           onDismiss={() => setIsFiltersModalVisible(false)}
         />
       </Portal>
-
-      <FloatingActionButton
-        icon="tune"
-        onPress={() => setIsFiltersModalVisible(true)}
-        style={styles.fab}
-      />
     </Fragment>
   )
 }
@@ -556,23 +340,21 @@ export default () => {
   }
 
   return (
-    <VirtualizedView>
-      <SafeAreaView style={styles.container}>
-        <SearchInput
-          value={text}
-          showCancel={false}
-          disabled
-        />
+    <SafeAreaView style={styles.container}>
+      <SearchInput
+        value={text}
+        showCancel={false}
+        disabled
+      />
 
-        <ScreenSelector
-          value={currentScreenIndex}
-          onChange={setCurrentScreenIndex}
-        />
+      <ScreenSelector
+        value={currentScreenIndex}
+        onChange={setCurrentScreenIndex}
+      />
 
-        <View style={{ flex: 1, padding: 15 }}>
-          {getCurrentScreen()}
-        </View>
-      </SafeAreaView>
-    </VirtualizedView>
+      <View style={{ flex: 1, padding: 15 }}>
+        {getCurrentScreen()}
+      </View>
+    </SafeAreaView>
   )
 }

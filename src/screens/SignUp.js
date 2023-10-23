@@ -286,10 +286,6 @@ export default () => {
 
           <Divider style={{ width: "90%" }} />
 
-          <Subtitle>
-            También puedes registrarte con
-          </Subtitle>
-
           <GoogleSignInButton
             text="Registrate con Google"
             onSignIn={fillUpFormWithGoogleData}

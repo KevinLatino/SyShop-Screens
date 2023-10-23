@@ -374,10 +374,6 @@ export default () => {
   const [isCloseSessionDialogVisible, setIsCloseSessionDialogVisible] = useState(false)
   const [isDeleteAccountDialogVisible, setIsDeleteAccountDialogVisible] = useState(false)
 
-  navigation.addListener("beforeRemove", (event) => {
-    event.preventDefault()
-  })
-
   const navigateToCreateReport = () => {
     navigation.navigate("CreateReport")
   }

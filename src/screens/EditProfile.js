@@ -167,6 +167,7 @@ export default () => {
         />
 
         <Button
+          style={{ width: "70%" }}
           onPress={handleUpdate}
           disabled={updateCustomerMutation.isLoading}
         >

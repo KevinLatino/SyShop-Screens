@@ -65,6 +65,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     gap: 10
+  },
+  buyButton: {
+    width: "100%",
+    backgroundColor: configuration.BACKGROUND_COLOR,
+    borderColor: configuration.BACKGROUND_COLOR
   }
 })
 
@@ -318,7 +323,7 @@ const PostView = ({ postId }) => {
         </View>
 
         <Button
-          style={{ width: "100%" }}
+          style={styles.buyButton}
           onPress={navigateToOrder}
         >
           Comprar

@@ -5,6 +5,7 @@ import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import Padder from '../components/Padder'
+import Scroller from '../components/Scroller'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
 import Button from '../components/Button'
@@ -16,7 +17,8 @@ const styles = StyleSheet.create({
   container: {
     gap: 20,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    width: "100%"
   },
   buttonContainer: {
     width: "100%",
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    top: Dimensions.get("screen").height * 0.85,
+    top: Dimensions.get("screen").height * 0.8,
     left: Dimensions.get("screen").width * 0.8
   }
 })
@@ -81,7 +83,7 @@ const LocationsScrollView = ({ saleId }) => {
       "Tu entrega ahora está pendiente"
     )
 
-    navigation.goBack()
+    navigation.navigate("Home")
   }
 
   const locationsQuery = useQuery({
@@ -103,9 +105,9 @@ const LocationsScrollView = ({ saleId }) => {
   }
 
   return (
-    <View style={{ gap: 20 }}>
+    <View style={{ gap: 20, width: "100%", alignItems: "center" }}>
       <ScrollView
-        style={{ flex: 1 }}
+        style={{ width: "100%", height: "70%" }}
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
         renderItem={
@@ -152,20 +154,22 @@ export default () => {
   }
 
   return (
-    <Padder style={styles.container}>
-      <Title>
-        Escoge el destino de tu compra
-      </Title>
+    <Scroller>
+      <Padder style={styles.container}>
+        <Title>
+          Escoge el destino de tu compra
+        </Title>
 
-      <LocationsScrollView
-        saleId={saleId}
-      />
+        <LocationsScrollView
+          saleId={saleId}
+        />
 
-      <FloatingActionButton
-        icon="plus"
-        style={styles.fab}
-        onPress={navigateToAddLocation}
-      />
-    </Padder>
+        <FloatingActionButton
+          icon="plus"
+          style={styles.fab}
+          onPress={navigateToAddLocation}
+        />
+      </Padder>
+    </Scroller>
   )
 }
