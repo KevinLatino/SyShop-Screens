@@ -82,7 +82,7 @@ export default () => {
         </List.Subheader>
 
         {
-          activeDeliveriesQuery.isLoading ?
+          activeDeliveriesQuery.isFetching ?
           <LoadingSpinner /> :
           <DeliveriesListItems
             deliveries={activeDeliveriesQuery.data}
@@ -94,7 +94,7 @@ export default () => {
         </List.Subheader>
 
         {
-          inactiveDeliveriesQuery.isLoading ?
+          inactiveDeliveriesQuery.isFetching ?
           <LoadingSpinner /> :
           <DeliveriesListItems
             deliveries={inactiveDeliveriesQuery.data}
