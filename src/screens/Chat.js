@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
-import { useSession } from '../context'
+import { useSession, useWebsocket } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
 import { call } from '../utilities/calls'
@@ -57,6 +57,19 @@ const fetchMessages = async (chatId) => {
   )
 
   return messages
+}
+
+const fetchChat = async (senderId, receiverId) => {
+  const payload = {
+    sender_id: senderId,
+    receiver_id: receiverId
+  }
+  const optionChat = await requestServer(
+    "/chat_service/get_chat_by_sender_and_receiver",
+    payload
+  )
+
+  return optionChat
 }
 
 const addMessage = async (message, senderId, receiverId) => {
@@ -136,10 +149,12 @@ export default () => {
   const route = useRoute()
   const queryClient = useQueryClient()
   const [session, _] = useSession()
+  const [websocket, __] = useWebsocket()
 
   const { chat } = route.params
 
   const [messages, setMessages] = useState([])
+  const [thisChatId, setThisChatId] = useState(chat.chat_id)
 
   const addMessageToState = (message) => {
     setMessages((previousMessages) => {
@@ -200,17 +215,32 @@ export default () => {
     setMessages(giftedFetchedMessages)
   }
 
-  const handleMutationSuccess = () => {
+  const handleMutationSuccess = async () => {
+    if (!thisChatId) {
+      const newChat = await fetchChat(
+        session.data.storeId, chat.user.user_id
+      )
+
+      setThisChatId(_ => newChat.chat_id)
+      setIsNew(_ => false)
+
+      return
+    }
+
     queryClient.refetchQueries({
-      queryKey: ["chatMessages", chat.chat_id]
+      queryKey: ["chatMessages", thisChatId]
+    })
+
+    queryClient.refetchQueries({
+      queryKey: ["listOfChats"]
     })
   }
 
   const messagesQuery = useQuery({
-    queryKey: ["chatMessages", chat.chat_id],
-    queryFn: () => fetchMessages(chat.chat_id),
+    queryKey: ["chatMessages", thisChatId],
+    queryFn: () => fetchMessages(thisChatId),
     onSuccess: handleLoadMessages,
-    enabled: chat.chat_id !== undefined
+    enabled: thisChatId !== undefined
   })
   const addMessageMutation = useMutation(
     ({ message, customerId, receiverId }) => addMessage(
@@ -222,6 +252,28 @@ export default () => {
       onSuccess: handleMutationSuccess
     }
   )
+
+  useEffect(() => {
+    websocket.addEventListener("message", (event) => {
+      if (event.type === "chat.message.added") {
+        messagesQuery.refetch()
+      }
+    })
+
+    return () => {
+      websocket.removeEventListener("message")
+    }
+  }, [])
+
+  useEffect(() => {
+    queryClient.refetchQueries({
+      queryKey: ["chatMessages", thisChatId]
+    })
+
+    queryClient.refetchQueries({
+      queryKey: ["listOfChats"]
+    })
+  }, [thisChatId])
 
   if (session.isLoading) {
     return (

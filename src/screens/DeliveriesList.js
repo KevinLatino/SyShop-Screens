@@ -1,12 +1,13 @@
+import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useSession } from '../context'
+import { useSession, useWebsocket } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import DeliveryTile from '../components/DeliveryTile'
 import SecondaryTitle from '../components/SecondaryTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Padder from '../components/Padder'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { List } from 'react-native-paper'
 
 const styles = StyleSheet.create({
@@ -52,6 +53,7 @@ const DeliveriesListItems = ({ deliveries }) => {
 
 export default () => {
   const [session, _] = useSession()
+  const [websocket, __] = useWebsocket()
 
   const activeDeliveriesQuery = useQuery({
     queryKey: ["activeDeliveries"],
@@ -63,6 +65,20 @@ export default () => {
     queryFn: () => fetchInactiveDeliveries(session.data.customerId),
     disabled: session.isLoading
   })
+
+  useEffect(() => {
+    websocket.addEventListener("message", (event) => {
+      if (event.type === "deliveries.delivery.status_updated") {
+        activeDeliveriesQuery.refetch()
+
+        inactiveDeliveriesQuery.refetch()
+      }
+    })
+
+    return () => {
+      websocket.addEventListener("message")
+    }
+  }, [])
 
   if (session.isLoading) {
     return (
