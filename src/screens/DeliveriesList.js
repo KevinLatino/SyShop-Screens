@@ -76,7 +76,7 @@ export default () => {
         Entregas que esperas
       </SecondaryTitle>
 
-      <List.Section style={{ flex: 1 }}>
+      <List.Section>
         <List.Subheader style={{ color: "green" }}>
           Entregas activas
         </List.Subheader>

@@ -77,6 +77,8 @@ const LocationsScrollView = ({ saleId }) => {
 
   const handleSuccess = (_) => {
     queryClient.refetchQueries({ queryKey: ["activeDeliveries"] })
+    queryClient.refetchQueries({ queryKey: ["inactiveDeliveries"] })
+    queryClient.refetchQueries({ queryKey: ["feedPosts"] })
 
     Alert.alert(
       "Éxito",
@@ -107,6 +109,7 @@ const LocationsScrollView = ({ saleId }) => {
   return (
     <View style={{ gap: 20, width: "100%", alignItems: "center" }}>
       <ScrollView
+        isDark
         style={{ width: "100%", height: "70%" }}
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}

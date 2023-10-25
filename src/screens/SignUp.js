@@ -105,7 +105,7 @@ export default () => {
   const [picture, setPicture] = useState(null)
 
   const handleSignUp = () => {
-    if (!form.validate()) {
+    if (!form.validate() || (picture === null)) {
       Alert.alert(
         "Información incompleta",
         "Ingresa la información necesaria para registrarte"

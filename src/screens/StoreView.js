@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
@@ -225,6 +225,7 @@ const ExtraInformationContainer = ({ followerCount, location, phoneNumber }) => 
 }
 
 const ActionsContainer = ({ store }) => {
+  const queryClient = useQueryClient()
   const navigation = useNavigation()
   const [session, _] = useSession()
 
@@ -261,8 +262,17 @@ const ActionsContainer = ({ store }) => {
     setIsFollowing(!isFollowing)
   }
 
+  const handleFollowStoreSuccess = () => {
+    queryClient.refetchQueries({
+      queryKey: ["feedPosts"]
+    })
+  }
+
   const followStoreMutation = useMutation(
-    ({ storeId, customerId }) => followStore(storeId, customerId)
+    ({ storeId, customerId }) => followStore(storeId, customerId),
+    {
+      onSuccess: handleFollowStoreSuccess
+    }
   )
 
   return (

@@ -16,9 +16,11 @@ const styles = StyleSheet.create({
     backgroundColor: configuration.BACKGROUND_COLOR
   },
   customerView: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 25
+    gap: 25,
+    padding: 20
   },
   fab: {
     position: "absolute",
@@ -69,7 +71,10 @@ const CustomerView = () => {
         size={90}
       />
 
-      <Text variant="titleLarge">
+      <Text
+        variant="titleLarge"
+        style={{ color: "white" }}
+      >
         {formatCustomerName(name, first_surname, second_surname)}
       </Text>
 
@@ -83,11 +88,14 @@ const CustomerView = () => {
       >
         <MaterialCommunityIcons
           name="phone"
-          size={64}
+          size={40}
           color="white"
         />
 
-        <Text variant="titleLarge">
+        <Text
+          variant="titleMedium"
+          style={{ color: "white" }}
+        >
           {phone_number}
         </Text>
       </View>

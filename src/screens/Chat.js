@@ -217,7 +217,7 @@ export default () => {
   const handleMutationSuccess = async () => {
     if (!thisChatId) {
       const newChat = await fetchChat(
-        session.data.storeId, chat.user.user_id
+        session.data.customerId, chat.user.user_id
       )
 
       setThisChatId(_ => newChat.chat_id)
