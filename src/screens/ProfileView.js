@@ -50,7 +50,7 @@ const CustomerView = () => {
     disabled: session.isLoading
   })
 
-  if (customerQuery.isLoading || session.isLoading) {
+  if (customerQuery.isFetching || session.isLoading) {
     return (
       <LoadingSpinner inScreen />
     )
@@ -73,7 +73,7 @@ const CustomerView = () => {
 
       <Text
         variant="titleLarge"
-        style={{ color: "white" }}
+        style={{ color: "white", textAlign: "center" }}
       >
         {formatCustomerName(name, first_surname, second_surname)}
       </Text>
