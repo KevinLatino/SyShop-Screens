@@ -89,12 +89,12 @@ const CustomerView = () => {
         <MaterialCommunityIcons
           name="phone"
           size={40}
-          color="white"
+          color={configuration.ACCENT_COLOR_1}
         />
 
         <Text
           variant="titleMedium"
-          style={{ color: "white" }}
+          style={{ color: configuration.ACCENT_COLOR_1 }}
         >
           {phone_number}
         </Text>
