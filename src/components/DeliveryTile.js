@@ -1,28 +1,18 @@
 import * as Linking from 'expo-linking'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { requestServer } from '../utilities/requests'
 import { Alert } from 'react-native'
 import { List, TouchableRipple } from 'react-native-paper'
+import configuration from '../configuration'
 
-const formatUberState = (uberState) => {
-  switch (uberState) {
-    case "pending":
-      return "buscando un repartidor"
-
-    case "pickup":
-      return "recogiendo el producto"
-
-    case "pickup_complete":
-      return "producto recogido"
-
-    case "dropoff":
-      return "entregando el producto"
-
-    case "delivered":
-      return "producto entregado"
-
-    case "delivered":
-    case "returned":
-      return "entrega cancelada"
+const activateDelivery = async (deliveryId) => {
+  const payload = {
+    delivery_id: deliveryId
   }
+  const _ = await requestServer(
+    "/deliveries_service/activate_delivery",
+    payload
+  )
 }
 
 const TrackLocationIcon = ({ delivery, ...props }) => {
@@ -46,23 +36,73 @@ const TrackLocationIcon = ({ delivery, ...props }) => {
     >
       <List.Icon
         {...props}
+        color={configuration.ACCENT_COLOR_1}
         icon="map-marker"
       />
     </TouchableRipple>
   )
 }
 
-export default ({ delivery }) =>  {
+export default ({ activable, delivery }) =>  {
+  const queryClient = useQueryClient()
+
+  const handleActivateDelivery = () => {
+    Alert.alert(
+      "¿Deseas activar esta entrega?",
+      "Estás apunto de activar esta entrega, una vez activada la entrega no podrás desactivarla",
+      [
+        {
+          text: "Cancelar",
+          onPress: null
+        },
+        {
+          text: "Activar",
+          onPress: () => {
+            activateDeliveryMutation.mutate({
+              deliveryId: delivery.delivery_id
+            })
+          }
+        }
+      ]
+    )
+  }
+
+  const handleActivateDeliverySuccess = () => {
+    queryClient.refetchQueries({
+      queryKey: ["activeDeliveries"]
+    })
+
+    queryClient.refetchQueries({
+      queryKey: ["inactiveDeliveries"] })
+  }
+
+  const activateDeliveryMutation = useMutation(
+    ({ deliveryId }) => activateDelivery(deliveryId),
+    {
+      onSuccess: handleActivateDeliverySuccess
+    }
+  )
+
   const title = delivery.post.title
   const amount = delivery.sale.amount
-  const uberState = delivery.uber_state
   const placeName = delivery.location.place_name
 
   return (
-    <List.Item
-      title={`${amount} ${amount === 1 ? "unidad" : "unidades"} de '${title}'`}
-      description={`${placeName}: ${uberState ? formatUberState(uberState) : "entrega sin asignar"}`}
-      left={(props) => <TrackLocationIcon {...props} delivery={delivery} />}
-    />
+    <TouchableRipple
+      disabled={!activable}
+      onPress={handleActivateDelivery}
+    >
+      <List.Item
+        titleStyle={{
+          color: configuration.SECONDARY_COLOR
+        }}
+        descriptionStyle={{
+          color: "silver"
+        }}
+        title={`${amount} ${amount === 1 ? "unidad" : "unidades"} de '${title}'`}
+        description={placeName}
+        left={(props) => <TrackLocationIcon {...props} delivery={delivery} />}
+      />
+    </TouchableRipple>
   )
 }

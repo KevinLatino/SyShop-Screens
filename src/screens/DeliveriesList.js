@@ -1,12 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
-import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
-import { View } from 'react-native'
-import { List, Text } from 'react-native-paper'
+import ScrollView from '../components/ScrollView'
 import DeliveryTile from '../components/DeliveryTile'
+import SecondaryTitle from '../components/SecondaryTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
+import Padder from '../components/Padder'
+import { StyleSheet } from 'react-native'
+import { List } from 'react-native-paper'
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white"
+  }
+})
 
 const fetchActiveDeliveries = async (customerId) => {
   const payload = {
@@ -33,29 +40,18 @@ const fetchInactiveDeliveries = async (customerId) => {
 }
 
 const DeliveriesListItems = ({ deliveries }) => {
-  const deliviriesListItems = deliveries.map((delivery) => {
-    return (
-      <DeliveryTile
-        key={delivery.delivery_id}
-        delivery={delivery}
-      />
-    )
-  })
-
   return (
-    <View>
-      {deliviriesListItems}
-    </View>
+    <ScrollView
+      neverEmpty
+      data={deliveries}
+      keyExtractor={(delivery) => delivery.delivery_id}
+      renderItem={({ item }) => <DeliveryTile delivery={item} />}
+    />
   )
 }
 
 export default () => {
-  const navigation = useNavigation()
   const [session, _] = useSession()
-
-  navigation.addListener("beforeRemove", (event) => {
-    event.preventDefault()
-  })
 
   const activeDeliveriesQuery = useQuery({
     queryKey: ["activeDeliveries"],
@@ -75,32 +71,36 @@ export default () => {
   }
 
   return (
-    <Screen>
-      <Text variant="titleLarge">
+    <Padder style={styles.container}>
+      <SecondaryTitle>
         Entregas que esperas
-      </Text>
+      </SecondaryTitle>
 
       <List.Section>
-        <List.Subheader>
+        <List.Subheader style={{ color: "green" }}>
           Entregas activas
         </List.Subheader>
 
         {
-          activeDeliveriesQuery.isLoading ?
+          activeDeliveriesQuery.isFetching ?
           <LoadingSpinner /> :
-          <DeliveriesListItems deliveries={activeDeliveriesQuery.data} />
+          <DeliveriesListItems
+            deliveries={activeDeliveriesQuery.data}
+          />
         }
 
-        <List.Subheader>
+        <List.Subheader style={{ color: "red" }}>
           Entregas inactivas
         </List.Subheader>
 
         {
-          inactiveDeliveriesQuery.isLoading ?
+          inactiveDeliveriesQuery.isFetching ?
           <LoadingSpinner /> :
-          <DeliveriesListItems deliveries={inactiveDeliveriesQuery.data} />
+          <DeliveriesListItems
+            deliveries={inactiveDeliveriesQuery.data}
+          />
         }
       </List.Section>
-    </Screen>
+    </Padder>
   )
 }

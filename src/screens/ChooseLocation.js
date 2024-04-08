@@ -4,15 +4,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
+import Padder from '../components/Padder'
+import Scroller from '../components/Scroller'
 import LoadingSpinner from '../components/LoadingSpinner'
 import LocationTile from '../components/LocationTile'
 import Button from '../components/Button'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Fragment } from 'react'
-import { View, StyleSheet, Alert, Dimensions } from 'react-native'
-import { FAB } from 'react-native-paper'
+import Title from '../components/Title'
+import FloatingActionButton from '../components/FloatingActionButton'
+import { View, Alert, StyleSheet, Dimensions } from 'react-native'
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: "100%"
+  },
   buttonContainer: {
     width: "100%",
     position: "absolute",
@@ -22,7 +29,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    top: Dimensions.get("screen").height * 0.85,
+    top: Dimensions.get("screen").height * 0.8,
     left: Dimensions.get("screen").width * 0.8
   }
 })
@@ -70,13 +77,15 @@ const LocationsScrollView = ({ saleId }) => {
 
   const handleSuccess = (_) => {
     queryClient.refetchQueries({ queryKey: ["activeDeliveries"] })
+    queryClient.refetchQueries({ queryKey: ["inactiveDeliveries"] })
+    queryClient.refetchQueries({ queryKey: ["feedPosts"] })
 
     Alert.alert(
       "Éxito",
       "Tu entrega ahora está pendiente"
     )
 
-    navigation.goBack()
+    navigation.navigate("Home")
   }
 
   const locationsQuery = useQuery({
@@ -98,22 +107,10 @@ const LocationsScrollView = ({ saleId }) => {
   }
 
   return (
-    <View>
-      <View style={{ padding: 20, justifyContent: "center", alignItems: "center" }}>
-        <Button
-          style={{ width: "70%" }}
-          onPress={handleSubmit}
-          disabled={selectedLocation === null || createDeliveryMutation.isLoading}
-        >
-          {
-            createDeliveryMutation.isLoading ?
-            <LoadingSpinner /> :
-            "Programar entrega"
-          }
-        </Button>
-      </View>
-
+    <View style={{ gap: 20, width: "100%", alignItems: "center" }}>
       <ScrollView
+        isDark
+        style={{ width: "100%", height: "70%" }}
         data={locationsQuery.data}
         keyExtractor={(location) => location.location_id}
         renderItem={
@@ -133,6 +130,18 @@ const LocationsScrollView = ({ saleId }) => {
         emptyIcon="map-marker"
         emptyMessage="No has añadido ningún domicilio"
       />
+
+      <Button
+        style={{ width: "70%" }}
+        onPress={handleSubmit}
+        disabled={selectedLocation === null || createDeliveryMutation.isLoading}
+      >
+        {
+          createDeliveryMutation.isLoading ?
+          <LoadingSpinner /> :
+          "Programar entrega"
+        }
+      </Button>
     </View>
   )
 }
@@ -148,16 +157,22 @@ export default () => {
   }
 
   return (
-    <Fragment>
-      <SafeAreaView>
-        <LocationsScrollView saleId={saleId} />
-      </SafeAreaView>
+    <Scroller>
+      <Padder style={styles.container}>
+        <Title>
+          Escoge el destino de tu compra
+        </Title>
 
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={navigateToAddLocation}
-      />
-    </Fragment>
+        <LocationsScrollView
+          saleId={saleId}
+        />
+
+        <FloatingActionButton
+          icon="plus"
+          style={styles.fab}
+          onPress={navigateToAddLocation}
+        />
+      </Padder>
+    </Scroller>
   )
 }

@@ -1,12 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
-import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { requestServer } from '../utilities/requests'
 import ScrollView from '../components/ScrollView'
 import ChatTile from '../components/ChatTile'
 import LoadingSpinner from '../components/LoadingSpinner'
-import Screen from '../components/Screen'
-import { Text } from 'react-native-paper'
+import Padder from '../components/Padder'
+import SecondaryTitle from '../components/SecondaryTitle'
+import { StyleSheet } from 'react-native'
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    gap: 20
+  }
+})
 
 const fetchChats = async (customerId) => {
   const payload = {
@@ -21,12 +28,7 @@ const fetchChats = async (customerId) => {
 }
 
 export default () => {
-  const navigation = useNavigation()
   const [session, _] = useSession()
-
-  navigation.addListener("beforeRemove", (event) => {
-    event.preventDefault()
-  })
 
   const chatsQuery = useQuery({
     queryKey: ["listOfChats"],
@@ -41,10 +43,10 @@ export default () => {
   }
 
   return (
-    <Screen>
-      <Text variant="titleLarge">
+    <Padder style={styles.container}>
+      <SecondaryTitle>
         Tus mensajes
-      </Text>
+      </SecondaryTitle>
 
       <ScrollView
         data={chatsQuery.data}
@@ -53,6 +55,6 @@ export default () => {
         emptyIcon="chat"
         emptyMessage="No has hablado con nadie"
       />
-    </Screen>
+    </Padder>
   )
 }

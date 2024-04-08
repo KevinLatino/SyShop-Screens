@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai'
+import { atom, useAtom } from 'jotai'
 import { atomWithStorage, createJSONStorage, loadable } from 'jotai/utils'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 

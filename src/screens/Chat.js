@@ -1,32 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { useSession } from '../context'
 import { useRoute } from '@react-navigation/native'
 import { requestServer } from '../utilities/requests'
+import { call } from '../utilities/calls'
 import { selectPictureFromGallery } from '../utilities/camera'
 import { formatBase64String } from '../utilities/formatting'
-import { v4 as uuidv4 } from 'uuid'
+import uuid from 'react-native-uuid'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, TouchableOpacity, StyleSheet} from 'react-native'
 import { List, IconButton, Avatar } from 'react-native-paper'
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+import configuration from '../configuration'
 
 const styles = StyleSheet.create({
   headerLoadingView: {
     padding: 10,
     width: "100%",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    backgroundColor: "white"
   }
 })
-
-const generateId = () => {
-  const id = Date.now().toString()
-
-  return id
-}
 
 const giftMessage = (message) => {
   const text =
@@ -62,6 +59,19 @@ const fetchMessages = async (chatId) => {
   return messages
 }
 
+const fetchChat = async (senderId, receiverId) => {
+  const payload = {
+    sender_id: senderId,
+    receiver_id: receiverId
+  }
+  const optionChat = await requestServer(
+    "/chat_service/get_chat_by_sender_and_receiver",
+    payload
+  )
+
+  return optionChat
+}
+
 const addMessage = async (message, senderId, receiverId) => {
   const payload = {
     sender_id: senderId,
@@ -86,6 +96,10 @@ const Header = ({ chat, isLoading }) => {
     )
   }
 
+  const handleCallUser = async () => {
+    call(chat.user.phone_number)
+  }
+
   return (
     <TouchableOpacity onPress={navigateToStoreView}>
       {
@@ -101,6 +115,8 @@ const Header = ({ chat, isLoading }) => {
       }
 
       <List.Item
+        style={{ backgroundColor: "white" }}
+        titleStyle={{ color: configuration.SECONDARY_COLOR }}
         title={chat.user.name}
         left={(props) => {
           return (
@@ -110,6 +126,17 @@ const Header = ({ chat, isLoading }) => {
               source={{
                 uri: formatBase64String(chat.user.picture)
               }}
+            />
+          )
+        }}
+        right={(props) => {
+          return (
+            <IconButton
+              {...props}
+              icon="phone"
+              iconColor={configuration.ACCENT_COLOR_1}
+              style={{ backgroundColor: "white" }}
+              onPress={handleCallUser}
             />
           )
         }}
@@ -169,7 +196,7 @@ export default () => {
     })
 
     const giftedMessage = {
-      _id: generateId(),
+      _id: uuid.v4(),
       image: formatBase64String(picture),
       createdAt: new Date(),
       user: {
@@ -186,9 +213,15 @@ export default () => {
     setMessages(giftedFetchedMessages)
   }
 
-  const handleMutationSuccess = () => {
+  const handleMutationSuccess = async () => {
+    if (chat.chat_id !== undefined) {
+      queryClient.refetchQueries({
+        queryKey: ["chatMessages", chat.chat_id]
+      })
+    }
+
     queryClient.refetchQueries({
-      queryKey: ["chatMessages", chat.chat_id]
+      queryKey: ["listOfChats"]
     })
   }
 
@@ -215,6 +248,19 @@ export default () => {
     )
   }
 
+  const renderBubble = (props) => {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: configuration.BACKGROUND_COLOR
+          }
+        }}
+      />
+    )
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header
@@ -230,7 +276,12 @@ export default () => {
         }}
 
         placeholder='Mensaje...'
-        renderActions={() => <IconButton icon="camera-outline" onPress={handlePictureMessageChoosen}/>}
+        renderBubble={renderBubble}
+        renderActions={() => <IconButton
+          icon="camera-outline"
+          iconColor={configuration.SECONDARY_COLOR}
+          onPress={handlePictureMessageChoosen}
+        />}
         renderLoading={() => <LoadingSpinner inScreen /> }
 
         scrollToBottom
